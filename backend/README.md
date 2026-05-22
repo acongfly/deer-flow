@@ -1,10 +1,10 @@
 # DeerFlow Backend
 
-DeerFlow is a LangGraph-based AI super agent with sandbox execution, persistent memory, and extensible tool integration. The backend enables AI agents to execute code, browse the web, manage files, delegate tasks to subagents, and retain context across conversations - all in isolated, per-thread environments.
+DeerFlow 是一个基于 LangGraph 的 AI super agent，具备 sandbox 执行、持久化 memory 以及可扩展的工具集成。后端使 AI agent 能够执行代码、浏览网页、管理文件、将任务委派给 subagent，并在对话间保留上下文——所有这些都运行在隔离的、按线程划分的环境中。
 
 ---
 
-## Architecture
+## 架构
 
 ```
                         ┌──────────────────────────────────────┐
@@ -29,118 +29,118 @@ DeerFlow is a LangGraph-based AI super agent with sandbox execution, persistent 
                └────────────────────────────────────────┘
 ```
 
-**Request Routing** (via Nginx):
-- `/api/langgraph/*` → Gateway LangGraph-compatible API - agent interactions, threads, streaming
-- `/api/*` (other) → Gateway API - models, MCP, skills, memory, artifacts, uploads, thread-local cleanup
-- `/` (non-API) → Frontend - Next.js web interface
+**请求路由**（通过 Nginx）：
+- `/api/langgraph/*` → Gateway 兼容 LangGraph 的 API —— agent 交互、线程、流式传输
+- `/api/*`（其他）→ Gateway API —— models、MCP、skills、memory、artifacts、uploads、线程本地清理
+- `/`（非 API）→ Frontend —— Next.js Web 界面
 
 ---
 
-## Core Components
+## 核心组件
 
 ### Lead Agent
 
-The single LangGraph agent (`lead_agent`) is the runtime entry point, created via `make_lead_agent(config)`. It combines:
+单个 LangGraph agent（`lead_agent`）是运行时入口，通过 `make_lead_agent(config)` 创建。它组合了：
 
-- **Dynamic model selection** with thinking and vision support
-- **Middleware chain** for cross-cutting concerns (9 middlewares)
-- **Tool system** with sandbox, MCP, community, and built-in tools
-- **Subagent delegation** for parallel task execution
-- **System prompt** with skills injection, memory context, and working directory guidance
+- 具备 thinking 和 vision 支持的**动态模型选择**
+- 用于处理横切关注点的 **Middleware 链**（9 个 middleware）
+- 包含 sandbox、MCP、community 和内置工具的**工具系统**
+- 用于并行任务执行的 **subagent 委派**
+- 带有 skills 注入、memory 上下文和工作目录指引的 **system prompt**
 
-### Middleware Chain
+### Middleware 链
 
-Middlewares execute in strict order, each handling a specific concern:
+Middlewares 按严格顺序执行，每个 middleware 处理一个特定关注点：
 
-| # | Middleware | Purpose |
-|---|-----------|---------|
-| 1 | **ThreadDataMiddleware** | Creates per-thread isolated directories (workspace, uploads, outputs) |
-| 2 | **UploadsMiddleware** | Injects newly uploaded files into conversation context |
-| 3 | **SandboxMiddleware** | Acquires sandbox environment for code execution |
-| 4 | **SummarizationMiddleware** | Reduces context when approaching token limits (optional) |
-| 5 | **TodoListMiddleware** | Tracks multi-step tasks in plan mode (optional) |
-| 6 | **TitleMiddleware** | Auto-generates conversation titles after first exchange |
-| 7 | **MemoryMiddleware** | Queues conversations for async memory extraction |
-| 8 | **ViewImageMiddleware** | Injects image data for vision-capable models (conditional) |
-| 9 | **ClarificationMiddleware** | Intercepts clarification requests and interrupts execution (must be last) |
+| # | Middleware | 作用 |
+|---|-----------|------|
+| 1 | **ThreadDataMiddleware** | 创建按线程隔离的目录（workspace、uploads、outputs） |
+| 2 | **UploadsMiddleware** | 将新上传的文件注入到对话上下文中 |
+| 3 | **SandboxMiddleware** | 获取用于代码执行的 sandbox 环境 |
+| 4 | **SummarizationMiddleware** | 在接近 token 限制时压缩上下文（可选） |
+| 5 | **TodoListMiddleware** | 在 plan mode 中跟踪多步骤任务（可选） |
+| 6 | **TitleMiddleware** | 在首次交互后自动生成对话标题 |
+| 7 | **MemoryMiddleware** | 将对话加入异步 memory 提取队列 |
+| 8 | **ViewImageMiddleware** | 为支持 vision 的模型注入图像数据（条件启用） |
+| 9 | **ClarificationMiddleware** | 拦截澄清请求并中断执行（必须最后） |
 
-### Sandbox System
+### Sandbox 系统
 
-Per-thread isolated execution with virtual path translation:
+具备虚拟路径转换的按线程隔离执行：
 
-- **Abstract interface**: `execute_command`, `read_file`, `write_file`, `list_dir`
-- **Providers**: `LocalSandboxProvider` (filesystem) and `AioSandboxProvider` (Docker, in community/). Async runtime paths use async sandbox lifecycle hooks so startup, readiness polling, and release do not block the event loop.
-- **Virtual paths**: `/mnt/user-data/{workspace,uploads,outputs}` → thread-specific physical directories
-- **Skills path**: `/mnt/skills` → `deer-flow/skills/` directory
-- **Skills loading**: Recursively discovers nested `SKILL.md` files under `skills/{public,custom}` and preserves nested container paths
-- **File-write safety**: `str_replace` serializes read-modify-write per `(sandbox.id, path)` so isolated sandboxes keep concurrency even when virtual paths match
-- **Tools**: `bash`, `ls`, `read_file`, `write_file`, `str_replace` (`write_file` overwrites by default and exposes `append` for end-of-file writes; `bash` is disabled by default when using `LocalSandboxProvider`; use `AioSandboxProvider` for isolated shell access)
+- **抽象接口**：`execute_command`、`read_file`、`write_file`、`list_dir`
+- **Providers**：`LocalSandboxProvider`（文件系统）和 `AioSandboxProvider`（Docker，位于 community/）。异步运行时路径使用异步 sandbox 生命周期钩子，因此启动、就绪轮询和释放不会阻塞事件循环。
+- **虚拟路径**：`/mnt/user-data/{workspace,uploads,outputs}` → 线程专属物理目录
+- **Skills 路径**：`/mnt/skills` → `deer-flow/skills/` 目录
+- **Skills 加载**：递归发现 `skills/{public,custom}` 下嵌套的 `SKILL.md` 文件，并保留嵌套容器路径
+- **文件写入安全性**：`str_replace` 按 `(sandbox.id, path)` 串行化读-改-写，因此即使虚拟路径相同，隔离的 sandboxes 也能保持并发
+- **工具**：`bash`、`ls`、`read_file`、`write_file`、`str_replace`（`write_file` 默认覆盖，并暴露 `append` 用于文件末尾追加；使用 `LocalSandboxProvider` 时默认禁用 `bash`；若需要隔离的 shell 访问，请使用 `AioSandboxProvider`）
 
-### Subagent System
+### Subagent 系统
 
-Async task delegation with concurrent execution:
+具备并发执行能力的异步任务委派：
 
-- **Built-in agents**: `general-purpose` (full toolset) and `bash` (command specialist, exposed only when shell access is available)
-- **Concurrency**: Max 3 subagents per turn, 15-minute timeout
-- **Execution**: Background thread pools with status tracking and SSE events
-- **Flow**: Agent calls `task()` tool → executor runs subagent in background → polls for completion → returns result
+- **内置 agents**：`general-purpose`（完整工具集）和 `bash`（命令专家，仅在可用 shell 访问时暴露）
+- **并发**：每轮最多 3 个 subagent，超时时间 15 分钟
+- **执行**：带有状态跟踪和 SSE 事件的后台线程池
+- **流程**：Agent 调用 `task()` 工具 → executor 在后台运行 subagent → 轮询直到完成 → 返回结果
 
-### Memory System
+### Memory 系统
 
-LLM-powered persistent context retention across conversations:
+由 LLM 驱动、可在对话间保留上下文的持久化机制：
 
-- **Automatic extraction**: Analyzes conversations for user context, facts, and preferences
-- **Structured storage**: User context (work, personal, top-of-mind), history, and confidence-scored facts
-- **Debounced updates**: Batches updates to minimize LLM calls (configurable wait time)
-- **System prompt injection**: Top facts + context injected into agent prompts
-- **Storage**: JSON file with mtime-based cache invalidation
+- **自动提取**：分析对话中的用户上下文、事实和偏好
+- **结构化存储**：用户上下文（工作、个人、当前关注）、历史以及带置信度评分的事实
+- **去抖更新**：批量更新以减少 LLM 调用（等待时间可配置）
+- **System prompt 注入**：将关键事实和上下文注入到 agent prompt 中
+- **存储**：带有基于 mtime 的缓存失效机制的 JSON 文件
 
-### Tool Ecosystem
+### 工具生态
 
-| Category | Tools |
+| 类别 | 工具 |
 |----------|-------|
-| **Sandbox** | `bash`, `ls`, `read_file`, `write_file`, `str_replace` |
-| **Built-in** | `present_files`, `ask_clarification`, `view_image`, `task` (subagent) |
-| **Community** | Tavily (web search), Jina AI (web fetch), Firecrawl (scraping), DuckDuckGo (image search) |
-| **MCP** | Any Model Context Protocol server (stdio, SSE, HTTP transports) |
-| **Skills** | Domain-specific workflows injected via system prompt |
+| **Sandbox** | `bash`、`ls`、`read_file`、`write_file`、`str_replace` |
+| **内置** | `present_files`、`ask_clarification`、`view_image`、`task`（subagent） |
+| **Community** | Tavily（Web 搜索）、Jina AI（网页抓取）、Firecrawl（抓取）、DuckDuckGo（图片搜索） |
+| **MCP** | 任意 Model Context Protocol 服务器（stdio、SSE、HTTP 传输） |
+| **Skills** | 通过 system prompt 注入的领域特定工作流 |
 
 ### Gateway API
 
-FastAPI application providing REST endpoints for frontend integration:
+提供用于 frontend 集成的 REST 端点的 FastAPI 应用：
 
-| Route | Purpose |
-|-------|---------|
-| `GET /api/models` | List available LLM models |
-| `GET/PUT /api/mcp/config` | Manage MCP server configurations |
-| `GET/PUT /api/skills` | List and manage skills |
-| `POST /api/skills/install` | Install skill from `.skill` archive |
-| `GET /api/memory` | Retrieve memory data |
-| `POST /api/memory/reload` | Force memory reload |
-| `GET /api/memory/config` | Memory configuration |
-| `GET /api/memory/status` | Combined config + data |
-| `POST /api/threads/{id}/uploads` | Upload files (auto-converts PDF/PPT/Excel/Word to Markdown, rejects directory paths, auto-renames duplicate filenames in one request) |
-| `GET /api/threads/{id}/uploads/list` | List uploaded files |
-| `DELETE /api/threads/{id}` | Delete DeerFlow-managed local thread data after LangGraph thread deletion; unexpected failures are logged server-side and return a generic 500 detail |
-| `GET /api/threads/{id}/artifacts/{path}` | Serve generated artifacts |
+| 路由 | 作用 |
+|-------|------|
+| `GET /api/models` | 列出可用的 LLM models |
+| `GET/PUT /api/mcp/config` | 管理 MCP server 配置 |
+| `GET/PUT /api/skills` | 列出并管理 skills |
+| `POST /api/skills/install` | 从 `.skill` 压缩包安装 skill |
+| `GET /api/memory` | 获取 memory 数据 |
+| `POST /api/memory/reload` | 强制重新加载 memory |
+| `GET /api/memory/config` | Memory 配置 |
+| `GET /api/memory/status` | 合并后的配置 + 数据 |
+| `POST /api/threads/{id}/uploads` | 上传文件（自动将 PDF/PPT/Excel/Word 转换为 Markdown，拒绝目录路径，并在单次请求中自动重命名重复文件名） |
+| `GET /api/threads/{id}/uploads/list` | 列出已上传文件 |
+| `DELETE /api/threads/{id}` | 在 LangGraph 删除线程后，删除由 DeerFlow 管理的本地线程数据；意外失败会在服务端记录日志，并返回通用的 500 detail |
+| `GET /api/threads/{id}/artifacts/{path}` | 提供生成的 artifacts |
 
 ### IM Channels
 
-The IM bridge supports Feishu, Slack, and Telegram. Slack and Telegram still use the final `runs.wait()` response path, while Feishu now streams through `runs.stream(["messages-tuple", "values"])` and updates a single in-thread card in place.
+IM bridge 支持 Feishu、Slack 和 Telegram。Slack 和 Telegram 仍然使用最终的 `runs.wait()` 响应路径，而 Feishu 现在通过 `runs.stream(["messages-tuple", "values"])` 进行流式传输，并在原位更新同一张线程卡片。
 
-For Feishu card updates, DeerFlow stores the running card's `message_id` per inbound message and patches that same card until the run finishes, preserving the existing `OK` / `DONE` reaction flow.
+对于 Feishu 卡片更新，DeerFlow 会为每条入站消息存储运行中卡片的 `message_id`，并在 run 结束前持续 patch 同一张卡片，从而保留现有的 `OK` / `DONE` 反应流程。
 
 ---
 
-## Quick Start
+## 快速开始
 
-### Prerequisites
+### 先决条件
 
 - Python 3.12+
-- [uv](https://docs.astral.sh/uv/) package manager
-- API keys for your chosen LLM provider
+- [uv](https://docs.astral.sh/uv/) 包管理器
+- 你所选 LLM provider 的 API 密钥
 
-### Installation
+### 安装
 
 ```bash
 cd deer-flow
@@ -153,9 +153,9 @@ cd backend
 make install
 ```
 
-### Configuration
+### 配置
 
-Edit `config.yaml` in the project root:
+编辑项目根目录中的 `config.yaml`：
 
 ```yaml
 models:
@@ -177,34 +177,34 @@ models:
     supports_vision: true
 ```
 
-Set your API keys:
+设置你的 API 密钥：
 
 ```bash
 export OPENAI_API_KEY="your-api-key-here"
 ```
 
-### Running
+### 运行
 
-**Full Application** (from project root):
+**完整应用**（在项目根目录中）：
 
 ```bash
 make dev  # Starts Gateway + Frontend + Nginx
 ```
 
-Access at: http://localhost:2026
+访问地址：http://localhost:2026
 
-**Backend Only** (from backend directory):
+**仅后端**（在 backend 目录中）：
 
 ```bash
 # Gateway API + embedded agent runtime
 make dev
 ```
 
-Direct access: Gateway at http://localhost:8001
+直接访问：Gateway 位于 http://localhost:8001
 
 ---
 
-## Project Structure
+## 项目结构
 
 ```
 backend/
@@ -242,36 +242,34 @@ backend/
 └── Dockerfile                  # Container build
 ```
 
-`langgraph.json` is not the default service entrypoint.  The scripts and Docker
-deployments run the Gateway embedded runtime; the file is kept for LangGraph
-tooling, Studio, or direct LangGraph Server compatibility.
+`langgraph.json` 并不是默认的服务入口点。脚本和 Docker 部署运行的是 Gateway 内嵌运行时；该文件保留用于 LangGraph 工具、Studio 或直接兼容 LangGraph Server。
 
 ---
 
-## Configuration
+## 配置
 
-### Main Configuration (`config.yaml`)
+### 主配置（`config.yaml`）
 
-Place in project root. Config values starting with `$` resolve as environment variables.
+放在项目根目录中。以 `$` 开头的配置值会解析为环境变量。
 
-Key sections:
-- `models` - LLM configurations with class paths, API keys, thinking/vision flags
-- `tools` - Tool definitions with module paths and groups
-- `tool_groups` - Logical tool groupings
-- `sandbox` - Execution environment provider
-- `skills` - Skills directory paths
-- `title` - Auto-title generation settings
-- `summarization` - Context summarization settings
-- `subagents` - Subagent system (enabled/disabled)
-- `memory` - Memory system settings (enabled, storage, debounce, facts limits)
+关键部分：
+- `models` - 带有类路径、API 密钥、thinking/vision 标志的 LLM 配置
+- `tools` - 带有模块路径和分组的工具定义
+- `tool_groups` - 工具的逻辑分组
+- `sandbox` - 执行环境 provider
+- `skills` - skills 目录路径
+- `title` - 自动标题生成设置
+- `summarization` - 上下文总结设置
+- `subagents` - Subagent 系统（启用/禁用）
+- `memory` - Memory 系统设置（启用、存储、去抖、事实数量限制）
 
-Provider note:
-- `models[*].use` references provider classes by module path (for example `langchain_openai:ChatOpenAI`).
-- If a provider module is missing, DeerFlow now returns an actionable error with install guidance (for example `uv add langchain-google-genai`).
+Provider 说明：
+- `models[*].use` 通过模块路径引用 provider 类（例如 `langchain_openai:ChatOpenAI`）。
+- 如果缺少 provider 模块，DeerFlow 现在会返回带有安装指引的可操作错误（例如 `uv add langchain-google-genai`）。
 
-### Extensions Configuration (`extensions_config.json`)
+### 扩展配置（`extensions_config.json`）
 
-MCP servers and skill states in a single file:
+将 MCP servers 和 skill 状态放在同一个文件中：
 
 ```json
 {
@@ -302,21 +300,21 @@ MCP servers and skill states in a single file:
 }
 ```
 
-### Environment Variables
+### 环境变量
 
-- `DEER_FLOW_CONFIG_PATH` - Override config.yaml location
-- `DEER_FLOW_EXTENSIONS_CONFIG_PATH` - Override extensions_config.json location
-- Model API keys: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `DEEPSEEK_API_KEY`, etc.
-- Tool API keys: `TAVILY_API_KEY`, `GITHUB_TOKEN`, etc.
+- `DEER_FLOW_CONFIG_PATH` - 覆盖 `config.yaml` 位置
+- `DEER_FLOW_EXTENSIONS_CONFIG_PATH` - 覆盖 `extensions_config.json` 位置
+- Model API 密钥：`OPENAI_API_KEY`、`ANTHROPIC_API_KEY`、`DEEPSEEK_API_KEY` 等
+- Tool API 密钥：`TAVILY_API_KEY`、`GITHUB_TOKEN` 等
 
 ### LangSmith Tracing
 
-DeerFlow has built-in [LangSmith](https://smith.langchain.com) integration for observability. When enabled, all LLM calls, agent runs, tool executions, and middleware processing are traced and visible in the LangSmith dashboard.
+DeerFlow 内置了 [LangSmith](https://smith.langchain.com) 集成，用于可观测性。启用后，所有 LLM 调用、agent runs、工具执行和 middleware 处理都会被追踪，并可在 LangSmith 仪表板中查看。
 
-**Setup:**
+**设置：**
 
-1. Sign up at [smith.langchain.com](https://smith.langchain.com) and create a project.
-2. Add the following to your `.env` file in the project root:
+1. 在 [smith.langchain.com](https://smith.langchain.com) 注册并创建一个项目。
+2. 将以下内容添加到项目根目录中的 `.env` 文件：
 
 ```bash
 LANGSMITH_TRACING=true
@@ -325,13 +323,13 @@ LANGSMITH_API_KEY=lsv2_pt_xxxxxxxxxxxxxxxx
 LANGSMITH_PROJECT=xxx
 ```
 
-**Legacy variables:** The `LANGCHAIN_TRACING_V2`, `LANGCHAIN_API_KEY`, `LANGCHAIN_PROJECT`, and `LANGCHAIN_ENDPOINT` variables are also supported for backward compatibility. `LANGSMITH_*` variables take precedence when both are set.
+**旧版变量：** 也支持 `LANGCHAIN_TRACING_V2`、`LANGCHAIN_API_KEY`、`LANGCHAIN_PROJECT` 和 `LANGCHAIN_ENDPOINT` 变量以保持向后兼容。当两者都设置时，`LANGSMITH_*` 变量优先。
 
 ### Langfuse Tracing
 
-DeerFlow also supports [Langfuse](https://langfuse.com) observability for LangChain-compatible runs.
+DeerFlow 还支持 [Langfuse](https://langfuse.com) 对兼容 LangChain 的运行进行可观测性追踪。
 
-Add the following to your `.env` file:
+将以下内容添加到你的 `.env` 文件：
 
 ```bash
 LANGFUSE_TRACING=true
@@ -340,21 +338,21 @@ LANGFUSE_SECRET_KEY=sk-lf-xxxxxxxxxxxxxxxx
 LANGFUSE_BASE_URL=https://cloud.langfuse.com
 ```
 
-If you are using a self-hosted Langfuse deployment, set `LANGFUSE_BASE_URL` to your Langfuse host.
+如果你使用的是自托管 Langfuse 部署，请将 `LANGFUSE_BASE_URL` 设置为你的 Langfuse 主机。
 
-### Dual Provider Behavior
+### 双 Provider 行为
 
-If both LangSmith and Langfuse are enabled, DeerFlow initializes and attaches both callbacks so the same run data is reported to both systems.
+如果同时启用了 LangSmith 和 Langfuse，DeerFlow 会初始化并附加两者的 callbacks，使同一份运行数据同时上报到两个系统。
 
-If a provider is explicitly enabled but required credentials are missing, or the provider callback cannot be initialized, DeerFlow raises an error when tracing is initialized during model creation instead of silently disabling tracing.
+如果某个 provider 被显式启用但缺少必需凭据，或者无法初始化 provider callback，DeerFlow 会在创建模型期间初始化 tracing 时抛出错误，而不是静默禁用 tracing。
 
-**Docker:** In `docker-compose.yaml`, tracing is disabled by default (`LANGSMITH_TRACING=false`). Set `LANGSMITH_TRACING=true` and/or `LANGFUSE_TRACING=true` in your `.env`, together with the required credentials, to enable tracing in containerized deployments.
+**Docker：** 在 `docker-compose.yaml` 中，默认禁用 tracing（`LANGSMITH_TRACING=false`）。要在容器化部署中启用 tracing，请在你的 `.env` 中设置 `LANGSMITH_TRACING=true` 和/或 `LANGFUSE_TRACING=true`，并同时提供所需凭据。
 
 ---
 
-## Development
+## 开发
 
-### Commands
+### 命令
 
 ```bash
 make install    # Install dependencies
@@ -364,15 +362,15 @@ make lint       # Run linter (ruff)
 make format     # Format code (ruff)
 ```
 
-### Code Style
+### 代码风格
 
-- **Linter/Formatter**: `ruff`
-- **Line length**: 240 characters
-- **Python**: 3.12+ with type hints
-- **Quotes**: Double quotes
-- **Indentation**: 4 spaces
+- **Linter/Formatter**：`ruff`
+- **行长度**：240 个字符
+- **Python**：3.12+，带类型提示
+- **引号**：双引号
+- **缩进**：4 个空格
 
-### Testing
+### 测试
 
 ```bash
 uv run pytest
@@ -380,35 +378,35 @@ uv run pytest
 
 ---
 
-## Technology Stack
+## 技术栈
 
-- **LangGraph** (1.0.6+) - Agent framework and multi-agent orchestration
-- **LangChain** (1.2.3+) - LLM abstractions and tool system
-- **FastAPI** (0.115.0+) - Gateway REST API
-- **langchain-mcp-adapters** - Model Context Protocol support
-- **agent-sandbox** - Sandboxed code execution
-- **markitdown** - Multi-format document conversion
-- **tavily-python** / **firecrawl-py** - Web search and scraping
+- **LangGraph**（1.0.6+）- Agent 框架与多 agent 编排
+- **LangChain**（1.2.3+）- LLM 抽象与工具系统
+- **FastAPI**（0.115.0+）- Gateway REST API
+- **langchain-mcp-adapters** - Model Context Protocol 支持
+- **agent-sandbox** - 沙箱化代码执行
+- **markitdown** - 多格式文档转换
+- **tavily-python** / **firecrawl-py** - Web 搜索与抓取
 
 ---
 
-## Documentation
+## 文档
 
-- [Configuration Guide](docs/CONFIGURATION.md)
-- [Architecture Details](docs/ARCHITECTURE.md)
-- [API Reference](docs/API.md)
-- [File Upload](docs/FILE_UPLOAD.md)
-- [Path Examples](docs/PATH_EXAMPLES.md)
-- [Context Summarization](docs/summarization.md)
+- [配置指南](docs/CONFIGURATION.md)
+- [架构细节](docs/ARCHITECTURE.md)
+- [API 参考](docs/API.md)
+- [文件上传](docs/FILE_UPLOAD.md)
+- [路径示例](docs/PATH_EXAMPLES.md)
+- [上下文总结](docs/summarization.md)
 - [Plan Mode](docs/plan_mode_usage.md)
-- [Setup Guide](docs/SETUP.md)
+- [安装指南](docs/SETUP.md)
 
 ---
 
-## License
+## 许可证
 
-See the [LICENSE](../LICENSE) file in the project root.
+请参阅项目根目录中的 [LICENSE](../LICENSE) 文件。
 
-## Contributing
+## 贡献
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+贡献指南请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。
