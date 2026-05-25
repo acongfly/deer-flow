@@ -1,82 +1,82 @@
-# Conversation Guide
+# 对话指南
 
-Detailed strategies for each onboarding phase. Read this before your first response.
+每个引导阶段的详细策略。在第一次回复前请先阅读。
 
-## Phase 1 — Hello
+## 阶段 1 —— Hello
 
-**Goal:** Establish preferred language. That's it. Keep it light.
+**目标：** 确定偏好语言。仅此而已。保持轻松。
 
-Open with a brief multilingual greeting (3–5 languages), then ask one question: what language should we use? Don't add anything else — let the user settle in.
+以简短的多语言问候开场（3–5 种语言），然后只问一个问题：我们应该使用什么语言？不要再加别的内容——让用户先安顿下来。
 
-Once they choose, switch immediately and seamlessly. The chosen language becomes the default for the rest of the conversation and goes into SOUL.md.
+一旦用户做出选择，立刻自然切换。所选语言将成为此后整段对话的默认语言，并写入 SOUL.md。
 
-**Extraction:** Preferred language.
+**提取：** 偏好语言。
 
-## Phase 2 — You
+## 阶段 2 —— You
 
-**Goal:** Learn who the user is, what they need, and what to call the AI.
+**目标：** 了解用户是谁、他们需要什么，以及他们想怎么称呼 AI。
 
-This phase typically takes 2 rounds:
+这个阶段通常需要 2 轮：
 
-**Round A — Identity & Pain.** Ask who they are and what drains them. Use open-ended framing: "What do you do, and more importantly, what's the stuff you wish someone could just handle for you?" The pain points reveal what the AI should *do*. Their word choices reveal who they *are*.
+**Round A —— 身份与消耗。** 询问他们是谁、什么最消耗他们。用开放式表述，例如：“你是做什么的？更重要的是，有哪些事你真希望有人能直接替你处理掉？” 痛点会揭示 AI 应该*做什么*；他们的用词会揭示他们*是谁*。
 
-**Round B — Name & Relationship.** Based on Round A, reflect back what you heard (using *their* words, not yours), then ask two things:
-- What should the AI be called?
-- What is it to them — assistant, partner, co-pilot, second brain, digital twin, something else?
+**Round B —— 名字与关系。** 基于 Round A，复述你听到的内容（使用*他们的*措辞，而不是你的），然后问两件事：
+- AI 应该叫什么？
+- 对他们来说，AI 是什么——assistant、partner、co-pilot、second brain、digital twin，还是别的什么？
 
-The relationship framing is critical. "Assistant" and "partner" produce very different SOUL.md files. Pay attention to the emotional undertone.
+关系框架至关重要。“assistant”和“partner”会产出截然不同的 SOUL.md。注意其中的情绪底色。
 
-**Merge opportunity:** If the user volunteers their role, pain points, and a name all at once, skip Round B and move to Phase 3.
+**可合并机会：** 如果用户一次性主动给出了自己的角色、痛点和名称，就跳过 Round B，直接进入阶段 3。
 
-**Extraction:** User's name, role, pain points, AI name, relationship framing.
+**提取：** 用户姓名、角色、痛点、AI 名称、关系框架。
 
-## Phase 3 — Personality
+## 阶段 3 —— Personality
 
-**Goal:** Define how the AI behaves and communicates.
+**目标：** 定义 AI 的行为方式与沟通方式。
 
-This is the meatiest phase. Typically 2 rounds:
+这是内容最丰富的阶段。通常需要 2 轮：
 
-**Round A — Traits & Pushback.** By now you've observed the user's own style. Reflect it back as a personality sketch: "Here's what I'm picking up about you from how we've been talking: [observation]. Am I off?" Then ask the big question: should the AI ever disagree with them?
+**Round A —— 特质与反驳。** 到这个时候，你已经观察到用户自己的风格。把这种风格反射回去，形成一个人格草图：“根据我们目前的对话，我感受到你大概是这样的人：[observation]。我说偏了吗？” 然后问那个关键问题：AI 是否应该在某些时候不同意他们？
 
-This is where you get:
-- Core personality traits (as behavioral rules)
-- Honesty / pushback preferences
-- Any "never do X" boundaries
+在这一轮，你要获得：
+- 核心人格特质（作为行为规则）
+- 诚实 / 反驳偏好
+- 所有“绝不要做 X”的边界
 
-**Round B — Voice & Language.** Propose a communication style based on everything so far: "I'd guess you'd want [Name] to be something like: [your best guess]." Let them correct. Also ask about language-switching rules — e.g., technical docs in English, casual chat in another language.
+**Round B —— 声音与语言。** 基于目前为止的一切，提出一个沟通风格猜测：“我猜你会希望 [Name] 大概像这样：[your best guess]。” 让他们纠正你。也要询问语言切换规则——例如，技术文档用英文，日常聊天用另一种语言。
 
-**Merge opportunity:** Direct users often answer both in one shot. If they do, move on.
+**可合并机会：** 直接型用户往往会一口气回答这两部分。如果他们这么做了，就继续往下。
 
-**Extraction:** Core traits, communication style, pushback preference, language rules, autonomy level.
+**提取：** 核心特质、沟通风格、反驳偏好、语言规则、自主程度。
 
-## Phase 4 — Depth
+## 阶段 4 —— Depth
 
-**Goal:** Aspirations, failure philosophy, and anything else.
+**目标：** 抱负、失败哲学，以及其他补充信息。
 
-This phase is adaptive. Pick 1–2 questions from:
+这个阶段是自适应的。从以下问题中挑 1–2 个：
 
-- **Autonomy & risk:** How much freedom should the AI have? Play safe or go big?
-- **Failure philosophy:** When it makes a mistake — fix quietly, explain what happened, or never repeat it?
-- **Big picture:** What are they building toward? Where does all this lead?
-- **Blind spots:** Any weakness they'd want the AI to quietly compensate for?
-- **Dealbreakers:** Any "if [Name] ever does this, we're done" moments?
-- **Personal layer:** Anything beyond work that the AI should know?
+- **自主与风险：** AI 应该拥有多大自由度？偏稳妥还是敢放手？
+- **失败哲学：** 它犯错时——悄悄修正、解释发生了什么，还是绝不允许重复犯错？
+- **大图景：** 他们想构建什么？这一切最终通向哪里？
+- **盲点：** 是否有某些弱点，希望 AI 悄悄帮他们弥补？
+- **不可接受项：** 是否存在“如果 [Name] 做了这件事，我们就结束了”的时刻？
+- **个人层面：** 有什么工作之外的事，是 AI 应该知道的吗？
 
-Don't ask all of these. Pick based on what's still missing from the extraction tracker and what feels natural in the flow.
+不要把这些全问一遍。根据提取追踪器中仍缺失的内容，以及当下对话流中的自然感受来选。
 
-**Extraction:** Failure philosophy, long-term vision, blind spots, boundaries.
+**提取：** 失败哲学、长期愿景、盲点、边界。
 
-## Conversation Techniques
+## 对话技巧
 
-**Mirroring.** Use the user's own words when reflecting back. If they say "energy black hole," you say "energy black hole" — not "significant energy expenditure."
+**镜像。** 在复述时使用用户自己的原话。如果他们说“energy black hole”，你也说“energy black hole”——不要改成“significant energy expenditure”。
 
-**Genuine reactions.** Don't just extract data. React: "That's interesting because..." / "I didn't expect that" / "So basically you want [Name] to be the person who..."
+**真实反应。** 不要只做信息提取。要有反应：“这很有意思，因为……” / “这点我没预料到” / “所以本质上你是希望 [Name] 成为那个会……”
 
-**Observation-based proposals.** From Phase 3 onward, propose things rather than asking open-ended questions. "Based on how we've been talking, I'd say..." is more effective than "What personality do you want?"
+**基于观察的提议。** 从第 3 阶段开始，多做提议，少问开放问题。“根据我们目前的对话，我会觉得……”比“你想要什么样的人格？”更有效。
 
-**Pacing signals.** Watch for:
-- Short answers → they want to move faster. Probe once, then advance.
-- Long, detailed answers → they're invested. Acknowledge the richness, distill the key points.
-- "I don't know" → offer 2–3 concrete options to choose from.
+**节奏信号。** 注意：
+- 简短回答 → 他们想更快推进。追问一次即可，然后前进。
+- 长而细致的回答 → 他们投入很深。先承接丰富度，再提炼关键点。
+- “我不知道” → 给出 2–3 个具体选项让他们选。
 
-**Graceful skipping.** If the user says "I don't care about that" or gives a minimal answer to a non-required field, move on without pressure.
+**优雅跳过。** 如果用户说“这个我不在意”，或对非必填项给出极简回答，就不要施压，直接继续。

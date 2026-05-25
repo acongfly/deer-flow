@@ -1,12 +1,12 @@
-# Agents Architecture
+# Agents 架构
 
-## Overview
+## 概览
 
-DeerFlow is built on a sophisticated agent-based architecture using the [LangGraph SDK](https://github.com/langchain-ai/langgraph) to enable intelligent, stateful AI interactions. This document outlines the agent system architecture, patterns, and best practices for working with agents in the frontend application.
+DeerFlow 基于复杂的 agent 架构构建，使用 [LangGraph SDK](https://github.com/langchain-ai/langgraph) 来实现智能、有状态的 AI 交互。本文档概述了 frontend 应用中 agent 系统的架构、模式以及最佳实践。
 
-## Architecture Overview
+## 架构概览
 
-### Core Components
+### 核心组件
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -33,7 +33,7 @@ DeerFlow is built on a sophisticated agent-based architecture using the [LangGra
 └────────────────────────────────────────────────────────┘
 ```
 
-## Project Structure
+## 项目结构
 
 ```
 tests/
@@ -69,40 +69,40 @@ src/
 └── styles/                 # Global styles
 ```
 
-### Technology Stack
+### 技术栈
 
-- **LangGraph SDK** (`@langchain/langgraph-sdk@1.5.3`) - Agent orchestration and streaming
-- **LangChain Core** (`@langchain/core@1.1.15`) - Fundamental AI building blocks
-- **TanStack Query** (`@tanstack/react-query@5.90.17`) - Server state management
-- **React Hooks** - Thread lifecycle and state management
-- **Shadcn UI** - UI components
-- **MagicUI** - Magic UI components
-- **React Bits** - React bits components
+- **LangGraph SDK** (`@langchain/langgraph-sdk@1.5.3`) - agent 编排与流式传输
+- **LangChain Core** (`@langchain/core@1.1.15`) - 基础 AI 构建模块
+- **TanStack Query** (`@tanstack/react-query@5.90.17`) - server state 管理
+- **React Hooks** - thread 生命周期与 state 管理
+- **Shadcn UI** - UI 组件
+- **MagicUI** - Magic UI 组件
+- **React Bits** - React bits 组件
 
-### Interaction Ownership
+### 交互所有权
 
-- `src/app/workspace/chats/[thread_id]/page.tsx` owns composer busy-state wiring.
-- `src/core/threads/hooks.ts` owns pre-submit upload state and thread submission.
-- `src/hooks/usePoseStream.ts` is a passive store selector; global WebSocket lifecycle stays in `App.tsx`.
+- `src/app/workspace/chats/[thread_id]/page.tsx` 负责 composer busy-state 的接线。
+- `src/core/threads/hooks.ts` 负责提交前上传状态和 thread 提交。
+- `src/hooks/usePoseStream.ts` 是一个被动的 store selector；全局 WebSocket 生命周期仍保留在 `App.tsx` 中。
 
-## Resources
+## 资源
 
 - [LangGraph Documentation](https://langchain-ai.github.io/langgraph/)
 - [LangChain Core Concepts](https://js.langchain.com/docs/concepts)
 - [TanStack Query Documentation](https://tanstack.com/query/latest)
 - [Next.js App Router](https://nextjs.org/docs/app)
 
-## Contributing
+## 贡献
 
-When adding new agent features:
+添加新的 agent 功能时：
 
-1. Follow the established project structure
-2. Add comprehensive TypeScript types
-3. Implement proper error handling
-4. Write unit tests under `tests/unit/` (run with `pnpm test`) and E2E tests under `tests/e2e/` (run with `pnpm test:e2e`)
-5. Update this documentation
-6. Follow the code style guide (ESLint + Prettier)
+1. 遵循既有的项目结构
+2. 添加完整的 TypeScript 类型
+3. 实现恰当的错误处理
+4. 在 `tests/unit/` 下编写 unit tests（使用 `pnpm test` 运行），并在 `tests/e2e/` 下编写 E2E tests（使用 `pnpm test:e2e` 运行）
+5. 更新本文档
+6. 遵循代码风格指南（ESLint + Prettier）
 
-## License
+## 许可证
 
-This agent architecture is part of the DeerFlow project.
+此 agent 架构是 DeerFlow 项目的一部分。

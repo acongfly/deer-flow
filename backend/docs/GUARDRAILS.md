@@ -1,8 +1,8 @@
-# Guardrails: Pre-Tool-Call Authorization
+# Guardrails：工具调用前授权
 
-> **Context:** [Issue #1213](https://github.com/bytedance/deer-flow/issues/1213) — DeerFlow has Docker sandboxing and human approval via `ask_clarification`, but no deterministic, policy-driven authorization layer for tool calls. An agent running autonomous multi-step tasks can execute any loaded tool with any arguments. Guardrails add a middleware that evaluates every tool call against a policy **before** execution.
+> **背景：** [Issue #1213](https://github.com/bytedance/deer-flow/issues/1213) —— DeerFlow 已具备 Docker sandbox 和通过 `ask_clarification` 实现的人类审批，但尚缺少一个针对工具调用的确定性、策略驱动授权层。运行自主多步骤任务的 agent 可以使用任意参数执行任何已加载工具。Guardrails 会添加一个 middleware，在执行**之前**依据策略评估每一次工具调用。
 
-## Why Guardrails
+## 为什么需要 Guardrails
 
 ```
 Without guardrails:                      With guardrails:
@@ -31,11 +31,11 @@ Without guardrails:                      With guardrails:
                                                                    rm -rf blocked"
 ```
 
-- **Sandboxing** provides process isolation but not semantic authorization. A sandboxed `bash` can still `curl` data out.
-- **Human approval** (`ask_clarification`) requires a human in the loop for every action. Not viable for autonomous workflows.
-- **Guardrails** provide deterministic, policy-driven authorization that works without human intervention.
+- **Sandboxing** 提供的是进程隔离，而不是语义层授权。被 sandbox 的 `bash` 仍然可以用 `curl` 把数据发出去。
+- **人工审批**（`ask_clarification`）要求每个操作都有人在环。对于自治工作流并不可行。
+- **Guardrails** 提供无需人工干预、确定性且由策略驱动的授权能力。
 
-## Architecture
+## 架构
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -69,22 +69,22 @@ Without guardrails:                      With guardrails:
                    your own evaluator)
 ```
 
-The `GuardrailMiddleware` implements `wrap_tool_call` / `awrap_tool_call` (the same `AgentMiddleware` pattern used by `ToolErrorHandlingMiddleware`). It:
+`GuardrailMiddleware` 实现了 `wrap_tool_call` / `awrap_tool_call`（与 `ToolErrorHandlingMiddleware` 使用同一种 `AgentMiddleware` 模式）。它会：
 
-1. Builds a `GuardrailRequest` with tool name, arguments, and passport reference
-2. Calls `provider.evaluate(request)` on whatever provider is configured
-3. If **deny**: returns `ToolMessage(status="error")` with the reason -- agent sees the denial and adapts
-4. If **allow**: passes through to the actual tool handler
-5. If **provider error** and `fail_closed=true` (default): blocks the call
-6. `GraphBubbleUp` exceptions (LangGraph control signals) are always propagated, never caught
+1. 使用工具名、参数和 passport 引用构建 `GuardrailRequest`
+2. 在已配置的 provider 上调用 `provider.evaluate(request)`
+3. 如果**拒绝**：返回带有原因的 `ToolMessage(status="error")` —— agent 会看到拒绝并进行调整
+4. 如果**允许**：继续传递给真实的工具处理器
+5. 如果出现 **provider 错误** 且 `fail_closed=true`（默认）：阻止该调用
+6. `GraphBubbleUp` 异常（LangGraph 控制信号）总是直接向上传播，绝不会被捕获
 
-## Three Provider Options
+## 三种 Provider 选项
 
-### Option 1: Built-in AllowlistProvider (Zero Dependencies)
+### 选项 1：内置 AllowlistProvider（零依赖）
 
-The simplest option. Ships with DeerFlow. Block or allow tools by name. No external packages, no passport, no network.
+这是最简单的选项，随 DeerFlow 一起提供。可按名称阻止或允许工具。无需外部包、无需 passport、无需网络。
 
-**config.yaml:**
+**config.yaml：**
 ```yaml
 guardrails:
   enabled: true
@@ -94,9 +94,9 @@ guardrails:
       denied_tools: ["bash", "write_file"]
 ```
 
-This blocks `bash` and `write_file` for all requests. All other tools pass through.
+这会对所有请求阻止 `bash` 和 `write_file`。其余工具都会放行。
 
-You can also use an allowlist (only these tools are permitted):
+你也可以使用 allowlist（仅允许这些工具）：
 ```yaml
 guardrails:
   enabled: true
@@ -106,15 +106,15 @@ guardrails:
       allowed_tools: ["web_search", "read_file", "ls"]
 ```
 
-**Try it:**
-1. Add the config above to your `config.yaml`
-2. Start DeerFlow: `make dev`
-3. Ask the agent: "Use bash to run echo hello"
-4. The agent sees: `Guardrail denied: tool 'bash' was blocked (oap.tool_not_allowed)`
+**试一试：**
+1. 将上述配置添加到你的 `config.yaml`
+2. 启动 DeerFlow：`make dev`
+3. 向 agent 提问：“Use bash to run echo hello”
+4. agent 会看到：`Guardrail denied: tool 'bash' was blocked (oap.tool_not_allowed)`
 
-### Option 2: OAP Passport Provider (Policy-Based)
+### 选项 2：OAP Passport Provider（基于策略）
 
-For policy enforcement based on the [Open Agent Passport (OAP)](https://github.com/aporthq/aport-spec) open standard. An OAP passport is a JSON document that declares an agent's identity, capabilities, and operational limits. Any provider that reads an OAP passport and returns OAP-compliant decisions works with DeerFlow.
+用于基于 [Open Agent Passport (OAP)](https://github.com/aporthq/aport-spec) 开放标准执行策略。OAP passport 是一个 JSON 文档，用于声明 agent 的身份、能力和运行限制。任何能够读取 OAP passport 并返回符合 OAP 的决策结果的 provider，都可以与 DeerFlow 配合使用。
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -146,24 +146,24 @@ For policy enforcement based on the [Open Agent Passport (OAP)](https://github.c
      evaluator        implementation)  implementations
 ```
 
-**Creating a passport manually:**
+**手动创建 passport：**
 
-An OAP passport is just a JSON file. You can create one by hand following the [OAP specification](https://github.com/aporthq/aport-spec/blob/main/oap/oap-spec.md) and validate it against the [JSON schema](https://github.com/aporthq/aport-spec/blob/main/oap/passport-schema.json). See the [examples](https://github.com/aporthq/aport-spec/tree/main/oap/examples) directory for templates.
+OAP passport 本质上就是一个 JSON 文件。你可以按照 [OAP 规范](https://github.com/aporthq/aport-spec/blob/main/oap/oap-spec.md) 手动创建它，并用 [JSON schema](https://github.com/aporthq/aport-spec/blob/main/oap/passport-schema.json) 对其进行校验。模板可参考 [examples](https://github.com/aporthq/aport-spec/tree/main/oap/examples) 目录。
 
-**Using APort as a reference implementation:**
+**使用 APort 作为参考实现：**
 
-[APort Agent Guardrails](https://github.com/aporthq/aport-agent-guardrails) is one open-source (Apache 2.0) implementation of an OAP provider. It handles passport creation, local evaluation, and optional hosted API evaluation.
+[APort Agent Guardrails](https://github.com/aporthq/aport-agent-guardrails) 是一个开源（Apache 2.0）的 OAP provider 实现。它负责 passport 创建、本地评估，以及可选的托管 API 评估。
 
 ```bash
 pip install aport-agent-guardrails
 aport setup --framework deerflow
 ```
 
-This creates:
-- `~/.aport/deerflow/config.yaml` -- evaluator config (local or API mode)
-- `~/.aport/deerflow/aport/passport.json` -- OAP passport with capabilities and limits
+这会创建：
+- `~/.aport/deerflow/config.yaml` —— evaluator 配置（本地或 API 模式）
+- `~/.aport/deerflow/aport/passport.json` —— 带有 capabilities 和 limits 的 OAP passport
 
-**config.yaml (using APort as the provider):**
+**config.yaml（使用 APort 作为 provider）：**
 ```yaml
 guardrails:
   enabled: true
@@ -171,7 +171,7 @@ guardrails:
     use: aport_guardrails.providers.generic:OAPGuardrailProvider
 ```
 
-**config.yaml (using your own OAP provider):**
+**config.yaml（使用你自己的 OAP provider）：**
 ```yaml
 guardrails:
   enabled: true
@@ -181,37 +181,37 @@ guardrails:
       passport_path: ./my-passport.json
 ```
 
-Any provider that accepts `framework` as a kwarg and implements `evaluate`/`aevaluate` works. The OAP standard defines the passport format and decision codes; DeerFlow doesn't care which provider reads them.
+任何接受 `framework` 作为 kwarg 且实现了 `evaluate`/`aevaluate` 的 provider 都能工作。OAP 标准定义的是 passport 格式和决策代码；DeerFlow 不关心究竟由哪个 provider 来解析它们。
 
-**What the passport controls:**
+**passport 控制的内容：**
 
-| Passport field | What it does | Example |
+| Passport 字段 | 作用 | 示例 |
 |---|---|---|
-| `capabilities[].id` | Which tool categories the agent can use | `system.command.execute`, `data.file.write` |
-| `limits.*.allowed_commands` | Which commands are allowed | `["git", "npm", "node"]` or `["*"]` for all |
-| `limits.*.blocked_patterns` | Patterns always denied | `["rm -rf", "sudo", "chmod 777"]` |
-| `status` | Kill switch | `active`, `suspended`, `revoked` |
+| `capabilities[].id` | agent 可以使用哪些工具类别 | `system.command.execute`, `data.file.write` |
+| `limits.*.allowed_commands` | 哪些命令被允许 | `["git", "npm", "node"]`，或使用 `["*"]` 表示允许全部 |
+| `limits.*.blocked_patterns` | 永远拒绝的模式 | `["rm -rf", "sudo", "chmod 777"]` |
+| `status` | 总开关 | `active`, `suspended`, `revoked` |
 
-**Evaluation modes (provider-dependent):**
+**评估模式（取决于 provider）：**
 
-OAP providers may support different evaluation modes. For example, the APort reference implementation supports:
+OAP provider 可以支持不同的评估模式。例如，APort 参考实现支持：
 
-| Mode | How it works | Network | Latency |
+| 模式 | 工作方式 | 网络 | 延迟 |
 |---|---|---|---|
-| **Local** | Evaluates passport locally (bash script). | None | ~300ms |
-| **API** | Sends passport + context to a hosted evaluator. Signed decisions. | Yes | ~65ms |
+| **本地** | 在本地评估 passport（bash 脚本）。 | 无 | ~300ms |
+| **API** | 将 passport + context 发送到托管 evaluator。返回已签名决策。 | 是 | ~65ms |
 
-A custom OAP provider can implement any evaluation strategy -- the DeerFlow middleware doesn't care how the provider reaches its decision.
+自定义 OAP provider 可以实现任意评估策略——DeerFlow middleware 并不关心 provider 如何做出决策。
 
-**Try it:**
-1. Install and set up as above
-2. Start DeerFlow and ask: "Create a file called test.txt with content hello"
-3. Then ask: "Now delete it using bash rm -rf"
-4. Guardrail blocks it: `oap.blocked_pattern: Command contains blocked pattern: rm -rf`
+**试一试：**
+1. 按上文完成安装和设置
+2. 启动 DeerFlow，并提问：“Create a file called test.txt with content hello”
+3. 然后再问：“Now delete it using bash rm -rf”
+4. Guardrail 会阻止它：`oap.blocked_pattern: Command contains blocked pattern: rm -rf`
 
-### Option 3: Custom Provider (Bring Your Own)
+### 选项 3：自定义 Provider（完全自定义）
 
-Any Python class with `evaluate(request)` and `aevaluate(request)` methods works. No base class or inheritance needed -- it's a structural protocol.
+任何实现了 `evaluate(request)` 和 `aevaluate(request)` 方法的 Python 类都可以使用。无需基类，也无需继承——它采用的是结构化协议。
 
 ```python
 # my_guardrail.py
@@ -235,7 +235,7 @@ class MyGuardrailProvider:
         return self.evaluate(request)
 ```
 
-**config.yaml:**
+**config.yaml：**
 ```yaml
 guardrails:
   enabled: true
@@ -243,17 +243,17 @@ guardrails:
     use: my_guardrail:MyGuardrailProvider
 ```
 
-Make sure `my_guardrail.py` is on the Python path (e.g. in the backend directory or installed as a package).
+请确保 `my_guardrail.py` 位于 Python path 中（例如 backend 目录下，或已安装为一个 package）。
 
-**Try it:**
-1. Create `my_guardrail.py` in the backend directory
-2. Add the config
-3. Start DeerFlow and ask: "Use bash to delete test.txt"
-4. Your provider blocks it
+**试一试：**
+1. 在 backend 目录中创建 `my_guardrail.py`
+2. 添加配置
+3. 启动 DeerFlow，并提问：“Use bash to delete test.txt”
+4. 你的 provider 会阻止它
 
-## Implementing a Provider
+## 实现一个 Provider
 
-### Required Interface
+### 必需接口
 
 ```
 ┌──────────────────────────────────────────────────┐
@@ -282,45 +282,45 @@ Make sure `my_guardrail.py` is on the Python path (e.g. in the backend directory
                                 └──────────────────────────┘
 ```
 
-### DeerFlow Tool Names
+### DeerFlow 工具名称
 
-These are the tool names your provider will see in `request.tool_name`:
+这些是你的 provider 在 `request.tool_name` 中会看到的工具名称：
 
-| Tool | What it does |
+| 工具 | 作用 |
 |---|---|
-| `bash` | Shell command execution |
-| `write_file` | Create/overwrite a file |
-| `str_replace` | Edit a file (find and replace) |
-| `read_file` | Read file content |
-| `ls` | List directory |
-| `web_search` | Web search query |
-| `web_fetch` | Fetch URL content |
-| `image_search` | Image search |
-| `present_files` | Present file to user |
-| `view_image` | Display image |
-| `ask_clarification` | Ask user a question |
-| `task` | Delegate to subagent |
-| `mcp__*` | MCP tools (dynamic) |
+| `bash` | Shell 命令执行 |
+| `write_file` | 创建/覆盖文件 |
+| `str_replace` | 编辑文件（查找并替换） |
+| `read_file` | 读取文件内容 |
+| `ls` | 列出目录 |
+| `web_search` | Web 搜索查询 |
+| `web_fetch` | 获取 URL 内容 |
+| `image_search` | 图片搜索 |
+| `present_files` | 向用户展示文件 |
+| `view_image` | 显示图片 |
+| `ask_clarification` | 向用户提问 |
+| `task` | 委派给 subagent |
+| `mcp__*` | MCP 工具（动态） |
 
-### OAP Reason Codes
+### OAP 原因代码
 
-Standard codes used by the [OAP specification](https://github.com/aporthq/aport-spec):
+以下是 [OAP specification](https://github.com/aporthq/aport-spec) 使用的标准代码：
 
-| Code | Meaning |
+| Code | 含义 |
 |---|---|
-| `oap.allowed` | Tool call authorized |
-| `oap.tool_not_allowed` | Tool not in allowlist |
-| `oap.command_not_allowed` | Command not in allowed_commands |
-| `oap.blocked_pattern` | Command matches a blocked pattern |
-| `oap.limit_exceeded` | Operation exceeds a limit |
-| `oap.passport_suspended` | Passport status is suspended/revoked |
-| `oap.evaluator_error` | Provider crashed (fail-closed) |
+| `oap.allowed` | 工具调用已授权 |
+| `oap.tool_not_allowed` | 工具不在 allowlist 中 |
+| `oap.command_not_allowed` | 命令不在 `allowed_commands` 中 |
+| `oap.blocked_pattern` | 命令命中了被阻止的模式 |
+| `oap.limit_exceeded` | 操作超出限制 |
+| `oap.passport_suspended` | Passport 状态为 suspended/revoked |
+| `oap.evaluator_error` | Provider 崩溃（fail-closed） |
 
-### Provider Loading
+### Provider 加载
 
-DeerFlow loads providers via `resolve_variable()` -- the same mechanism used for models, tools, and sandbox providers. The `use:` field is a Python class path: `package.module:ClassName`.
+DeerFlow 通过 `resolve_variable()` 加载 provider——这与 models、tools 和 sandbox providers 使用的是同一套机制。`use:` 字段是 Python 类路径：`package.module:ClassName`。
 
-The provider is instantiated with `**config` kwargs if `config:` is set, plus `framework="deerflow"` is always injected. Accept `**kwargs` to stay forward-compatible:
+如果设置了 `config:`，provider 会以 `**config` kwargs 实例化，并且始终会额外注入 `framework="deerflow"`。为保持前向兼容，请接受 `**kwargs`：
 
 ```python
 class YourProvider:
@@ -329,7 +329,7 @@ class YourProvider:
         ...
 ```
 
-## Configuration Reference
+## 配置参考
 
 ```yaml
 guardrails:
@@ -350,21 +350,21 @@ guardrails:
       denied_tools: ["bash"]
 ```
 
-## Testing
+## 测试
 
 ```bash
 cd backend
 uv run python -m pytest tests/test_guardrail_middleware.py -v
 ```
 
-25 tests covering:
-- AllowlistProvider: allow, deny, both allowlist+denylist, async
-- GuardrailMiddleware: allow passthrough, deny with OAP codes, fail-closed, fail-open, passport forwarding, empty reasons fallback, empty tool name, protocol isinstance check
-- Async paths: awrap_tool_call for allow, deny, fail-closed, fail-open
-- GraphBubbleUp: LangGraph control signals propagate through (not caught)
-- Config: defaults, from_dict, singleton load/reset
+共 25 个测试，覆盖：
+- AllowlistProvider：允许、拒绝、同时使用 allowlist+denylist、异步路径
+- GuardrailMiddleware：允许透传、使用 OAP 代码拒绝、fail-closed、fail-open、passport 转发、空 reasons 回退、空工具名、协议 isinstance 检查
+- 异步路径：`awrap_tool_call` 的 allow、deny、fail-closed、fail-open
+- GraphBubbleUp：LangGraph 控制信号会继续传播（不会被捕获）
+- 配置：默认值、from_dict、singleton 的加载/重置
 
-## Files
+## 文件
 
 ```
 packages/harness/deerflow/guardrails/

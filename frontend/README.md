@@ -1,21 +1,21 @@
-# DeerFlow Frontend
+# DeerFlow Frontend（前端）
 
-Like the original DeerFlow 1.0, we would love to give the community a minimalistic and easy-to-use web interface with a more modern and flexible architecture.
+像最初的 DeerFlow 1.0 一样，我们希望为社区提供一个极简、易用，并且拥有更现代、更灵活架构的 Web 界面。
 
-## Tech Stack
+## 技术栈
 
-- **Framework**: [Next.js 16](https://nextjs.org/) with [App Router](https://nextjs.org/docs/app)
-- **UI**: [React 19](https://react.dev/), [Tailwind CSS 4](https://tailwindcss.com/), [Shadcn UI](https://ui.shadcn.com/), [MagicUI](https://magicui.design/) and [React Bits](https://reactbits.dev/)
-- **AI Integration**: [LangGraph SDK](https://www.npmjs.com/package/@langchain/langgraph-sdk) and [Vercel AI Elements](https://vercel.com/ai-sdk/ai-elements)
+- **框架**：[Next.js 16](https://nextjs.org/) 与 [App Router](https://nextjs.org/docs/app)
+- **UI**：[React 19](https://react.dev/)、[Tailwind CSS 4](https://tailwindcss.com/)、[Shadcn UI](https://ui.shadcn.com/)、[MagicUI](https://magicui.design/) 和 [React Bits](https://reactbits.dev/)
+- **AI 集成**：[LangGraph SDK](https://www.npmjs.com/package/@langchain/langgraph-sdk) 与 [Vercel AI Elements](https://vercel.com/ai-sdk/ai-elements)
 
-## Quick Start
+## 快速开始
 
-### Prerequisites
+### 前置条件
 
 - Node.js 22+
 - pnpm 10.26.2+
 
-### Installation
+### 安装
 
 ```bash
 # Install dependencies
@@ -26,7 +26,7 @@ cp .env.example .env
 # Edit .env with your configuration
 ```
 
-### Development
+### 开发
 
 ```bash
 # Start development server
@@ -35,7 +35,7 @@ pnpm dev
 # The app will be available at http://localhost:3000
 ```
 
-### Build & Test
+### 构建与测试
 
 ```bash
 # Type check
@@ -66,7 +66,7 @@ pnpm build
 pnpm start
 ```
 
-## Site Map
+## 站点地图
 
 ```
 ├── /                    # Landing page
@@ -75,11 +75,11 @@ pnpm start
 └── /chats/[thread_id]   # A specific chat page
 ```
 
-## Configuration
+## 配置
 
-### Environment Variables
+### 环境变量
 
-Key environment variables (see `.env.example` for full list):
+关键环境变量（完整列表见 `.env.example`）：
 
 ```bash
 # Backend API URL (optional, uses local Next.js/nginx proxy by default)
@@ -88,7 +88,7 @@ NEXT_PUBLIC_BACKEND_BASE_URL="http://localhost:8001"
 NEXT_PUBLIC_LANGGRAPH_BASE_URL="http://localhost:8001/api"
 ```
 
-## Project Structure
+## 项目结构
 
 ```
 tests/
@@ -124,29 +124,29 @@ src/
 └── styles/                 # Global styles
 ```
 
-## Scripts
+## 脚本
 
-| Command             | Description                             |
+| 命令 | 说明 |
 | ------------------- | --------------------------------------- |
-| `pnpm dev`          | Start development server with Turbopack |
-| `pnpm build`        | Build for production                    |
-| `pnpm start`        | Start production server                 |
-| `pnpm test`         | Run unit tests with Vitest              |
-| `pnpm test:e2e`     | Run E2E tests with Playwright           |
-| `pnpm format`       | Check formatting with Prettier          |
-| `pnpm format:write` | Apply formatting with Prettier          |
-| `pnpm lint`         | Run ESLint                              |
-| `pnpm lint:fix`     | Fix ESLint issues                       |
-| `pnpm typecheck`    | Run TypeScript type checking            |
-| `pnpm check`        | Run both lint and typecheck             |
+| `pnpm dev`          | 使用 Turbopack 启动开发服务器 |
+| `pnpm build`        | 生产构建 |
+| `pnpm start`        | 启动生产服务器 |
+| `pnpm test`         | 使用 Vitest 运行 unit tests |
+| `pnpm test:e2e`     | 使用 Playwright 运行 E2E tests |
+| `pnpm format`       | 使用 Prettier 检查格式 |
+| `pnpm format:write` | 使用 Prettier 应用格式化 |
+| `pnpm lint`         | 运行 ESLint |
+| `pnpm lint:fix`     | 修复 ESLint 问题 |
+| `pnpm typecheck`    | 运行 TypeScript 类型检查 |
+| `pnpm check`        | 同时运行 lint 和 typecheck |
 
-## Development Notes
+## 开发说明
 
-- Uses pnpm workspaces (see `packageManager` in package.json)
-- Turbopack enabled by default in development for faster builds
-- Environment validation can be skipped with `SKIP_ENV_VALIDATION=1` (useful for Docker)
-- Backend API URLs are optional; nginx proxy is used by default in development
+- 使用 pnpm workspaces（见 package.json 中的 `packageManager`）
+- 开发环境默认启用 Turbopack，以加快构建速度
+- 可以通过 `SKIP_ENV_VALIDATION=1` 跳过环境校验（对 Docker 很有用）
+- Backend API URL 是可选的；开发环境默认使用 nginx proxy
 
-## License
+## 许可证
 
-MIT License. See [LICENSE](../LICENSE) for details.
+MIT License。详情见 [LICENSE](../LICENSE)。

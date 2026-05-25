@@ -1,46 +1,46 @@
 ---
 name: chart-visualization
-description: This skill should be used when the user wants to visualize data. It intelligently selects the most suitable chart type from 26 available options, extracts parameters based on detailed specifications, and generates a chart image using a JavaScript script.
+description: 当用户想要将数据可视化时，应使用此 skill。它会从 26 种可用图表中智能选择最合适的图表类型，根据详细规格提取参数，并通过 JavaScript 脚本生成图表图片。
 compatibility:
   nodejs: ">=18.0.0"
 ---
 
-# Chart Visualization Skill
+# 图表可视化 Skill
 
-This skill provides a comprehensive workflow for transforming data into visual charts. It handles chart selection, parameter extraction, and image generation.
+此 skill 提供将数据转换为可视化图表的完整工作流。它负责图表选择、参数提取和图片生成。
 
-## Workflow
+## 工作流
 
-To visualize data, follow these steps:
+要可视化数据，请按以下步骤操作：
 
-### 1. Intelligent Chart Selection
-Analyze the user's data features to determine the most appropriate chart type. Use the following guidelines (and consult `references/` for detailed specs):
+### 1. 智能图表选择
+分析用户数据的特征，以确定最合适的图表类型。使用以下准则（并查阅 `references/` 获取详细规格）：
 
-- **Time Series**: Use `generate_line_chart` (trends) or `generate_area_chart` (accumulated trends). Use `generate_dual_axes_chart` for two different scales.
-- **Comparisons**: Use `generate_bar_chart` (categorical) or `generate_column_chart`. Use `generate_histogram_chart` for frequency distributions.
-- **Part-to-Whole**: Use `generate_pie_chart` or `generate_treemap_chart` (hierarchical).
-- **Relationships & Flow**: Use `generate_scatter_chart` (correlation), `generate_sankey_chart` (flow), or `generate_venn_chart` (overlap).
-- **Maps**: Use `generate_district_map` (regions), `generate_pin_map` (points), or `generate_path_map` (routes).
-- **Hierarchies & Trees**: Use `generate_organization_chart` or `generate_mind_map`.
-- **Specialized**:
-    - `generate_radar_chart`: Multi-dimensional comparison.
-    - `generate_funnel_chart`: Process stages.
-    - `generate_liquid_chart`: Percentage/Progress.
-    - `generate_word_cloud_chart`: Text frequency.
-    - `generate_boxplot_chart` or `generate_violin_chart`: Statistical distribution.
-    - `generate_network_graph`: Complex node-edge relationships.
-    - `generate_fishbone_diagram`: Cause-effect analysis.
-    - `generate_flow_diagram`: Process flow.
-    - `generate_spreadsheet`: Tabular data or pivot tables for structured data display and cross-tabulation.
+- **时间序列**：使用 `generate_line_chart`（趋势）或 `generate_area_chart`（累计趋势）。对于两个不同量纲，使用 `generate_dual_axes_chart`。
+- **比较**：使用 `generate_bar_chart`（类别型）或 `generate_column_chart`。频率分布使用 `generate_histogram_chart`。
+- **整体中的部分**：使用 `generate_pie_chart` 或 `generate_treemap_chart`（层级结构）。
+- **关系与流向**：使用 `generate_scatter_chart`（相关性）、`generate_sankey_chart`（流向）或 `generate_venn_chart`（重叠）。
+- **地图**：使用 `generate_district_map`（区域）、`generate_pin_map`（点位）或 `generate_path_map`（路线）。
+- **层级与树结构**：使用 `generate_organization_chart` 或 `generate_mind_map`。
+- **专项图表**：
+    - `generate_radar_chart`：多维比较。
+    - `generate_funnel_chart`：流程阶段。
+    - `generate_liquid_chart`：百分比/进度。
+    - `generate_word_cloud_chart`：文本频率。
+    - `generate_boxplot_chart` 或 `generate_violin_chart`：统计分布。
+    - `generate_network_graph`：复杂节点-边关系。
+    - `generate_fishbone_diagram`：因果分析。
+    - `generate_flow_diagram`：流程图。
+    - `generate_spreadsheet`：表格型数据或数据透视表，用于结构化数据展示与交叉分析。
 
-### 2. Parameter Extraction
-Once a chart type is selected, read the corresponding file in the `references/` directory (e.g., `references/generate_line_chart.md`) to identify the required and optional fields.
-Extract the data from the user's input and map it to the expected `args` format.
+### 2. 参数提取
+一旦确定图表类型，就读取 `references/` 目录中的对应文件（例如 `references/generate_line_chart.md`）以识别必填和可选字段。
+将用户输入中的数据提取出来，并映射到预期的 `args` 格式。
 
-### 3. Chart Generation
-Invoke the `scripts/generate.js` script with a JSON payload.
+### 3. 生成图表
+使用 JSON payload 调用 `scripts/generate.js` 脚本。
 
-**Payload Format:**
+**Payload 格式：**
 ```json
 {
   "tool": "generate_chart_type_name",
@@ -53,21 +53,21 @@ Invoke the `scripts/generate.js` script with a JSON payload.
 }
 ```
 
-**Execution Command:**
+**执行命令：**
 ```bash
 node ./scripts/generate.js '<payload_json>'
 ```
 
-### 4. Result Return
-The script will output the URL of the generated chart image.
-Return the following to the user:
-- The image URL.
-- The complete `args` (specification) used for generation.
+### 4. 返回结果
+脚本会输出生成的图表图片 URL。
+向用户返回以下内容：
+- 图片 URL。
+- 用于生成的完整 `args`（规格）。
 
-## Reference Material
-Detailed specifications for each chart type are located in the `references/` directory. Consult these files to ensure the `args` passed to the script match the expected schema.
+## 参考资料
+每种图表类型的详细规格都位于 `references/` 目录中。请查阅这些文件，确保传给脚本的 `args` 符合预期 schema。
 
-## License
+## 许可证
 
-This `SKILL.md` is provided by [antvis/chart-visualization-skills](https://github.com/antvis/chart-visualization-skills).
-Licensed under the [MIT License](https://github.com/antvis/chart-visualization-skills/blob/master/LICENSE).
+此 `SKILL.md` 由 [antvis/chart-visualization-skills](https://github.com/antvis/chart-visualization-skills) 提供。
+遵循 [MIT License](https://github.com/antvis/chart-visualization-skills/blob/master/LICENSE) 许可。

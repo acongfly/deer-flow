@@ -1,12 +1,12 @@
-# Doraemon 8-Panel Comic Generator
+# Doraemon 8 格漫画生成器
 
-## Workflow
+## 工作流
 
-1. Extract story context (theme, gadget, conflict, punchline)
-2. Map to 8 narrative beats
-3. Use the provided prompt template to generate the JSON prompt file
+1. 提取故事上下文（主题、道具、冲突、笑点）
+2. 映射为 8 个叙事节拍
+3. 使用提供的 prompt 模板生成 JSON prompt 文件
 
-## Panel Layout
+## 面板布局
 
 ```
 ┌─────────┬─────────┐
@@ -22,7 +22,7 @@ Left column: x=90, width=450
 Right column: x=540, width=450
 ```
 
-## Characters
+## 角色
 
 * Doraemon
 * Nobita
@@ -30,7 +30,7 @@ Right column: x=540, width=450
 * Giant
 * Suneo
 
-## Prompt Template
+## Prompt 模板
 
 ```json
 {
@@ -103,10 +103,10 @@ Right column: x=540, width=450
 }
 ```
 
-## Story Pattern
+## 故事模式
 
-Setup → Problem → Gadget → Misuse → Backfire → Chaos → Consequence → Ironic Punchline
+铺垫 → 问题 → 道具 → 误用 → 反噬 → 混乱 → 后果 → 反讽式笑点
 
-## Aspect Ratio
+## 宽高比
 
 9:16

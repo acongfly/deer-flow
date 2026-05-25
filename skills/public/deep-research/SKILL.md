@@ -1,46 +1,46 @@
 ---
 name: deep-research
-description: Use this skill instead of WebSearch for ANY question requiring web research. Trigger on queries like "what is X", "explain X", "compare X and Y", "research X", or before content generation tasks. Provides systematic multi-angle research methodology instead of single superficial searches. Use this proactively when the user's question needs online information.
+description: 对于任何需要网络研究的问题，都应使用此 skill，而不是 WebSearch。当查询类似“what is X”“explain X”“compare X and Y”“research X”时触发，也应在内容生成任务之前主动加载。它提供系统化、多角度的研究方法，而不是一次性、表层化的搜索。当用户的问题需要在线信息时，应主动使用。
 ---
 
-# Deep Research Skill
+# 深度研究 Skill
 
-## Overview
+## 概述
 
-This skill provides a systematic methodology for conducting thorough web research. **Load this skill BEFORE starting any content generation task** to ensure you gather sufficient information from multiple angles, depths, and sources.
+此 skill 提供一种系统化的方法，用于开展深入的网络研究。**在开始任何内容生成任务之前，先加载此 skill**，以确保你从多个角度、多个层次和多个来源收集了足够的信息。
 
-## When to Use This Skill
+## 何时使用此 Skill
 
-**Always load this skill when:**
+**在以下情况下始终加载此 skill：**
 
-### Research Questions
-- User asks "what is X", "explain X", "research X", "investigate X"
-- User wants to understand a concept, technology, or topic in depth
-- The question requires current, comprehensive information from multiple sources
-- A single web search would be insufficient to answer properly
+### 研究类问题
+- 用户询问 “what is X”“explain X”“research X”“investigate X”
+- 用户希望深入理解某个概念、技术或主题
+- 问题需要来自多个来源的最新、全面信息
+- 仅靠一次 web search 不足以给出妥当答案
 
-### Content Generation (Pre-research)
-- Creating presentations (PPT/slides)
-- Creating frontend designs or UI mockups
-- Writing articles, reports, or documentation
-- Producing videos or multimedia content
-- Any content that requires real-world information, examples, or current data
+### 内容生成（预研究）
+- 制作 presentations（PPT/slides）
+- 创建 frontend designs 或 UI mockups
+- 撰写文章、报告或文档
+- 制作视频或多媒体内容
+- 任何需要现实世界信息、案例或最新数据的内容
 
-## Core Principle
+## 核心原则
 
-**Never generate content based solely on general knowledge.** The quality of your output directly depends on the quality and quantity of research conducted beforehand. A single search query is NEVER enough.
+**绝不要仅基于一般知识生成内容。** 输出质量直接取决于事前研究的质量和数量。一次搜索查询永远不够。
 
-## Research Methodology
+## 研究方法论
 
-### Phase 1: Broad Exploration
+### 阶段 1：广泛探索
 
-Start with broad searches to understand the landscape:
+先从宽泛搜索开始，理解整体图景：
 
-1. **Initial Survey**: Search for the main topic to understand the overall context
-2. **Identify Dimensions**: From initial results, identify key subtopics, themes, angles, or aspects that need deeper exploration
-3. **Map the Territory**: Note different perspectives, stakeholders, or viewpoints that exist
+1. **Initial Survey**：搜索主题本身，理解整体背景
+2. **Identify Dimensions**：从初步结果中识别需要进一步探索的关键子主题、主题线、角度或方面
+3. **Map the Territory**：记录其中存在的不同视角、利益相关方或立场
 
-Example:
+示例：
 ```
 Topic: "AI in healthcare"
 Initial searches:
@@ -57,16 +57,16 @@ Identified dimensions:
 - Ethical considerations
 ```
 
-### Phase 2: Deep Dive
+### 阶段 2：深入挖掘
 
-For each important dimension identified, conduct targeted research:
+对于识别出的每个重要维度，开展有针对性的研究：
 
-1. **Specific Queries**: Search with precise keywords for each subtopic
-2. **Multiple Phrasings**: Try different keyword combinations and phrasings
-3. **Fetch Full Content**: Use `web_fetch` to read important sources in full, not just snippets
-4. **Follow References**: When sources mention other important resources, search for those too
+1. **Specific Queries**：为每个子主题使用精确关键词进行搜索
+2. **Multiple Phrasings**：尝试不同关键词组合与不同表述方式
+3. **Fetch Full Content**：使用 `web_fetch` 读取重要来源的完整内容，而不只是摘要片段
+4. **Follow References**：当来源提到其他重要资源时，也继续搜索它们
 
-Example:
+示例：
 ```
 Dimension: "Diagnostic AI in radiology"
 Targeted searches:
@@ -80,34 +80,34 @@ Then fetch and read:
 - Real-world case studies
 ```
 
-### Phase 3: Diversity & Validation
+### 阶段 3：多样性与验证
 
-Ensure comprehensive coverage by seeking diverse information types:
+通过寻找多种类型的信息来确保覆盖全面：
 
-| Information Type | Purpose | Example Searches |
+| 信息类型 | 目的 | 示例搜索 |
 |-----------------|---------|------------------|
-| **Facts & Data** | Concrete evidence | "statistics", "data", "numbers", "market size" |
-| **Examples & Cases** | Real-world applications | "case study", "example", "implementation" |
-| **Expert Opinions** | Authority perspectives | "expert analysis", "interview", "commentary" |
-| **Trends & Predictions** | Future direction | "trends 2024", "forecast", "future of" |
-| **Comparisons** | Context and alternatives | "vs", "comparison", "alternatives" |
-| **Challenges & Criticisms** | Balanced view | "challenges", "limitations", "criticism" |
+| **Facts & Data** | 具体证据 | "statistics", "data", "numbers", "market size" |
+| **Examples & Cases** | 真实世界应用 | "case study", "example", "implementation" |
+| **Expert Opinions** | 权威视角 | "expert analysis", "interview", "commentary" |
+| **Trends & Predictions** | 未来方向 | "trends 2024", "forecast", "future of" |
+| **Comparisons** | 提供背景与替代项 | "vs", "comparison", "alternatives" |
+| **Challenges & Criticisms** | 保持平衡视角 | "challenges", "limitations", "criticism" |
 
-### Phase 4: Synthesis Check
+### 阶段 4：综合检查
 
-Before proceeding to content generation, verify:
+在进入内容生成之前，确认：
 
-- [ ] Have I searched from at least 3-5 different angles?
-- [ ] Have I fetched and read the most important sources in full?
-- [ ] Do I have concrete data, examples, and expert perspectives?
-- [ ] Have I explored both positive aspects and challenges/limitations?
-- [ ] Is my information current and from authoritative sources?
+- [ ] 我是否已从至少 3-5 个不同角度进行搜索？
+- [ ] 我是否已完整抓取并阅读最重要的来源？
+- [ ] 我是否已掌握具体数据、案例和专家观点？
+- [ ] 我是否同时覆盖了积极面与挑战/局限？
+- [ ] 我的信息是否最新，且来自权威来源？
 
-**If any answer is NO, continue researching before generating content.**
+**如果有任一答案为 NO，就继续研究，再开始内容生成。**
 
-## Search Strategy Tips
+## 搜索策略提示
 
-### Effective Query Patterns
+### 有效查询模式
 
 ```
 # Be specific with context
@@ -130,69 +130,69 @@ Before proceeding to content generation, verify:
 "[topic] recent developments"
 ```
 
-### Temporal Awareness
+### 时间意识
 
-**Always check `<current_date>` in your context before forming ANY search query.**
+**在形成任何搜索查询前，始终检查上下文中的 `<current_date>`。**
 
-`<current_date>` gives you the full date: year, month, day, and weekday (e.g. `2026-02-28, Saturday`). Use the right level of precision depending on what the user is asking:
+`<current_date>` 会给出完整日期：年份、月份、日期和星期（例如 `2026-02-28, Saturday`）。根据用户问题，使用合适精度：
 
-| User intent | Temporal precision needed | Example query |
+| 用户意图 | 需要的时间精度 | 示例查询 |
 |---|---|---|
-| "today / this morning / just released" | **Month + Day** | `"tech news February 28 2026"` |
-| "this week" | **Week range** | `"technology releases week of Feb 24 2026"` |
-| "recently / latest / new" | **Month** | `"AI breakthroughs February 2026"` |
-| "this year / trends" | **Year** | `"software trends 2026"` |
+| "today / this morning / just released" | **月 + 日** | `"tech news February 28 2026"` |
+| "this week" | **周范围** | `"technology releases week of Feb 24 2026"` |
+| "recently / latest / new" | **月** | `"AI breakthroughs February 2026"` |
+| "this year / trends" | **年** | `"software trends 2026"` |
 
-**Rules:**
-- When the user asks about "today" or "just released", use **month + day + year** in your search queries to get same-day results
-- Never drop to year-only when day-level precision is needed — `"tech news 2026"` will NOT surface today's news
-- Try multiple phrasings: numeric form (`2026-02-28`), written form (`February 28 2026`), and relative terms (`today`, `this week`) across different queries
+**规则：**
+- 当用户询问 “today” 或 “just released” 时，搜索查询中应使用**月 + 日 + 年**，以获取当天结果
+- 当需要日级精度时，绝不能只降到年份——`"tech news 2026"` **无法**检索到今天的新闻
+- 尝试多种表述：数字形式（`2026-02-28`）、文字形式（`February 28 2026`）以及相对术语（`today`、`this week`）
 
-❌ User asks "what's new in tech today" → searching `"new technology 2026"` → misses today's news
-✅ User asks "what's new in tech today" → searching `"new technology February 28 2026"` + `"tech news today Feb 28"` → gets today's results
+❌ 用户问 “what's new in tech today” → 搜索 `"new technology 2026"` → 会错过今天的新闻
+✅ 用户问 “what's new in tech today” → 搜索 `"new technology February 28 2026"` + `"tech news today Feb 28"` → 才能拿到今天的结果
 
-### When to Use web_fetch
+### 何时使用 web_fetch
 
-Use `web_fetch` to read full content when:
-- A search result looks highly relevant and authoritative
-- You need detailed information beyond the snippet
-- The source contains data, case studies, or expert analysis
-- You want to understand the full context of a finding
+在以下情况下使用 `web_fetch` 读取完整内容：
+- 某个搜索结果看起来高度相关且权威
+- 你需要比摘要片段更详细的信息
+- 来源包含数据、案例研究或专家分析
+- 你想理解某个发现的完整上下文
 
-### Iterative Refinement
+### 迭代式精炼
 
-Research is iterative. After initial searches:
-1. Review what you've learned
-2. Identify gaps in your understanding
-3. Formulate new, more targeted queries
-4. Repeat until you have comprehensive coverage
+研究是迭代过程。完成初步搜索后：
+1. 回顾你已经学到什么
+2. 找出理解中的空白
+3. 形成新的、更有针对性的查询
+4. 重复，直到覆盖足够全面
 
-## Quality Bar
+## 质量门槛
 
-Your research is sufficient when you can confidently answer:
-- What are the key facts and data points?
-- What are 2-3 concrete real-world examples?
-- What do experts say about this topic?
-- What are the current trends and future directions?
-- What are the challenges or limitations?
-- What makes this topic relevant or important now?
+当你能够自信回答以下问题时，研究才算充分：
+- 关键事实和数据点是什么？
+- 有哪 2-3 个具体的真实世界案例？
+- 专家如何看待这个主题？
+- 当前趋势和未来方向是什么？
+- 面临哪些挑战或局限？
+- 为什么这个主题在当下重要且相关？
 
-## Common Mistakes to Avoid
+## 需要避免的常见错误
 
-- ❌ Stopping after 1-2 searches
-- ❌ Relying on search snippets without reading full sources
-- ❌ Searching only one aspect of a multi-faceted topic
-- ❌ Ignoring contradicting viewpoints or challenges
-- ❌ Using outdated information when current data exists
-- ❌ Starting content generation before research is complete
+- ❌ 搜索 1-2 次就停止
+- ❌ 只依赖搜索摘要而不阅读完整来源
+- ❌ 对一个多面向主题只搜索其中一个方面
+- ❌ 忽视相反观点或挑战
+- ❌ 在已有最新数据时仍使用过时信息
+- ❌ 在研究尚未完成时就开始内容生成
 
-## Output
+## 输出
 
-After completing research, you should have:
-1. A comprehensive understanding of the topic from multiple angles
-2. Specific facts, data points, and statistics
-3. Real-world examples and case studies
-4. Expert perspectives and authoritative sources
-5. Current trends and relevant context
+完成研究后，你应该具备：
+1. 从多个角度理解该主题的全面认知
+2. 具体的事实、数据点和统计数据
+3. 真实世界案例与 case studies
+4. 专家观点与权威来源
+5. 当前趋势与相关背景
 
-**Only then proceed to content generation**, using the gathered information to create high-quality, well-informed content.
+**只有在这之后，才进入内容生成**，并基于已收集的信息创建高质量、信息充分的内容。

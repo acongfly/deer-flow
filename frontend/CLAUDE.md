@@ -1,32 +1,32 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+此文件为 Claude Code（claude.ai/code）在本仓库中工作时提供指导。
 
-## Project Overview
+## 项目概览
 
-DeerFlow Frontend is a Next.js 16 web interface for an AI agent system. It communicates with a LangGraph-based backend to provide thread-based AI conversations with streaming responses, artifacts, and a skills/tools system.
+DeerFlow Frontend 是一个基于 Next.js 16 的 AI agent 系统 Web 界面。它与基于 LangGraph 的 backend 通信，提供基于 thread 的 AI 对话、流式响应、artifacts，以及 skills/tools 系统。
 
-**Stack**: Next.js 16, React 19, TypeScript 5.8, Tailwind CSS 4, pnpm 10.26.2
+**技术栈**：Next.js 16、React 19、TypeScript 5.8、Tailwind CSS 4、pnpm 10.26.2
 
-## Commands
+## 命令
 
-| Command          | Purpose                                           |
+| 命令 | 用途 |
 | ---------------- | ------------------------------------------------- |
-| `pnpm dev`       | Dev server with Turbopack (http://localhost:3000) |
-| `pnpm build`     | Production build                                  |
-| `pnpm check`     | Lint + type check (run before committing)         |
-| `pnpm lint`      | ESLint only                                       |
-| `pnpm lint:fix`  | ESLint with auto-fix                              |
-| `pnpm test`      | Run unit tests with Vitest                        |
-| `pnpm test:e2e`  | Run E2E tests with Playwright (Chromium)          |
-| `pnpm typecheck` | TypeScript type check (`tsc --noEmit`)            |
-| `pnpm start`     | Start production server                           |
+| `pnpm dev`       | 使用 Turbopack 启动开发服务器（http://localhost:3000） |
+| `pnpm build`     | 生产构建 |
+| `pnpm check`     | Lint + 类型检查（提交前运行） |
+| `pnpm lint`      | 仅运行 ESLint |
+| `pnpm lint:fix`  | 运行 ESLint 并自动修复 |
+| `pnpm test`      | 使用 Vitest 运行 unit tests |
+| `pnpm test:e2e`  | 使用 Playwright（Chromium）运行 E2E tests |
+| `pnpm typecheck` | TypeScript 类型检查（`tsc --noEmit`） |
+| `pnpm start`     | 启动生产服务器 |
 
-Unit tests live under `tests/unit/` and mirror the `src/` layout (e.g., `tests/unit/core/api/stream-mode.test.ts` tests `src/core/api/stream-mode.ts`). Powered by Vitest; import source modules via the `@/` path alias.
+unit tests 位于 `tests/unit/` 下，并与 `src/` 目录结构对应（例如，`tests/unit/core/api/stream-mode.test.ts` 测试 `src/core/api/stream-mode.ts`）。测试基于 Vitest；通过 `@/` 路径别名导入源码模块。
 
-E2E tests live under `tests/e2e/` and use Playwright with Chromium. They mock all backend APIs via `page.route()` network interception and test real page interactions (navigation, chat input, streaming responses). Config: `playwright.config.ts`.
+E2E tests 位于 `tests/e2e/` 下，使用带 Chromium 的 Playwright。它们通过 `page.route()` 网络拦截来 mock 所有 backend API，并测试真实的页面交互（导航、聊天输入、流式响应）。配置文件：`playwright.config.ts`。
 
-## Architecture
+## 架构
 
 ```
 Frontend (Next.js) ──▶ LangGraph SDK ──▶ LangGraph Backend (lead_agent)
@@ -34,61 +34,61 @@ Frontend (Next.js) ──▶ LangGraph SDK ──▶ LangGraph Backend (lead_age
                                               └── Tools & Skills
 ```
 
-The frontend is a stateful chat application. Users create **threads** (conversations), send messages, and receive streamed AI responses. The backend orchestrates agents that can produce **artifacts** (files/code) and **todos**.
+frontend 是一个有状态的聊天应用。用户会创建 **threads**（对话）、发送消息，并接收流式的 AI 响应。backend 负责编排 agents，这些 agents 可以生成 **artifacts**（文件/代码）和 **todos**。
 
-### Source Layout (`src/`)
+### 源码布局（`src/`）
 
-- **`app/`** — Next.js App Router. Routes: `/` (landing), `/workspace/chats/[thread_id]` (chat).
-- **`components/`** — React components split into:
-  - `ui/` — Shadcn UI primitives (auto-generated, ESLint-ignored)
-  - `ai-elements/` — Vercel AI SDK elements (auto-generated, ESLint-ignored)
-  - `workspace/` — Chat page components (messages, artifacts, settings)
-  - `landing/` — Landing page sections
-- **`core/`** — Business logic, the heart of the app:
-  - `threads/` — Thread creation, streaming, state management (hooks + types)
-  - `api/` — LangGraph client singleton
-  - `artifacts/` — Artifact loading and caching
-  - `i18n/` — Internationalization (en-US, zh-CN)
-  - `settings/` — User preferences in localStorage
-  - `memory/` — Persistent user memory system
-  - `skills/` — Skills installation and management
-  - `messages/` — Message processing and transformation
-  - `mcp/` — Model Context Protocol integration
-  - `models/` — TypeScript types and data models
-- **`hooks/`** — Shared React hooks
-- **`lib/`** — Utilities (`cn()` from clsx + tailwind-merge)
-- **`server/`** — Server-side code (better-auth, not yet active)
-- **`styles/`** — Global CSS with Tailwind v4 `@import` syntax and CSS variables for theming
+- **`app/`** — Next.js App Router。路由：`/`（landing）、`/workspace/chats/[thread_id]`（chat）。
+- **`components/`** — React 组件，拆分为：
+  - `ui/` — Shadcn UI primitives（自动生成，ESLint 忽略）
+  - `ai-elements/` — Vercel AI SDK elements（自动生成，ESLint 忽略）
+  - `workspace/` — chat 页面组件（messages、artifacts、settings）
+  - `landing/` — landing 页面各区块
+- **`core/`** — 业务逻辑，是整个应用的核心：
+  - `threads/` — thread 创建、流式传输、state 管理（hooks + types）
+  - `api/` — LangGraph client 单例
+  - `artifacts/` — artifact 加载与缓存
+  - `i18n/` — 国际化（en-US、zh-CN）
+  - `settings/` — 存储在 localStorage 中的用户偏好
+  - `memory/` — 持久化用户 memory 系统
+  - `skills/` — skills 安装与管理
+  - `messages/` — message 处理与转换
+  - `mcp/` — Model Context Protocol 集成
+  - `models/` — TypeScript 类型与数据模型
+- **`hooks/`** — 共享的 React hooks
+- **`lib/`** — 工具函数（来自 clsx + tailwind-merge 的 `cn()`）
+- **`server/`** — server-side 代码（better-auth，尚未启用）
+- **`styles/`** — 全局 CSS，使用 Tailwind v4 `@import` 语法和 CSS variables 进行主题化
 
-### Data Flow
+### 数据流
 
-1. User input → thread hooks (`core/threads/hooks.ts`) → LangGraph SDK streaming
-2. Stream events update thread state (messages, artifacts, todos)
-3. TanStack Query manages server state; localStorage stores user settings
-4. Components subscribe to thread state and render updates
+1. 用户输入 → thread hooks（`core/threads/hooks.ts`）→ LangGraph SDK 流式传输
+2. stream events 更新 thread state（messages、artifacts、todos）
+3. TanStack Query 管理 server state；localStorage 存储用户设置
+4. 组件订阅 thread state 并渲染更新
 
-### Key Patterns
+### 关键模式
 
-- **Server Components by default**, `"use client"` only for interactive components
-- **Thread hooks** (`useThreadStream`, `useSubmitThread`, `useThreads`) are the primary API interface
-- **LangGraph client** is a singleton obtained via `getAPIClient()` in `core/api/`
-- **Environment validation** uses `@t3-oss/env-nextjs` with Zod schemas (`src/env.js`). Skip with `SKIP_ENV_VALIDATION=1`
+- **默认使用 Server Components**，只有交互型组件才使用 `"use client"`
+- **Thread hooks**（`useThreadStream`、`useSubmitThread`、`useThreads`）是主要的 API 接口
+- **LangGraph client** 是通过 `core/api/` 中的 `getAPIClient()` 获取的单例
+- **环境校验** 使用带 Zod schema 的 `@t3-oss/env-nextjs`（`src/env.js`）。可通过 `SKIP_ENV_VALIDATION=1` 跳过
 
-## Code Style
+## 代码风格
 
-- **Imports**: Enforced ordering (builtin → external → internal → parent → sibling), alphabetized, newlines between groups. Use inline type imports: `import { type Foo }`.
-- **Unused variables**: Prefix with `_`.
-- **Class names**: Use `cn()` from `@/lib/utils` for conditional Tailwind classes.
-- **Path alias**: `@/*` maps to `src/*`.
-- **Components**: `ui/` and `ai-elements/` are generated from registries (Shadcn, MagicUI, React Bits, Vercel AI SDK) — don't manually edit these.
+- **Imports**：强制排序（builtin → external → internal → parent → sibling），按字母排序，组之间空行分隔。类型导入使用内联形式：`import { type Foo }`。
+- **未使用变量**：使用 `_` 前缀。
+- **类名**：使用来自 `@/lib/utils` 的 `cn()` 处理条件式 Tailwind class。
+- **路径别名**：`@/*` 映射到 `src/*`。
+- **组件**：`ui/` 和 `ai-elements/` 来自 registries（Shadcn、MagicUI、React Bits、Vercel AI SDK）的自动生成内容——不要手动编辑这些文件。
 
-## Environment
+## 环境
 
-Backend API URLs are optional; an nginx proxy is used by default:
+Backend API URL 是可选的；默认使用 nginx proxy：
 
 ```
 NEXT_PUBLIC_BACKEND_BASE_URL=http://localhost:8001
 NEXT_PUBLIC_LANGGRAPH_BASE_URL=http://localhost:2024
 ```
 
-Requires Node.js 22+ and pnpm 10.26.2+.
+需要 Node.js 22+ 和 pnpm 10.26.2+。

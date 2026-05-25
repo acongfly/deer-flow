@@ -1,105 +1,105 @@
-# Langfuse Tracing Implementation Plan
+# Langfuse Tracing 实施计划
 
-**Goal:** Add optional Langfuse observability support to DeerFlow while preserving existing LangSmith tracing and allowing both providers to be enabled at the same time.
+**目标：** 为 DeerFlow 增加可选的 Langfuse observability 支持，同时保留现有的 LangSmith tracing，并允许两个 provider 同时启用。
 
-**Architecture:** Extend tracing configuration from a single LangSmith-only shape to a multi-provider config, add a tracing callback factory that builds zero, one, or two callbacks based on environment variables, and update model creation to attach those callbacks. If a provider is explicitly enabled but misconfigured or fails to initialize, tracing initialization during model creation should fail with a clear error naming that provider.
+**架构：** 将 tracing 配置从仅支持 LangSmith 的单一结构扩展为多 provider 配置；添加一个 tracing callback factory，根据环境变量构建 0 个、1 个或 2 个 callback；并更新 model 创建逻辑以附加这些 callback。如果某个 provider 被显式启用但配置错误或初始化失败，那么在 model 创建期间初始化 tracing 时应以清晰错误失败，并明确指出是哪个 provider。
 
-**Tech Stack:** Python 3.12, Pydantic, LangChain callbacks, LangSmith, Langfuse, pytest
+**技术栈：** Python 3.12、Pydantic、LangChain callbacks、LangSmith、Langfuse、pytest
 
 ---
 
-### Task 1: Add failing tracing config tests
+### 任务 1：添加失败中的 tracing config 测试
 
-**Files:**
-- Modify: `backend/tests/test_tracing_config.py`
+**文件：**
+- 修改：`backend/tests/test_tracing_config.py`
 
-**Step 1: Write the failing tests**
+**步骤 1：编写失败中的测试**
 
-Add tests covering:
-- Langfuse-only config parsing
-- dual-provider parsing
-- explicit enable with missing required Langfuse fields
-- provider enable detection without relying on LangSmith-only helpers
+添加以下覆盖场景的测试：
+- 仅 Langfuse 的配置解析
+- 双 provider 解析
+- 显式启用但缺少必需的 Langfuse 字段
+- 不依赖仅限 LangSmith helper 的 provider 启用检测
 
-**Step 2: Run tests to verify they fail**
+**步骤 2：运行测试并确认其失败**
 
-Run: `cd backend && uv run pytest tests/test_tracing_config.py -q`
-Expected: FAIL because tracing config only supports LangSmith today.
+运行：`cd backend && uv run pytest tests/test_tracing_config.py -q`
+预期：FAIL，因为当前 tracing config 只支持 LangSmith。
 
-**Step 3: Write minimal implementation**
+**步骤 3：编写最小实现**
 
-Update tracing config code to represent multiple providers and expose helper functions needed by the tests.
+更新 tracing config 代码，以表示多个 provider，并暴露测试所需的 helper functions。
 
-**Step 4: Run tests to verify they pass**
+**步骤 4：再次运行测试并确认通过**
 
-Run: `cd backend && uv run pytest tests/test_tracing_config.py -q`
-Expected: PASS
+运行：`cd backend && uv run pytest tests/test_tracing_config.py -q`
+预期：PASS
 
-### Task 2: Add failing callback factory and model attachment tests
+### 任务 2：添加失败中的 callback factory 和 model attachment 测试
 
-**Files:**
-- Modify: `backend/tests/test_model_factory.py`
-- Create: `backend/tests/test_tracing_factory.py`
+**文件：**
+- 修改：`backend/tests/test_model_factory.py`
+- 新建：`backend/tests/test_tracing_factory.py`
 
-**Step 1: Write the failing tests**
+**步骤 1：编写失败中的测试**
 
-Add tests covering:
-- LangSmith callback creation
-- Langfuse callback creation
-- dual callback creation
-- startup failure when an explicitly enabled provider cannot initialize
-- model factory appends all tracing callbacks to model callbacks
+添加以下覆盖场景的测试：
+- LangSmith callback 创建
+- Langfuse callback 创建
+- 双 callback 创建
+- 当显式启用的 provider 无法初始化时，启动失败
+- model factory 会将所有 tracing callbacks 附加到 model callbacks
 
-**Step 2: Run tests to verify they fail**
+**步骤 2：运行测试并确认其失败**
 
-Run: `cd backend && uv run pytest tests/test_model_factory.py tests/test_tracing_factory.py -q`
-Expected: FAIL because there is no provider factory and model creation only attaches LangSmith.
+运行：`cd backend && uv run pytest tests/test_model_factory.py tests/test_tracing_factory.py -q`
+预期：FAIL，因为目前没有 provider factory，而且 model 创建只会附加 LangSmith。
 
-**Step 3: Write minimal implementation**
+**步骤 3：编写最小实现**
 
-Create tracing callback factory module and update model factory to use it.
+创建 tracing callback factory 模块，并更新 model factory 以使用它。
 
-**Step 4: Run tests to verify they pass**
+**步骤 4：再次运行测试并确认通过**
 
-Run: `cd backend && uv run pytest tests/test_model_factory.py tests/test_tracing_factory.py -q`
-Expected: PASS
+运行：`cd backend && uv run pytest tests/test_model_factory.py tests/test_tracing_factory.py -q`
+预期：PASS
 
-### Task 3: Wire dependency and docs
+### 任务 3：接入依赖与文档
 
-**Files:**
-- Modify: `backend/packages/harness/pyproject.toml`
-- Modify: `README.md`
-- Modify: `backend/README.md`
+**文件：**
+- 修改：`backend/packages/harness/pyproject.toml`
+- 修改：`README.md`
+- 修改：`backend/README.md`
 
-**Step 1: Update dependency**
+**步骤 1：更新依赖**
 
-Add `langfuse` to the harness dependencies.
+将 `langfuse` 添加到 harness dependencies 中。
 
-**Step 2: Update docs**
+**步骤 2：更新文档**
 
-Document:
-- Langfuse environment variables
-- dual-provider behavior
-- failure behavior for explicitly enabled providers
+记录以下内容：
+- Langfuse 环境变量
+- 双 provider 行为
+- 显式启用 provider 时的失败行为
 
-**Step 3: Run targeted verification**
+**步骤 3：运行定向验证**
 
-Run: `cd backend && uv run pytest tests/test_tracing_config.py tests/test_model_factory.py tests/test_tracing_factory.py -q`
-Expected: PASS
+运行：`cd backend && uv run pytest tests/test_tracing_config.py tests/test_model_factory.py tests/test_tracing_factory.py -q`
+预期：PASS
 
-### Task 4: Run broader regression checks
+### 任务 4：运行更广泛的回归检查
 
-**Files:**
-- No code changes required
+**文件：**
+- 不需要代码改动
 
-**Step 1: Run relevant suite**
+**步骤 1：运行相关测试套件**
 
-Run: `cd backend && uv run pytest tests/test_tracing_config.py tests/test_model_factory.py tests/test_tracing_factory.py -q`
+运行：`cd backend && uv run pytest tests/test_tracing_config.py tests/test_model_factory.py tests/test_tracing_factory.py -q`
 
-**Step 2: Run lint if needed**
+**步骤 2：如有需要运行 lint**
 
-Run: `cd backend && uv run ruff check packages/harness/deerflow/config/tracing_config.py packages/harness/deerflow/models/factory.py packages/harness/deerflow/tracing`
+运行：`cd backend && uv run ruff check packages/harness/deerflow/config/tracing_config.py packages/harness/deerflow/models/factory.py packages/harness/deerflow/tracing`
 
-**Step 3: Review diff**
+**步骤 3：审阅 diff**
 
-Run: `git diff -- backend/packages/harness backend/tests README.md backend/README.md`
+运行：`git diff -- backend/packages/harness backend/tests README.md backend/README.md`
