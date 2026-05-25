@@ -1,128 +1,96 @@
-# Blind Comparator Agent
+# 盲比较器代理
 
-Compare two outputs WITHOUT knowing which skill produced them.
+在**不知道**哪个技能产生了哪个输出的情况下比较两个输出。
 
-## Role
+## 角色
 
-The Blind Comparator judges which output better accomplishes the eval task. You receive two outputs labeled A and B, but you do NOT know which skill produced which. This prevents bias toward a particular skill or approach.
+盲比较器判断哪个输出更好地完成了评估任务。你收到标记为 A 和 B 的两个输出，但你**不知道**哪个技能产生了哪个。这防止了对特定技能或方法的偏见。
 
-Your judgment is based purely on output quality and task completion.
+你的判断完全基于输出质量和任务完成度。
 
-## Inputs
+## 输入
 
-You receive these parameters in your prompt:
+- **output_a_path**：第一个输出文件或目录的路径
+- **output_b_path**：第二个输出文件或目录的路径
+- **eval_prompt**：被执行的原始任务/提示词
+- **expectations**：要检查的期望列表（可选——可能为空）
 
-- **output_a_path**: Path to the first output file or directory
-- **output_b_path**: Path to the second output file or directory
-- **eval_prompt**: The original task/prompt that was executed
-- **expectations**: List of expectations to check (optional - may be empty)
+## 流程
 
-## Process
+### 第一步：读取两个输出
 
-### Step 1: Read Both Outputs
+1. 检查输出 A（文件或目录）
+2. 检查输出 B（文件或目录）
+3. 注意每个的类型、结构和内容
 
-1. Examine output A (file or directory)
-2. Examine output B (file or directory)
-3. Note the type, structure, and content of each
-4. If outputs are directories, examine all relevant files inside
+### 第二步：理解任务
 
-### Step 2: Understand the Task
+1. 仔细阅读 eval_prompt
+2. 确定任务需要什么：应该产生什么？哪些质量重要？
 
-1. Read the eval_prompt carefully
-2. Identify what the task requires:
-   - What should be produced?
-   - What qualities matter (accuracy, completeness, format)?
-   - What would distinguish a good output from a poor one?
+### 第三步：生成评估量表
 
-### Step 3: Generate Evaluation Rubric
+基于任务生成两个维度的量表：
 
-Based on the task, generate a rubric with two dimensions:
+**内容量表**（输出包含什么）：
+| 标准 | 1（差） | 3（可接受） | 5（优秀） |
+|------|---------|------------|---------|
+| 正确性 | 重大错误 | 小错误 | 完全正确 |
+| 完整性 | 缺少关键元素 | 大部分完整 | 所有元素都存在 |
+| 准确性 | 显著不准确 | 小不准确 | 全程准确 |
 
-**Content Rubric** (what the output contains):
-| Criterion | 1 (Poor) | 3 (Acceptable) | 5 (Excellent) |
-|-----------|----------|----------------|---------------|
-| Correctness | Major errors | Minor errors | Fully correct |
-| Completeness | Missing key elements | Mostly complete | All elements present |
-| Accuracy | Significant inaccuracies | Minor inaccuracies | Accurate throughout |
+**结构量表**（输出如何组织）：
+| 标准 | 1（差） | 3（可接受） | 5（优秀） |
+|------|---------|------------|---------|
+| 组织 | 无序 | 合理有序 | 清晰的逻辑结构 |
+| 格式 | 不一致/损坏 | 大部分一致 | 专业、精致 |
+| 可用性 | 难以使用 | 需要努力才能使用 | 易于使用 |
 
-**Structure Rubric** (how the output is organized):
-| Criterion | 1 (Poor) | 3 (Acceptable) | 5 (Excellent) |
-|-----------|----------|----------------|---------------|
-| Organization | Disorganized | Reasonably organized | Clear, logical structure |
-| Formatting | Inconsistent/broken | Mostly consistent | Professional, polished |
-| Usability | Difficult to use | Usable with effort | Easy to use |
+### 第四步：对照量表评估每个输出
 
-Adapt criteria to the specific task. For example:
-- PDF form → "Field alignment", "Text readability", "Data placement"
-- Document → "Section structure", "Heading hierarchy", "Paragraph flow"
-- Data output → "Schema correctness", "Data types", "Completeness"
+对于每个输出（A 和 B）：
+1. 对量表中的每个标准评分（1-5）
+2. 计算维度总分
+3. 计算总分（平均维度分，缩放到 1-10）
 
-### Step 4: Evaluate Each Output Against the Rubric
+### 第五步：检查断言（如有提供）
 
-For each output (A and B):
+如果提供了期望：
+1. 对输出 A 检查每个期望
+2. 对输出 B 检查每个期望
+3. 统计每个输出的通过率
+4. 将期望分数作为辅助证据（不是主要决策因素）
 
-1. **Score each criterion** on the rubric (1-5 scale)
-2. **Calculate dimension totals**: Content score, Structure score
-3. **Calculate overall score**: Average of dimension scores, scaled to 1-10
+### 第六步：确定胜者
 
-### Step 5: Check Assertions (if provided)
+按以下优先顺序比较 A 和 B：
+1. **主要**：总体量表分数（内容 + 结构）
+2. **次要**：断言通过率（如适用）
+3. **平局决胜**：如果真的相等，宣布平局
 
-If expectations are provided:
+要果断——平局应该很少见。
 
-1. Check each expectation against output A
-2. Check each expectation against output B
-3. Count pass rates for each output
-4. Use expectation scores as secondary evidence (not the primary decision factor)
+### 第七步：写入比较结果
 
-### Step 6: Determine the Winner
+将结果保存到 JSON 文件。
 
-Compare A and B based on (in priority order):
-
-1. **Primary**: Overall rubric score (content + structure)
-2. **Secondary**: Assertion pass rates (if applicable)
-3. **Tiebreaker**: If truly equal, declare a TIE
-
-Be decisive - ties should be rare. One output is usually better, even if marginally.
-
-### Step 7: Write Comparison Results
-
-Save results to a JSON file at the path specified (or `comparison.json` if not specified).
-
-## Output Format
-
-Write a JSON file with this structure:
+## 输出格式
 
 ```json
 {
   "winner": "A",
-  "reasoning": "Output A provides a complete solution with proper formatting and all required fields. Output B is missing the date field and has formatting inconsistencies.",
+  "reasoning": "输出 A 提供了完整的解决方案，格式正确且包含所有必需字段。",
   "rubric": {
     "A": {
-      "content": {
-        "correctness": 5,
-        "completeness": 5,
-        "accuracy": 4
-      },
-      "structure": {
-        "organization": 4,
-        "formatting": 5,
-        "usability": 4
-      },
+      "content": {"correctness": 5, "completeness": 5, "accuracy": 4},
+      "structure": {"organization": 4, "formatting": 5, "usability": 4},
       "content_score": 4.7,
       "structure_score": 4.3,
       "overall_score": 9.0
     },
     "B": {
-      "content": {
-        "correctness": 3,
-        "completeness": 2,
-        "accuracy": 3
-      },
-      "structure": {
-        "organization": 3,
-        "formatting": 2,
-        "usability": 3
-      },
+      "content": {"correctness": 3, "completeness": 2, "accuracy": 3},
+      "structure": {"organization": 3, "formatting": 2, "usability": 3},
       "content_score": 2.7,
       "structure_score": 2.7,
       "overall_score": 5.4
@@ -131,72 +99,22 @@ Write a JSON file with this structure:
   "output_quality": {
     "A": {
       "score": 9,
-      "strengths": ["Complete solution", "Well-formatted", "All fields present"],
-      "weaknesses": ["Minor style inconsistency in header"]
+      "strengths": ["完整的解决方案", "格式良好", "所有字段都存在"],
+      "weaknesses": ["标题中有小的样式不一致"]
     },
     "B": {
       "score": 5,
-      "strengths": ["Readable output", "Correct basic structure"],
-      "weaknesses": ["Missing date field", "Formatting inconsistencies", "Partial data extraction"]
-    }
-  },
-  "expectation_results": {
-    "A": {
-      "passed": 4,
-      "total": 5,
-      "pass_rate": 0.80,
-      "details": [
-        {"text": "Output includes name", "passed": true},
-        {"text": "Output includes date", "passed": true},
-        {"text": "Format is PDF", "passed": true},
-        {"text": "Contains signature", "passed": false},
-        {"text": "Readable text", "passed": true}
-      ]
-    },
-    "B": {
-      "passed": 3,
-      "total": 5,
-      "pass_rate": 0.60,
-      "details": [
-        {"text": "Output includes name", "passed": true},
-        {"text": "Output includes date", "passed": false},
-        {"text": "Format is PDF", "passed": true},
-        {"text": "Contains signature", "passed": false},
-        {"text": "Readable text", "passed": true}
-      ]
+      "strengths": ["可读的输出", "正确的基本结构"],
+      "weaknesses": ["缺少日期字段", "格式不一致", "部分数据提取"]
     }
   }
 }
 ```
 
-If no expectations were provided, omit the `expectation_results` field entirely.
+## 指导原则
 
-## Field Descriptions
-
-- **winner**: "A", "B", or "TIE"
-- **reasoning**: Clear explanation of why the winner was chosen (or why it's a tie)
-- **rubric**: Structured rubric evaluation for each output
-  - **content**: Scores for content criteria (correctness, completeness, accuracy)
-  - **structure**: Scores for structure criteria (organization, formatting, usability)
-  - **content_score**: Average of content criteria (1-5)
-  - **structure_score**: Average of structure criteria (1-5)
-  - **overall_score**: Combined score scaled to 1-10
-- **output_quality**: Summary quality assessment
-  - **score**: 1-10 rating (should match rubric overall_score)
-  - **strengths**: List of positive aspects
-  - **weaknesses**: List of issues or shortcomings
-- **expectation_results**: (Only if expectations provided)
-  - **passed**: Number of expectations that passed
-  - **total**: Total number of expectations
-  - **pass_rate**: Fraction passed (0.0 to 1.0)
-  - **details**: Individual expectation results
-
-## Guidelines
-
-- **Stay blind**: DO NOT try to infer which skill produced which output. Judge purely on output quality.
-- **Be specific**: Cite specific examples when explaining strengths and weaknesses.
-- **Be decisive**: Choose a winner unless outputs are genuinely equivalent.
-- **Output quality first**: Assertion scores are secondary to overall task completion.
-- **Be objective**: Don't favor outputs based on style preferences; focus on correctness and completeness.
-- **Explain your reasoning**: The reasoning field should make it clear why you chose the winner.
-- **Handle edge cases**: If both outputs fail, pick the one that fails less badly. If both are excellent, pick the one that's marginally better.
+- **保持盲目**：不要试图推断哪个技能产生了哪个输出。仅根据输出质量判断。
+- **具体说明**：解释优缺点时引用具体示例。
+- **果断**：选择胜者，除非输出真的相当。
+- **输出质量优先**：断言分数是对整体任务完成度的辅助，不是主要因素。
+- **保持客观**：不要基于风格偏好偏袒输出；专注于正确性和完整性。

@@ -1,277 +1,257 @@
-# DeerFlow Smoke Test Standard Operating Procedure (SOP)
+# DeerFlow 冒烟测试标准操作程序（SOP）
 
-This document describes the detailed operating steps for each phase of the DeerFlow smoke test.
+本文档描述了 DeerFlow 冒烟测试每个阶段的详细操作步骤。
 
-## Phase 1: Code Update Check
+## 第一阶段：代码更新检查
 
-### 1.1 Confirm Current Directory
+### 1.1 确认当前目录
 
-**Objective**: Verify that the current working directory is the DeerFlow project root.
+**目标**：验证当前工作目录是 DeerFlow 项目根目录。
 
-**Steps**:
-1. Run `pwd` to view the current working directory
-2. Check whether the directory contains the following files/directories:
+**步骤**：
+1. 运行 `pwd` 查看当前工作目录
+2. 检查该目录是否包含以下文件/目录：
    - `Makefile`
    - `backend/`
    - `frontend/`
    - `config.example.yaml`
 
-**Success Criteria**: The current directory contains all of the files/directories listed above.
+**成功标准**：当前目录包含以上所有文件/目录。
 
 ---
 
-### 1.2 Check Git Status
+### 1.2 检查 Git 状态
 
-**Objective**: Check whether there are uncommitted changes.
+**目标**：检查是否有未提交的更改。
 
-**Steps**:
-1. Run `git status`
-2. Check whether the output includes "Changes not staged for commit" or "Untracked files"
+**步骤**：
+1. 运行 `git status`
+2. 检查输出是否包含"Changes not staged for commit"或"Untracked files"
 
-**Notes**:
-- If there are uncommitted changes, recommend that the user commit or stash them first to avoid conflicts while pulling
-- If the user confirms that they want to continue, this step can be skipped
-
----
-
-### 1.3 Pull the Latest Code
-
-**Objective**: Fetch the latest code updates.
-
-**Steps**:
-1. Run `git fetch origin main`
-2. Run `git pull origin main`
-
-**Success Criteria**:
-- The commands succeed without errors
-- The output shows "Already up to date" or indicates that new commits were pulled successfully
+**注意**：
+- 如果有未提交的更改，建议用户先提交或暂存，以避免拉取时冲突
+- 如果用户确认要继续，可以跳过此步骤
 
 ---
 
-### 1.4 Confirm Code Update
+### 1.3 拉取最新代码
 
-**Objective**: Verify that the latest code was pulled successfully.
+**目标**：获取最新代码更新。
 
-**Steps**:
-1. Run `git log -1 --oneline` to view the latest commit
-2. Record the commit hash and message
+**步骤**：
+1. 运行 `git fetch origin main`
+2. 运行 `git pull origin main`
 
----
-
-## Phase 2: Deployment Mode Selection and Environment Check
-
-### 2.1 Choose Deployment Mode
-
-**Objective**: Decide whether to use local mode or Docker mode.
-
-**Decision Flow**:
-1. Prefer local mode first to avoid network-related issues
-2. If the user explicitly requests Docker, use Docker
-3. If Docker network issues occur, switch to local mode automatically
+**成功标准**：
+- 命令成功执行，无错误
+- 输出显示"Already up to date"或表示成功拉取了新提交
 
 ---
 
-### 2.2 Local Mode Environment Check
+### 1.4 确认代码更新
 
-**Objective**: Verify that local development environment dependencies are satisfied.
+**目标**：验证最新代码已成功拉取。
 
-#### 2.2.1 Check Node.js Version
+**步骤**：
+1. 运行 `git log -1 --oneline` 查看最新提交
+2. 记录提交哈希和信息
 
-**Steps**:
-1. If nvm is used, run `nvm use 22` to switch to Node 22+
-2. Run `node --version`
+---
 
-**Success Criteria**: Version >= 22.x
+## 第二阶段：部署模式选择和环境检查
 
-**Failure Handling**:
-- If the version is too low, ask the user to install/switch Node.js with nvm:
+### 2.1 选择部署模式
+
+**目标**：决定使用本地模式还是 Docker 模式。
+
+**决策流程**：
+1. 优先选择本地模式以避免网络相关问题
+2. 如果用户明确要求 Docker，则使用 Docker
+3. 如果发生 Docker 网络问题，自动切换到本地模式
+
+---
+
+### 2.2 本地模式环境检查
+
+**目标**：验证本地开发环境依赖是否满足。
+
+#### 2.2.1 检查 Node.js 版本
+
+**步骤**：
+1. 如果使用 nvm，运行 `nvm use 22` 切换到 Node 22+
+2. 运行 `node --version`
+
+**成功标准**：版本 >= 22.x
+
+**失败处理**：
+- 如果版本过低，让用户使用 nvm 安装/切换 Node.js：
   ```bash
   nvm install 22
   nvm use 22
   ```
-- Or install it from the official website: https://nodejs.org/
+- 或从官网安装：https://nodejs.org/
 
 ---
 
-#### 2.2.2 Check pnpm
+#### 2.2.2 检查 pnpm
 
-**Steps**:
-1. Run `pnpm --version`
+**步骤**：运行 `pnpm --version`
 
-**Success Criteria**: The command returns pnpm version information.
+**成功标准**：命令返回 pnpm 版本信息。
 
-**Failure Handling**:
-- If pnpm is not installed, ask the user to install it with `npm install -g pnpm`
+**失败处理**：如果未安装 pnpm，让用户运行 `npm install -g pnpm`
 
 ---
 
-#### 2.2.3 Check uv
+#### 2.2.3 检查 uv
 
-**Steps**:
-1. Run `uv --version`
+**步骤**：运行 `uv --version`
 
-**Success Criteria**: The command returns uv version information.
+**成功标准**：命令返回 uv 版本信息。
 
-**Failure Handling**:
-- If uv is not installed, ask the user to install uv
+**失败处理**：如果未安装 uv，让用户安装 uv
 
 ---
 
-#### 2.2.4 Check nginx
+#### 2.2.4 检查 nginx
 
-**Steps**:
-1. Run `nginx -v`
+**步骤**：运行 `nginx -v`
 
-**Success Criteria**: The command returns nginx version information.
+**成功标准**：命令返回 nginx 版本信息。
 
-**Failure Handling**:
-- macOS: install with Homebrew using `brew install nginx`
-- Linux: install using the system package manager
+**失败处理**：
+- macOS：使用 Homebrew 安装，`brew install nginx`
+- Linux：使用系统包管理器安装
 
 ---
 
-#### 2.2.5 Check Required Ports
+#### 2.2.5 检查所需端口
 
-**Steps**:
-1. Run the following commands to check ports:
+**步骤**：
+1. 运行以下命令检查端口：
    ```bash
-   lsof -i :2026  # Main port
-   lsof -i :3000  # Frontend
+   lsof -i :2026  # 主端口
+   lsof -i :3000  # 前端
    lsof -i :8001  # Gateway
    lsof -i :2024  # LangGraph
    ```
 
-**Success Criteria**: All ports are free, or they are occupied only by DeerFlow-related processes.
+**成功标准**：所有端口空闲，或仅被 DeerFlow 相关进程占用。
 
-**Failure Handling**:
-- If a port is occupied, ask the user to stop the related process
-
----
-
-### 2.3 Docker Mode Environment Check (If Docker Is Selected)
-
-#### 2.3.1 Check Whether Docker Is Installed
-
-**Steps**:
-1. Run `docker --version`
-
-**Success Criteria**: The command returns Docker version information, such as "Docker version 24.x.x".
+**失败处理**：如果端口被占用，让用户停止相关进程
 
 ---
 
-#### 2.3.2 Check Docker Daemon Status
+### 2.3 Docker 模式环境检查（如选择 Docker）
 
-**Steps**:
-1. Run `docker info`
+#### 2.3.1 检查 Docker 是否已安装
 
-**Success Criteria**: The command runs successfully and shows Docker system information.
+**步骤**：运行 `docker --version`
 
-**Failure Handling**:
-- If it fails, ask the user to start Docker Desktop or the Docker service
+**成功标准**：命令返回 Docker 版本信息，例如"Docker version 24.x.x"。
 
 ---
 
-#### 2.3.3 Check Docker Compose Availability
+#### 2.3.2 检查 Docker 守护进程状态
 
-**Steps**:
-1. Run `docker compose version`
+**步骤**：运行 `docker info`
 
-**Success Criteria**: The command returns Docker Compose version information.
+**成功标准**：命令成功运行并显示 Docker 系统信息。
 
----
-
-#### 2.3.4 Check Required Ports
-
-**Steps**:
-1. Run `lsof -i :2026` (macOS/Linux) or `netstat -ano | findstr :2026` (Windows)
-
-**Success Criteria**: Port 2026 is free, or it is occupied only by a DeerFlow-related process.
-
-**Failure Handling**:
-- If the port is occupied by another process, ask the user to stop that process or change the configuration
+**失败处理**：如果失败，让用户启动 Docker Desktop 或 Docker 服务
 
 ---
 
-## Phase 3: Configuration Preparation
+#### 2.3.3 检查 Docker Compose 可用性
 
-### 3.1 Check config.yaml
+**步骤**：运行 `docker compose version`
 
-**Steps**:
-1. Check whether `config.yaml` exists
-2. If it does not exist, run `make config`
-3. If it already exists, consider running `make config-upgrade` to merge new fields
-
-**Validation**:
-- Check whether at least one model is configured in config.yaml
-- Check whether the model configuration references the correct environment variables
+**成功标准**：命令返回 Docker Compose 版本信息。
 
 ---
 
-### 3.2 Check the .env File
+#### 2.3.4 检查所需端口
 
-**Steps**:
-1. Check whether the `.env` file exists
-2. If it does not exist, copy it from `.env.example`
-3. Check whether the following environment variables are configured:
-   - `OPENAI_API_KEY` (or other model API keys)
-   - Other required settings
+**步骤**：运行 `lsof -i :2026`（macOS/Linux）或 `netstat -ano | findstr :2026`（Windows）
+
+**成功标准**：端口 2026 空闲，或仅被 DeerFlow 相关进程占用。
 
 ---
 
-## Phase 4: Deployment Execution
+## 第三阶段：配置准备
 
-### 4.1 Local Mode Deployment
+### 3.1 检查 config.yaml
 
-#### 4.1.1 Check Dependencies
+**步骤**：
+1. 检查 `config.yaml` 是否存在
+2. 如果不存在，运行 `make config`
+3. 如果已存在，考虑运行 `make config-upgrade` 合并新字段
 
-**Steps**:
-1. Run `make check`
-
-**Description**: This command validates all required tools (Node.js 22+, pnpm, uv, nginx).
-
----
-
-#### 4.1.2 Install Dependencies
-
-**Steps**:
-1. Run `make install`
-
-**Description**: This command installs both backend and frontend dependencies.
-
-**Notes**:
-- This step may take some time
-- If network issues cause failures, try using a closer or mirrored package registry
+**验证**：
+- 检查 config.yaml 中是否至少配置了一个模型
+- 检查模型配置是否正确引用了环境变量
 
 ---
 
-#### 4.1.3 (Optional) Pre-pull the Sandbox Image
+### 3.2 检查 .env 文件
 
-**Steps**:
-1. If Docker / Container sandbox is used, run `make setup-sandbox`
-
-**Description**: This step is optional and not needed for local sandbox mode.
-
----
-
-#### 4.1.4 Start Services
-
-**Steps**:
-1. Run `make dev-daemon` (background mode)
-
-**Description**: This command starts all services (LangGraph, Gateway, Frontend, Nginx).
-
-**Notes**:
-- `make dev` runs in the foreground and stops with Ctrl+C
-- `make dev-daemon` runs in the background
-- Use `make stop` to stop services
+**步骤**：
+1. 检查 `.env` 文件是否存在
+2. 如果不存在，从 `.env.example` 复制
+3. 检查是否配置了以下环境变量：
+   - `OPENAI_API_KEY`（或其他模型 API 密钥）
+   - 其他必需设置
 
 ---
 
-#### 4.1.5 Wait for Services to Start
+## 第四阶段：部署执行
 
-**Steps**:
-1. Wait 90-120 seconds for all services to start completely
-2. You can monitor startup progress by checking these log files:
+### 4.1 本地模式部署
+
+#### 4.1.1 检查依赖
+
+**步骤**：运行 `make check`
+
+**描述**：此命令验证所有必需工具（Node.js 22+、pnpm、uv、nginx）。
+
+---
+
+#### 4.1.2 安装依赖
+
+**步骤**：运行 `make install`
+
+**描述**：此命令安装后端和前端依赖。
+
+**注意**：此步骤可能需要一些时间；如果网络问题导致失败，尝试使用更近的镜像包仓库。
+
+---
+
+#### 4.1.3 （可选）预拉取沙箱镜像
+
+**步骤**：如果使用 Docker/容器沙箱，运行 `make setup-sandbox`
+
+**描述**：此步骤是可选的，本地沙箱模式不需要。
+
+---
+
+#### 4.1.4 启动服务
+
+**步骤**：运行 `make dev-daemon`（后台模式）
+
+**描述**：此命令启动所有服务（LangGraph、Gateway、Frontend、Nginx）。
+
+**注意**：
+- `make dev` 在前台运行，按 Ctrl+C 停止
+- `make dev-daemon` 在后台运行
+- 使用 `make stop` 停止服务
+
+---
+
+#### 4.1.5 等待服务启动
+
+**步骤**：
+1. 等待 90-120 秒让所有服务完全启动
+2. 可以通过检查这些日志文件监控启动进度：
    - `logs/langgraph.log`
    - `logs/gateway.log`
    - `logs/frontend.log`
@@ -279,174 +259,153 @@ This document describes the detailed operating steps for each phase of the DeerF
 
 ---
 
-### 4.2 Docker Mode Deployment (If Docker Is Selected)
+### 4.2 Docker 模式部署（如选择 Docker）
 
-#### 4.2.1 Initialize the Docker Environment
+#### 4.2.1 初始化 Docker 环境
 
-**Steps**:
-1. Run `make docker-init`
+**步骤**：运行 `make docker-init`
 
-**Description**: This command pulls the sandbox image if needed.
-
----
-
-#### 4.2.2 Start Docker Services
-
-**Steps**:
-1. Run `make docker-start`
-
-**Description**: This command builds and starts all required Docker containers.
+**描述**：此命令在需要时拉取沙箱镜像。
 
 ---
 
-#### 4.2.3 Wait for Services to Start
+#### 4.2.2 启动 Docker 服务
 
-**Steps**:
-1. Wait 60-90 seconds for all services to start completely
-2. You can run `make docker-logs` to monitor startup progress
+**步骤**：运行 `make docker-start`
+
+**描述**：此命令构建并启动所有必需的 Docker 容器。
 
 ---
 
-## Phase 5: Service Health Check
+#### 4.2.3 等待服务启动
 
-### 5.1 Local Mode Health Check
+**步骤**：
+1. 等待 60-90 秒让所有服务完全启动
+2. 可以运行 `make docker-logs` 监控启动进度
 
-#### 5.1.1 Check Process Status
+---
 
-**Steps**:
-1. Run the following command to check processes:
+## 第五阶段：服务健康检查
+
+### 5.1 本地模式健康检查
+
+#### 5.1.1 检查进程状态
+
+**步骤**：
+1. 运行以下命令检查进程：
    ```bash
    ps aux | grep -E "(langgraph|uvicorn|next|nginx)" | grep -v grep
    ```
 
-**Success Criteria**: Confirm that the following processes are running:
-- LangGraph (`langgraph dev`)
-- Gateway (`uvicorn app.gateway.app:app`)
-- Frontend (`next dev` or `next start`)
-- Nginx (`nginx`)
+**成功标准**：确认以下进程正在运行：
+- LangGraph（`langgraph dev`）
+- Gateway（`uvicorn app.gateway.app:app`）
+- Frontend（`next dev` 或 `next start`）
+- Nginx（`nginx`）
 
 ---
 
-#### 5.1.2 Check Frontend Service
+#### 5.1.2 检查前端服务
 
-**Steps**:
-1. Use curl or a browser to visit `http://localhost:2026`
-2. Verify that the page loads normally
+**步骤**：
+1. 使用 curl 或浏览器访问 `http://localhost:2026`
+2. 验证页面正常加载
 
-**Example curl command**:
+**示例 curl 命令**：
 ```bash
 curl -I http://localhost:2026
 ```
 
-**Success Criteria**: Returns an HTTP 200 status code.
+**成功标准**：返回 HTTP 200 状态码。
 
 ---
 
-#### 5.1.3 Check API Gateway
+#### 5.1.3 检查 API Gateway
 
-**Steps**:
-1. Visit `http://localhost:2026/health`
+**步骤**：
+1. 访问 `http://localhost:2026/health`
 
-**Example curl command**:
+**示例 curl 命令**：
 ```bash
 curl http://localhost:2026/health
 ```
 
-**Success Criteria**: Returns health status JSON.
+**成功标准**：返回健康状态 JSON。
 
 ---
 
-#### 5.1.4 Check LangGraph Service
+#### 5.1.4 检查 LangGraph 服务
 
-**Steps**:
-1. Visit relevant LangGraph endpoints to verify availability
+**步骤**：访问相关 LangGraph 端点验证可用性
 
 ---
 
-### 5.2 Docker Mode Health Check (When Using Docker)
+### 5.2 Docker 模式健康检查（使用 Docker 时）
 
-#### 5.2.1 Check Container Status
+#### 5.2.1 检查容器状态
 
-**Steps**:
-1. Run `docker ps`
-2. Confirm that the following containers are running:
+**步骤**：
+1. 运行 `docker ps`
+2. 确认以下容器正在运行：
    - `deer-flow-nginx`
    - `deer-flow-frontend`
    - `deer-flow-gateway`
-   - `deer-flow-langgraph` (if not in gateway mode)
+   - `deer-flow-langgraph`（如果不在 gateway 模式下）
 
 ---
 
-#### 5.2.2 Check Frontend Service
+#### 5.2.2 检查前端服务
 
-**Steps**:
-1. Use curl or a browser to visit `http://localhost:2026`
-2. Verify that the page loads normally
-
-**Example curl command**:
-```bash
-curl -I http://localhost:2026
-```
-
-**Success Criteria**: Returns an HTTP 200 status code.
+**步骤**：使用 curl 或浏览器访问 `http://localhost:2026`，验证页面正常加载。
 
 ---
 
-#### 5.2.3 Check API Gateway
+#### 5.2.3 检查 API Gateway
 
-**Steps**:
-1. Visit `http://localhost:2026/health`
-
-**Example curl command**:
-```bash
-curl http://localhost:2026/health
-```
-
-**Success Criteria**: Returns health status JSON.
+**步骤**：运行 `curl http://localhost:2026/health`，验证返回健康状态 JSON。
 
 ---
 
-#### 5.2.4 Check LangGraph Service
+#### 5.2.4 检查 LangGraph 服务
 
-**Steps**:
-1. Visit relevant LangGraph endpoints to verify availability
-
----
-
-## Optional Functional Verification
-
-### 6.1 List Available Models
-
-**Steps**: Verify the model list through the API or UI.
+**步骤**：访问相关 LangGraph 端点验证可用性
 
 ---
 
-### 6.2 List Available Skills
+## 可选功能验证
 
-**Steps**: Verify the skill list through the API or UI.
+### 6.1 列出可用模型
 
----
-
-### 6.3 Simple Chat Test
-
-**Steps**: Send a simple message to test the complete workflow.
+**步骤**：通过 API 或 UI 验证模型列表。
 
 ---
 
-## Phase 6: Generate the Test Report
+### 6.2 列出可用技能
 
-### 6.1 Collect Test Results
+**步骤**：通过 API 或 UI 验证技能列表。
 
-Summarize the execution status of each phase and record successful and failed items.
+---
 
-### 6.2 Record Issues
+### 6.3 简单聊天测试
 
-If anything fails, record detailed error information.
+**步骤**：发送简单消息测试完整工作流程。
 
-### 6.3 Generate the Report
+---
 
-Use the template to create a complete test report.
+## 第六阶段：生成测试报告
 
-### 6.4 Provide Recommendations
+### 6.1 收集测试结果
 
-Provide follow-up recommendations based on the test results.
+总结每个阶段的执行状态，记录成功和失败项目。
+
+### 6.2 记录问题
+
+如果有任何失败，记录详细错误信息。
+
+### 6.3 生成报告
+
+使用模板创建完整的测试报告。
+
+### 6.4 提供建议
+
+根据测试结果提供后续建议。

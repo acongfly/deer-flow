@@ -1,181 +1,181 @@
 ---
 name: smoke-test
-description: End-to-end smoke test skill for DeerFlow. Guides through: 1) Pulling latest code, 2) Docker OR Local installation and deployment (user preference, default to Local if Docker network issues), 3) Service availability verification, 4) Health check, 5) Final test report. Use when the user says "run smoke test", "smoke test deployment", "verify installation", "test service availability", "end-to-end test", or similar.
+description: DeerFlow 端对端冒烟测试技能。引导完成：1）拉取最新代码，2）Docker 或本地安装部署（用户偏好，Docker 网络问题时默认本地），3）服务可用性验证，4）健康检查，5）最终测试报告。当用户说"运行冒烟测试"、"冒烟测试部署"、"验证安装"、"测试服务可用性"、"端到端测试"或类似表达时使用。
 ---
 
-# DeerFlow Smoke Test Skill
+# DeerFlow 冒烟测试技能
 
-This skill guides the Agent through DeerFlow's full end-to-end smoke test workflow, including code updates, deployment (supporting both Docker and local installation modes), service availability verification, and health checks.
+此技能引导 Agent 完成 DeerFlow 的完整端对端冒烟测试工作流程，包括代码更新、部署（支持 Docker 和本地安装两种模式）、服务可用性验证和健康检查。
 
-## Deployment Mode Selection
+## 部署模式选择
 
-This skill supports two deployment modes:
-- **Local installation mode** (recommended, especially when network issues occur) - Run all services directly on the local machine
-- **Docker mode** - Run all services inside Docker containers
+此技能支持两种部署模式：
+- **本地安装模式**（推荐，尤其在网络问题发生时）——直接在本地机器上运行所有服务
+- **Docker 模式**——在 Docker 容器内运行所有服务
 
-**Selection strategy**:
-- If the user explicitly asks for Docker mode, use Docker
-- If network issues occur (such as slow image pulls), automatically switch to local mode
-- Default to local mode whenever possible
+**选择策略**：
+- 如果用户明确要求 Docker 模式，使用 Docker
+- 如果发生网络问题（如镜像拉取缓慢），自动切换到本地模式
+- 尽可能默认使用本地模式
 
-## Structure
+## 目录结构
 
 ```
 smoke-test/
-├── SKILL.md                          ← You are here - core workflow and logic
+├── SKILL.md                          ← 你在这里 - 核心工作流程和逻辑
 ├── scripts/
-│   ├── check_docker.sh               ← Check the Docker environment
-│   ├── check_local_env.sh            ← Check local environment dependencies
-│   ├── frontend_check.sh             ← Frontend page smoke check
-│   ├── pull_code.sh                  ← Pull the latest code
-│   ├── deploy_docker.sh              ← Docker deployment
-│   ├── deploy_local.sh               ← Local deployment
-│   └── health_check.sh               ← Service health check
+│   ├── check_docker.sh               ← 检查 Docker 环境
+│   ├── check_local_env.sh            ← 检查本地环境依赖
+│   ├── frontend_check.sh             ← 前端页面冒烟检查
+│   ├── pull_code.sh                  ← 拉取最新代码
+│   ├── deploy_docker.sh              ← Docker 部署
+│   ├── deploy_local.sh               ← 本地部署
+│   └── health_check.sh               ← 服务健康检查
 ├── references/
-│   ├── SOP.md                        ← Standard operating procedure
-│   └── troubleshooting.md            ← Troubleshooting guide
+│   ├── SOP.md                        ← 标准操作程序
+│   └── troubleshooting.md            ← 故障排除指南
 └── templates/
-    ├── report.local.template.md      ← Local mode smoke test report template
-    └── report.docker.template.md     ← Docker mode smoke test report template
+    ├── report.local.template.md      ← 本地模式冒烟测试报告模板
+    └── report.docker.template.md     ← Docker 模式冒烟测试报告模板
 ```
 
-## Standard Operating Procedure (SOP)
+## 标准操作程序（SOP）
 
-### Phase 1: Code Update Check
+### 第一阶段：代码更新检查
 
-1. **Confirm current directory** - Verify that the current working directory is the DeerFlow project root
-2. **Check Git status** - See whether there are uncommitted changes
-3. **Pull the latest code** - Use `git pull origin main` to get the latest updates
-4. **Confirm code update** - Verify that the latest code was pulled successfully
+1. **确认当前目录** - 验证当前工作目录是 DeerFlow 项目根目录
+2. **检查 Git 状态** - 查看是否有未提交的更改
+3. **拉取最新代码** - 使用 `git pull origin main` 获取最新更新
+4. **确认代码更新** - 验证最新代码已成功拉取
 
-### Phase 2: Deployment Mode Selection and Environment Check
+### 第二阶段：部署模式选择和环境检查
 
-**Choose deployment mode**:
-- Ask for user preference, or choose automatically based on network conditions
-- Default to local installation mode
+**选择部署模式**：
+- 询问用户偏好，或根据网络条件自动选择
+- 默认使用本地安装模式
 
-**Local mode environment check**:
-1. **Check Node.js version** - Requires 22+
-2. **Check pnpm** - Package manager
-3. **Check uv** - Python package manager
-4. **Check nginx** - Reverse proxy
-5. **Check required ports** - Confirm that ports 2026, 3000, 8001, and 2024 are not occupied
+**本地模式环境检查**：
+1. **检查 Node.js 版本** - 需要 22+
+2. **检查 pnpm** - 包管理器
+3. **检查 uv** - Python 包管理器
+4. **检查 nginx** - 反向代理
+5. **检查所需端口** - 确认端口 2026、3000、8001 和 2024 未被占用
 
-**Docker mode environment check** (if Docker is selected):
-1. **Check whether Docker is installed** - Run `docker --version`
-2. **Check Docker daemon status** - Run `docker info`
-3. **Check Docker Compose availability** - Run `docker compose version`
-4. **Check required ports** - Confirm that port 2026 is not occupied
+**Docker 模式环境检查**（如选择 Docker）：
+1. **检查 Docker 是否已安装** - 运行 `docker --version`
+2. **检查 Docker 守护进程状态** - 运行 `docker info`
+3. **检查 Docker Compose 可用性** - 运行 `docker compose version`
+4. **检查所需端口** - 确认端口 2026 未被占用
 
-### Phase 3: Configuration Preparation
+### 第三阶段：配置准备
 
-1. **Check whether config.yaml exists**
-   - If it does not exist, run `make config` to generate it
-   - If it already exists, check whether it needs an upgrade with `make config-upgrade`
-2. **Check the .env file**
-   - Verify that required environment variables are configured
-   - Especially model API keys such as `OPENAI_API_KEY`
+1. **检查 config.yaml 是否存在**
+   - 如果不存在，运行 `make config` 生成
+   - 如果已存在，检查是否需要使用 `make config-upgrade` 升级
+2. **检查 .env 文件**
+   - 验证必需的环境变量已配置
+   - 尤其是 `OPENAI_API_KEY` 等模型 API 密钥
 
-### Phase 4: Deployment Execution
+### 第四阶段：部署执行
 
-**Local mode deployment**:
-1. **Check dependencies** - Run `make check`
-2. **Install dependencies** - Run `make install`
-3. **(Optional) Pre-pull the sandbox image** - If needed, run `make setup-sandbox`
-4. **Start services** - Run `make dev-daemon` (background mode, recommended) or `make dev` (foreground mode)
-5. **Wait for startup** - Give all services enough time to start completely (90-120 seconds recommended)
+**本地模式部署**：
+1. **检查依赖** - 运行 `make check`
+2. **安装依赖** - 运行 `make install`
+3. **（可选）预拉取沙箱镜像** - 如需要，运行 `make setup-sandbox`
+4. **启动服务** - 运行 `make dev-daemon`（后台模式，推荐）或 `make dev`（前台模式）
+5. **等待启动** - 给所有服务足够的时间完全启动（建议 90-120 秒）
 
-**Docker mode deployment** (if Docker is selected):
-1. **Initialize Docker environment** - Run `make docker-init`
-2. **Start Docker services** - Run `make docker-start`
-3. **Wait for startup** - Give all containers enough time to start completely (60 seconds recommended)
+**Docker 模式部署**（如选择 Docker）：
+1. **初始化 Docker 环境** - 运行 `make docker-init`
+2. **启动 Docker 服务** - 运行 `make docker-start`
+3. **等待启动** - 给所有容器足够的时间完全启动（建议 60 秒）
 
-### Phase 5: Service Health Check
+### 第五阶段：服务健康检查
 
-**Local mode health check**:
-1. **Check process status** - Confirm that LangGraph, Gateway, Frontend, and Nginx processes are all running
-2. **Check frontend service** - Visit `http://localhost:2026` and verify that the page loads
-3. **Check API Gateway** - Verify the `http://localhost:2026/health` endpoint
-4. **Check LangGraph service** - Verify the availability of relevant endpoints
-5. **Frontend route smoke check** - Run `bash .agent/skills/smoke-test/scripts/frontend_check.sh` to verify key routes under `/workspace`
+**本地模式健康检查**：
+1. **检查进程状态** - 确认 LangGraph、Gateway、Frontend 和 Nginx 进程都在运行
+2. **检查前端服务** - 访问 `http://localhost:2026` 并验证页面加载
+3. **检查 API Gateway** - 验证 `http://localhost:2026/health` 端点
+4. **检查 LangGraph 服务** - 验证相关端点的可用性
+5. **前端路由冒烟检查** - 运行 `bash .agent/skills/smoke-test/scripts/frontend_check.sh` 验证 `/workspace` 下的关键路由
 
-**Docker mode health check** (when using Docker):
-1. **Check container status** - Run `docker ps` and confirm that all containers are running
-2. **Check frontend service** - Visit `http://localhost:2026` and verify that the page loads
-3. **Check API Gateway** - Verify the `http://localhost:2026/health` endpoint
-4. **Check LangGraph service** - Verify the availability of relevant endpoints
-5. **Frontend route smoke check** - Run `bash .agent/skills/smoke-test/scripts/frontend_check.sh` to verify key routes under `/workspace`
+**Docker 模式健康检查**（使用 Docker 时）：
+1. **检查容器状态** - 运行 `docker ps` 并确认所有容器正在运行
+2. **检查前端服务** - 访问 `http://localhost:2026` 并验证页面加载
+3. **检查 API Gateway** - 验证 `http://localhost:2026/health` 端点
+4. **检查 LangGraph 服务** - 验证相关端点的可用性
+5. **前端路由冒烟检查** - 运行 `bash .agent/skills/smoke-test/scripts/frontend_check.sh` 验证 `/workspace` 下的关键路由
 
-### Optional Functional Verification
+### 可选功能验证
 
-1. **List available models** - Verify that model configuration loads correctly
-2. **List available skills** - Verify that the skill directory is mounted correctly
-3. **Simple chat test** - Send a simple message to verify the end-to-end flow
+1. **列出可用模型** - 验证模型配置是否正确加载
+2. **列出可用技能** - 验证技能目录是否正确挂载
+3. **简单聊天测试** - 发送简单消息验证端对端流程
 
-### Phase 6: Generate Test Report
+### 第六阶段：生成测试报告
 
-1. **Collect all test results** - Summarize execution status for each phase
-2. **Record encountered issues** - If anything fails, record the error details
-3. **Generate the final report** - Use the template that matches the selected deployment mode to create the complete test report, including overall conclusion, detailed key test cases, and explicit frontend page / route results
-4. **Provide follow-up recommendations** - Offer suggestions based on the test results
+1. **收集所有测试结果** - 总结每个阶段的执行状态
+2. **记录遇到的问题** - 如果有任何失败，记录错误详情
+3. **生成最终报告** - 使用与所选部署模式匹配的模板创建完整测试报告，包括总体结论、详细关键测试用例和明确的前端页面/路由结果
+4. **提供后续建议** - 根据测试结果提供建议
 
-## Execution Rules
+## 执行规则
 
-- **Follow the sequence** - Execute strictly in the order described above
-- **Idempotency** - Every step should be safe to repeat
-- **Error handling** - If a step fails, stop and report the issue, then provide troubleshooting suggestions
-- **Detailed logging** - Record the execution result and status of each step
-- **User confirmation** - Ask for confirmation before potentially risky operations such as overwriting config
-- **Mode preference** - Prefer local mode to avoid network-related issues
-- **Template requirement** - The final report must use the matching template under `templates/`; do not output a free-form summary instead of the template-based report
-- **Report clarity** - The execution summary must include the overall pass/fail conclusion plus per-case result explanations, and frontend smoke check results must be listed explicitly in the report
-- **Optional phase handling** - If functional verification is not executed, do not present it as a separate skipped phase in the final report
+- **遵循顺序** - 严格按照上述描述的顺序执行
+- **幂等性** - 每个步骤应该可以安全重复
+- **错误处理** - 如果一个步骤失败，停止并报告问题，然后提供故障排除建议
+- **详细日志** - 记录每个步骤的执行结果和状态
+- **用户确认** - 在可能有风险的操作（如覆盖配置）之前请求确认
+- **模式偏好** - 优先使用本地模式以避免网络相关问题
+- **模板要求** - 最终报告必须使用 `templates/` 下的匹配模板；不要输出自由格式摘要代替基于模板的报告
+- **报告清晰度** - 执行摘要必须包括总体通过/失败结论以及每个用例的结果说明，前端冒烟检查结果必须在报告中明确列出
+- **可选阶段处理** - 如果功能验证未执行，不要在最终报告中将其呈现为单独的跳过阶段
 
-## Known Acceptable Warnings
+## 已知可接受的警告
 
-The following warnings can appear during smoke testing and do not block a successful result:
-- Feishu/Lark SSL errors in Gateway logs (certificate verification failure) can be ignored if that channel is not enabled
-- Warnings in LangGraph logs about missing methods in the custom checkpointer, such as `adelete_for_runs` or `aprune`, do not affect the core functionality
+以下警告可能在冒烟测试期间出现，不会阻止成功结果：
+- 如果飞书/Lark 渠道未启用，Gateway 日志中的 SSL 错误（证书验证失败）可以忽略
+- LangGraph 日志中关于自定义检查点器中缺少方法（如 `adelete_for_runs` 或 `aprune`）的警告不影响核心功能
 
-## Key Tools
+## 关键工具
 
-Use the following tools during execution:
+执行期间使用以下工具：
 
-1. **bash** - Run shell commands
-2. **present_file** - Show generated reports and important files
-3. **task_tool** - Organize complex steps with subtasks when needed
+1. **bash** - 运行 shell 命令
+2. **present_file** - 显示生成的报告和重要文件
+3. **task_tool** - 需要时用子任务组织复杂步骤
 
-## Success Criteria
+## 成功标准
 
-Smoke test pass criteria (local mode):
-- [x] Latest code is pulled successfully
-- [x] Local environment check passes (Node.js 22+, pnpm, uv, nginx)
-- [x] Configuration files are set up correctly
-- [x] `make check` passes
-- [x] `make install` completes successfully
-- [x] `make dev` starts successfully
-- [x] All service processes run normally
-- [x] Frontend page is accessible
-- [x] Frontend route smoke check passes (`/workspace` key routes)
-- [x] API Gateway health check passes
-- [x] Test report is generated completely
+冒烟测试通过标准（本地模式）：
+- [x] 最新代码拉取成功
+- [x] 本地环境检查通过（Node.js 22+、pnpm、uv、nginx）
+- [x] 配置文件设置正确
+- [x] `make check` 通过
+- [x] `make install` 成功完成
+- [x] `make dev` 成功启动
+- [x] 所有服务进程正常运行
+- [x] 前端页面可访问
+- [x] 前端路由冒烟检查通过（`/workspace` 关键路由）
+- [x] API Gateway 健康检查通过
+- [x] 测试报告完整生成
 
-Smoke test pass criteria (Docker mode):
-- [x] Latest code is pulled successfully
-- [x] Docker environment check passes
-- [x] Configuration files are set up correctly
-- [x] `make docker-init` completes successfully
-- [x] `make docker-start` completes successfully
-- [x] All Docker containers run normally
-- [x] Frontend page is accessible
-- [x] Frontend route smoke check passes (`/workspace` key routes)
-- [x] API Gateway health check passes
-- [x] Test report is generated completely
+冒烟测试通过标准（Docker 模式）：
+- [x] 最新代码拉取成功
+- [x] Docker 环境检查通过
+- [x] 配置文件设置正确
+- [x] `make docker-init` 成功完成
+- [x] `make docker-start` 成功完成
+- [x] 所有 Docker 容器正常运行
+- [x] 前端页面可访问
+- [x] 前端路由冒烟检查通过（`/workspace` 关键路由）
+- [x] API Gateway 健康检查通过
+- [x] 测试报告完整生成
 
-## Read Reference Files
+## 读取参考文件
 
-Before starting execution, read the following reference files:
-1. `references/SOP.md` - Detailed step-by-step operating instructions
-2. `references/troubleshooting.md` - Common issues and solutions
-3. `templates/report.local.template.md` - Local mode test report template
-4. `templates/report.docker.template.md` - Docker mode test report template
+开始执行前，读取以下参考文件：
+1. `references/SOP.md` - 详细的分步操作说明
+2. `references/troubleshooting.md` - 常见问题和解决方案
+3. `templates/report.local.template.md` - 本地模式测试报告模板
+4. `templates/report.docker.template.md` - Docker 模式测试报告模板

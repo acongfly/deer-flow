@@ -1,127 +1,79 @@
-# IEEE Citation Template
+# IEEE 引用模板
 
-Use this template when the user targets an IEEE conference or journal, or explicitly asks for IEEE format. IEEE uses **numeric citations** — references are numbered in the order they first appear in the text, and in-text citations use bracketed numbers.
+当用户面向 IEEE 会议或期刊，或明确要求 IEEE 格式时使用此模板。IEEE 使用**数字引用**——参考文献按首次出现顺序编号，正文引用使用括号数字。
 
-## Citation Format Rules
+## 引用格式规则
 
-### In-text citations
+### 正文内引用
 
-- **Single reference**: `[1]` — use the number assigned in the References section.
-- **Multiple references**: `[1], [3], [5]` or `[1]–[3]` for consecutive ranges.
-- **Citation as a noun**: "As shown in [1], ..." or "Reference [1] demonstrated...".
-- **Author attribution**: "Vaswani et al. [1] introduced..." — author names are optional in IEEE; use them when it improves readability, always followed by the bracketed number.
+- **单个引用**：`[1]` — 使用参考文献部分分配的编号。
+- **多个引用**：`[1], [3], [5]` 或连续范围 `[1]–[3]`。
+- **引用作为名词**：`如 [1] 所示，...` 或 `参考文献 [1] 证明了...`。
+- **作者归因**：`Vaswani et al. [1] 引入了...`。
 
-Numbers are assigned in **order of first appearance in the text**, not alphabetically. The first reference you cite is `[1]`, the second new reference is `[2]`, and so on.
+数字按**正文中首次出现的顺序**分配，不按字母顺序。第一个引用的参考文献是 `[1]`，第二个新参考文献是 `[2]`，依此类推。
 
-### Reference list entry for arXiv preprints
-
-IEEE format for arXiv preprints:
+### arXiv 预印本的参考文献条目
 
 ```
 [N] A. A. Author, B. B. Author, and C. C. Author, "Title of the paper," arXiv:ARXIV_ID, Year.
 ```
 
-**Real example**:
+**实际示例**：
 
 ```
 [1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, "Attention is all you need," arXiv:1706.03762, 2017.
 ```
 
-Formatting rules:
+格式规则：
 
-- **Author names**: `FirstInitial. LastName` — initials before the last name, opposite of APA. Join with commas; last author gets `and` (no Oxford comma before it in strict IEEE, but accepted).
-- **Title**: in double quotes, sentence case. No italics.
-- **Source**: `arXiv:<id>` — the literal prefix `arXiv:` followed by the bare id (e.g. `arXiv:1706.03762`, not the full URL).
-- **Year**: at the end, after a comma.
-- **URL**: optional in IEEE. Include if the publication venue requires it; otherwise the `arXiv:<id>` identifier is sufficient and is the IEEE-preferred form.
+- **作者姓名**：`FirstInitial. LastName` — 首字母在姓氏前，与 APA 相反。用逗号连接；最后一位作者前加 `and`。
+- **标题**：用双引号括起，句首大写。不斜体。
+- **来源**：`arXiv:<id>` — 字面前缀 `arXiv:` 后跟裸 id（例如 `arXiv:1706.03762`，不是完整 URL）。
+- **年份**：最后，逗号后。
 
-### Special cases
+### 特殊情况
 
-- **More than 6 authors**: IEEE allows listing the first author followed by `et al.`: `A. Vaswani et al., "Attention is all you need," arXiv:1706.03762, 2017.` Use this for papers with many authors to keep reference entries readable.
-- **If the paper has also been published at a venue**: prefer the venue citation format over arXiv. In this workflow we only have arXiv metadata, so always use the arXiv form.
+- **超过 6 位作者**：IEEE 允许列出第一作者后跟 `et al.`。
 
-## Report Structure
-
-Follow this structure verbatim. Note that IEEE reports use **numeric citations throughout**, so you need to assign a number to each paper **in order of first appearance** in the Themes section, then use those numbers consistently in per-paper annotations and the reference list.
+## 报告结构
 
 ```markdown
-# Systematic Literature Review: <Topic>
+# 系统性文献综述：<主题>
 
-**Date**: <YYYY-MM-DD>
-**Papers surveyed**: <N>
-**Scope**: <arXiv search query, category, time window>
-**Citation format**: IEEE
+**日期**：<YYYY-MM-DD>
+**调查论文数**：<N>
+**引用格式**：IEEE
 
-## Executive Summary
+## 执行摘要
 
-<3-5 sentences summarizing the state of the literature. Cite papers with bracketed numbers as you first introduce them, e.g. "Transformer architectures [1] have become the dominant approach, with extensions focusing on efficiency [2], [3] and long-context handling [4].">
+<3-5 句话总结文献现状。首次引入每篇论文时使用括号数字，例如"Transformer 架构 [1] 已成为主导方法，后续工作聚焦于效率 [2], [3] 和长上下文处理 [4]。">
 
-## Methodology
+## 主题
 
-This review surveyed <N> arXiv papers retrieved on <YYYY-MM-DD> using the query `<query>`<, filtered to category <cat>><, published between <start_date> and <end_date>>. Papers were sorted by <relevance | submission date> and the top <N> were included. Metadata extraction was performed by language-model agents, with cross-paper synthesis performed by the lead agent.
-
-**Limitations of this review**: arXiv preprints are not peer-reviewed; coverage is limited to arXiv.
-
-## Themes
-
-<3-6 thematic sections. First appearance of each paper gets a bracketed number; subsequent mentions reuse the same number. The number assignment order is: first paper mentioned in Theme 1 gets [1], next new paper gets [2], etc.>
-
-### Theme 1: <Theme name>
-
-<Paragraphs describing the theme. Cite with bracketed numbers: "The original transformer architecture [1] introduced self-attention, which was later extended in [2] and [3]. Comparative analyses [4] show that...">
-
-### Theme 2: <Theme name>
-
-<...>
-
-## Convergences and Disagreements
-
-**Convergences**: <e.g. "Multiple papers [1], [3], [5] agree that X is necessary.">
-
-**Disagreements**: <e.g. "While [1] argues X, [2] finds the opposite under condition Y.">
-
-## Gaps and Open Questions
-
-<What the collective literature does not yet address, with citations to papers that explicitly mention these gaps.>
-
-## Per-Paper Annotations
-
-<One subsection per paper, ordered by their assigned reference number.>
+<3-6 个主题章节。每篇论文首次出现时获得一个括号数字；后续提及重用相同数字。>
 
 ### [1] Vaswani et al., "Attention is all you need" (2017)
 
-**Research question**: <1 sentence>
-**Methodology**: <1-2 sentences>
-**Key findings**:
-- <bullet>
-- <bullet>
-- <bullet>
-**Limitations**: <1-2 sentences>
+**研究问题**：<1 句话>
+**方法论**：<1-2 句话>
+**主要发现**：
+- <要点>
+**局限性**：<1-2 句话>
 
-### [2] <Next paper>
+## 参考文献
 
-<...>
+<按首次出现顺序编号的列表。>
 
-## References
-
-<Numbered list in order of first appearance in the text. The number must match the in-text citations above.>
-
-[1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, "Attention is all you need," arXiv:1706.03762, 2017.
+[1] A. Vaswani, N. Shazeer, ..., "Attention is all you need," arXiv:1706.03762, 2017.
 
 [2] J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, "BERT: Pre-training of deep bidirectional transformers for language understanding," arXiv:1810.04805, 2018.
-
-<... more entries ...>
 ```
 
-## Quality checks before finalizing
+## 定稿前的质量检查
 
-Before saving the report, verify:
-
-- [ ] Every paper in the surveyed set has a unique reference number.
-- [ ] Reference numbers are assigned in order of **first appearance in the text**, not alphabetically.
-- [ ] Every bracketed number in the text has a matching entry in the References section.
-- [ ] Every entry in References is cited at least once in the text.
-- [ ] Author names use `FirstInitial. LastName` format (initials before last name).
-- [ ] Titles are in double quotes and sentence case.
-- [ ] arXiv identifiers use the `arXiv:<bare_id>` form, not the full URL.
-- [ ] Per-paper annotations are ordered by reference number, matching the References section order.
+- [ ] 每篇论文都有唯一的参考编号。
+- [ ] 参考编号按**正文中首次出现的顺序**分配，不按字母顺序。
+- [ ] 正文中的每个括号数字在参考文献部分都有匹配的条目。
+- [ ] 作者姓名使用 `FirstInitial. LastName` 格式（首字母在姓氏前）。
+- [ ] arXiv 标识符使用 `arXiv:<bare_id>` 形式，不是完整 URL。

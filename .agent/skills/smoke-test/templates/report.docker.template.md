@@ -1,149 +1,149 @@
-# DeerFlow Smoke Test Report
+# DeerFlow 冒烟测试报告
 
-**Test Date**: {{test_date}}  
-**Test Environment**: {{test_environment}}  
-**Deployment Mode**: Docker  
-**Test Version**: {{git_commit}}
+**测试日期**：{{test_date}}
+**测试环境**：{{test_environment}}
+**部署模式**：Docker
+**测试版本**：{{git_commit}}
 
 ---
 
-## Execution Summary
+## 执行摘要
 
-| Metric | Status |
+| 指标 | 状态 |
 |------|------|
-| Total Test Phases | 6 |
-| Passed Phases | {{passed_stages}} |
-| Failed Phases | {{failed_stages}} |
-| Overall Conclusion | **{{overall_status}}** |
+| 总测试阶段 | 6 |
+| 通过阶段 | {{passed_stages}} |
+| 失败阶段 | {{failed_stages}} |
+| 总体结论 | **{{overall_status}}** |
 
-### Key Test Cases
+### 关键测试用例
 
-| Case | Result | Details |
-|------|--------|---------|
-| Code update check | {{case_code_update}} | {{case_code_update_details}} |
-| Environment check | {{case_env_check}} | {{case_env_check_details}} |
-| Configuration preparation | {{case_config_prep}} | {{case_config_prep_details}} |
-| Deployment | {{case_deploy}} | {{case_deploy_details}} |
-| Health check | {{case_health_check}} | {{case_health_check_details}} |
-| Frontend routes | {{case_frontend_routes_overall}} | {{case_frontend_routes_details}} |
-
----
-
-## Detailed Test Results
-
-### Phase 1: Code Update Check
-
-- [x] Confirm current directory - {{status_dir_check}}
-- [x] Check Git status - {{status_git_status}}
-- [x] Pull latest code - {{status_git_pull}}
-- [x] Confirm code update - {{status_git_verify}}
-
-**Phase Status**: {{stage1_status}}
+| 用例 | 结果 | 详情 |
+|------|------|------|
+| 代码更新检查 | {{case_code_update}} | {{case_code_update_details}} |
+| 环境检查 | {{case_env_check}} | {{case_env_check_details}} |
+| 配置准备 | {{case_config_prep}} | {{case_config_prep_details}} |
+| 部署 | {{case_deploy}} | {{case_deploy_details}} |
+| 健康检查 | {{case_health_check}} | {{case_health_check_details}} |
+| 前端路由 | {{case_frontend_routes_overall}} | {{case_frontend_routes_details}} |
 
 ---
 
-### Phase 2: Docker Environment Check
+## 详细测试结果
 
-- [x] Docker version - {{status_docker_version}}
-- [x] Docker daemon - {{status_docker_daemon}}
+### 第一阶段：代码更新检查
+
+- [x] 确认当前目录 - {{status_dir_check}}
+- [x] 检查 Git 状态 - {{status_git_status}}
+- [x] 拉取最新代码 - {{status_git_pull}}
+- [x] 确认代码更新 - {{status_git_verify}}
+
+**阶段状态**：{{stage1_status}}
+
+---
+
+### 第二阶段：Docker 环境检查
+
+- [x] Docker 版本 - {{status_docker_version}}
+- [x] Docker 守护进程 - {{status_docker_daemon}}
 - [x] Docker Compose - {{status_docker_compose}}
-- [x] Port check - {{status_port_check}}
+- [x] 端口检查 - {{status_port_check}}
 
-**Phase Status**: {{stage2_status}}
+**阶段状态**：{{stage2_status}}
 
 ---
 
-### Phase 3: Configuration Preparation
+### 第三阶段：配置准备
 
 - [x] config.yaml - {{status_config_yaml}}
-- [x] .env file - {{status_env_file}}
-- [x] Model configuration - {{status_model_config}}
+- [x] .env 文件 - {{status_env_file}}
+- [x] 模型配置 - {{status_model_config}}
 
-**Phase Status**: {{stage3_status}}
+**阶段状态**：{{stage3_status}}
 
 ---
 
-### Phase 4: Docker Deployment
+### 第四阶段：Docker 部署
 
 - [x] docker-init - {{status_docker_init}}
 - [x] docker-start - {{status_docker_start}}
-- [x] Service startup wait - {{status_wait_startup}}
+- [x] 服务启动等待 - {{status_wait_startup}}
 
-**Phase Status**: {{stage4_status}}
+**阶段状态**：{{stage4_status}}
 
 ---
 
-### Phase 5: Service Health Check
+### 第五阶段：服务健康检查
 
-- [x] Container status - {{status_containers}}
-- [x] Frontend service - {{status_frontend}}
+- [x] 容器状态 - {{status_containers}}
+- [x] 前端服务 - {{status_frontend}}
 - [x] API Gateway - {{status_api_gateway}}
-- [x] LangGraph service - {{status_langgraph}}
+- [x] LangGraph 服务 - {{status_langgraph}}
 
-**Phase Status**: {{stage5_status}}
-
----
-
-### Frontend Routes Smoke Results
-
-| Route | Status | Details |
-|-------|--------|---------|
-| Landing `/` | {{landing_status}} | {{landing_details}} |
-| Workspace redirect `/workspace` | {{workspace_redirect_status}} | target {{workspace_redirect_target}} |
-| New chat `/workspace/chats/new` | {{new_chat_status}} | {{new_chat_details}} |
-| Chats list `/workspace/chats` | {{chats_list_status}} | {{chats_list_details}} |
-| Agents gallery `/workspace/agents` | {{agents_gallery_status}} | {{agents_gallery_details}} |
-| Docs `{{docs_path}}` | {{docs_status}} | {{docs_details}} |
-
-**Summary**: {{frontend_routes_summary}}
+**阶段状态**：{{stage5_status}}
 
 ---
 
-### Phase 6: Test Report Generation
+### 前端路由冒烟结果
 
-- [x] Result summary - {{status_summary}}
-- [x] Issue log - {{status_issues}}
-- [x] Report generation - {{status_report}}
+| 路由 | 状态 | 详情 |
+|------|------|------|
+| 首页 `/` | {{landing_status}} | {{landing_details}} |
+| Workspace 重定向 `/workspace` | {{workspace_redirect_status}} | 目标 {{workspace_redirect_target}} |
+| 新对话 `/workspace/chats/new` | {{new_chat_status}} | {{new_chat_details}} |
+| 对话列表 `/workspace/chats` | {{chats_list_status}} | {{chats_list_details}} |
+| Agent 库 `/workspace/agents` | {{agents_gallery_status}} | {{agents_gallery_details}} |
+| 文档 `{{docs_path}}` | {{docs_status}} | {{docs_details}} |
 
-**Phase Status**: {{stage6_status}}
-
----
-
-## Issue Log
-
-### Issue 1
-**Description**: {{issue1_description}}  
-**Severity**: {{issue1_severity}}  
-**Solution**: {{issue1_solution}}
+**摘要**：{{frontend_routes_summary}}
 
 ---
 
-## Environment Information
+### 第六阶段：测试报告生成
 
-### Docker Version
+- [x] 结果摘要 - {{status_summary}}
+- [x] 问题日志 - {{status_issues}}
+- [x] 报告生成 - {{status_report}}
+
+**阶段状态**：{{stage6_status}}
+
+---
+
+## 问题日志
+
+### 问题 1
+**描述**：{{issue1_description}}
+**严重性**：{{issue1_severity}}
+**解决方案**：{{issue1_solution}}
+
+---
+
+## 环境信息
+
+### Docker 版本
 ```text
 {{docker_version_output}}
 ```
 
-### Git Information
+### Git 信息
 ```text
-Repository: {{git_repo}}
-Branch: {{git_branch}}
-Commit: {{git_commit}}
-Commit Message: {{git_commit_message}}
+仓库：{{git_repo}}
+分支：{{git_branch}}
+提交：{{git_commit}}
+提交信息：{{git_commit_message}}
 ```
 
-### Configuration Summary
-- config.yaml exists: {{config_exists}}
-- .env file exists: {{env_exists}}
-- Number of configured models: {{model_count}}
+### 配置摘要
+- config.yaml 存在：{{config_exists}}
+- .env 文件存在：{{env_exists}}
+- 已配置模型数量：{{model_count}}
 
 ---
 
-## Container Status
+## 容器状态
 
-| Container Name | Status | Uptime |
-|----------|------|----------|
+| 容器名称 | 状态 | 运行时间 |
+|---------|------|---------|
 | deer-flow-nginx | {{nginx_status}} | {{nginx_uptime}} |
 | deer-flow-frontend | {{frontend_status}} | {{frontend_uptime}} |
 | deer-flow-gateway | {{gateway_status}} | {{gateway_uptime}} |
@@ -151,30 +151,30 @@ Commit Message: {{git_commit_message}}
 
 ---
 
-## Recommendations and Next Steps
+## 建议和后续步骤
 
-### If the Test Passes
-1. [ ] Visit http://localhost:2026 to start using DeerFlow
-2. [ ] Configure your preferred model if it is not configured yet
-3. [ ] Explore available skills
-4. [ ] Refer to the documentation to learn more features
+### 如果测试通过
+1. [ ] 访问 http://localhost:2026 开始使用 DeerFlow
+2. [ ] 如果尚未配置，配置你偏好的模型
+3. [ ] 探索可用技能
+4. [ ] 参阅文档了解更多功能
 
-### If the Test Fails
-1. [ ] Review references/troubleshooting.md for common solutions
-2. [ ] Check Docker logs: `make docker-logs`
-3. [ ] Verify configuration file format and content
-4. [ ] If needed, fully reset the environment: `make clean && make config && make docker-init && make docker-start`
+### 如果测试失败
+1. [ ] 查阅 references/troubleshooting.md 寻找常见解决方案
+2. [ ] 检查 Docker 日志：`make docker-logs`
+3. [ ] 验证配置文件格式和内容
+4. [ ] 如需要，完全重置环境：`make clean && make config && make docker-init && make docker-start`
 
 ---
 
-## Appendix
+## 附录
 
-### Full Logs
+### 完整日志
 {{full_logs}}
 
-### Tester
+### 测试人员
 {{tester_name}}
 
 ---
 
-*Report generated at: {{report_time}}*
+*报告生成时间：{{report_time}}*
