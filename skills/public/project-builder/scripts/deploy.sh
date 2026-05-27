@@ -4,8 +4,11 @@ set -euo pipefail
 
 PROJECT_PATH="${1:-.}"
 
-if [[ "${PROJECT_PATH:0:1}" != "/" ]]; then
-  PROJECT_PATH="$(cd "$PROJECT_PATH" && pwd)"
+if [[ "$PROJECT_PATH" != /* ]]; then
+  if ! PROJECT_PATH="$(cd "$PROJECT_PATH" && pwd)"; then
+    echo "Error: failed to resolve project path: $PROJECT_PATH" >&2
+    exit 1
+  fi
 fi
 
 if [[ ! -d "$PROJECT_PATH" ]]; then
@@ -32,6 +35,16 @@ RESULT_JSON="$(bash "$DEPLOY_SCRIPT" "$PROJECT_PATH")"
 
 if [[ -z "$RESULT_JSON" ]]; then
   echo "Error: empty deployment response." >&2
+  exit 1
+fi
+
+if ! printf '%s' "$RESULT_JSON" | python3 -c 'import json,sys
+data=json.load(sys.stdin)
+preview=data.get("previewUrl")
+if not isinstance(preview, str) or not preview:
+    raise SystemExit(1)
+'; then
+  echo "Error: deployment response is not valid JSON with previewUrl." >&2
   exit 1
 fi
 

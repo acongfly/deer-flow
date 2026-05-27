@@ -10,14 +10,21 @@ if [[ -z "$TARGET_DIR" ]]; then
   exit 1
 fi
 
-if [[ "${TARGET_DIR:0:1}" != "/" ]]; then
+if [[ "$TARGET_DIR" != /* ]]; then
   echo "Error: please provide an absolute project directory path." >&2
+  exit 1
+fi
+
+if [[ "$TARGET_DIR" == "/" ]]; then
+  echo "Error: target directory cannot be root (/)." >&2
   exit 1
 fi
 
 if [[ -z "$PROJECT_NAME" ]]; then
   PROJECT_NAME="$(basename "$TARGET_DIR")"
 fi
+PROJECT_NAME="${PROJECT_NAME//$'\n'/ }"
+PROJECT_NAME="${PROJECT_NAME//$'\r'/ }"
 
 mkdir -p "$TARGET_DIR/src"
 
