@@ -1,42 +1,42 @@
-# Documentation
+# 文档
 
-This directory contains detailed documentation for the DeerFlow backend.
+本目录包含 DeerFlow backend 的详细文档。
 
-## Quick Links
+## 快速链接
 
-| Document | Description |
+| 文档 | 说明 |
 |----------|-------------|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | System architecture overview |
-| [API.md](API.md) | Complete API reference |
-| [AUTH_DESIGN.md](AUTH_DESIGN.md) | User authentication, CSRF, and per-user isolation design |
-| [CONFIGURATION.md](CONFIGURATION.md) | Configuration options |
-| [SETUP.md](SETUP.md) | Quick setup guide |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | 系统架构概览 |
+| [API.md](API.md) | 完整 API 参考 |
+| [AUTH_DESIGN.md](AUTH_DESIGN.md) | 用户认证、CSRF 与按用户隔离的设计 |
+| [CONFIGURATION.md](CONFIGURATION.md) | 配置选项 |
+| [SETUP.md](SETUP.md) | 快速设置指南 |
 
-## Feature Documentation
+## 功能文档
 
-| Document | Description |
+| 文档 | 说明 |
 |----------|-------------|
-| [STREAMING.md](STREAMING.md) | Token-level streaming design: Gateway vs DeerFlowClient paths, `stream_mode` semantics, per-id dedup |
-| [FILE_UPLOAD.md](FILE_UPLOAD.md) | File upload functionality |
-| [PATH_EXAMPLES.md](PATH_EXAMPLES.md) | Path types and usage examples |
-| [summarization.md](summarization.md) | Context summarization feature |
-| [plan_mode_usage.md](plan_mode_usage.md) | Plan mode with TodoList |
-| [AUTO_TITLE_GENERATION.md](AUTO_TITLE_GENERATION.md) | Automatic title generation |
+| [STREAMING.md](STREAMING.md) | Token 级流式输出设计：Gateway 与 DeerFlowClient 路径、`stream_mode` 语义、按 id 去重 |
+| [FILE_UPLOAD.md](FILE_UPLOAD.md) | 文件上传功能 |
+| [PATH_EXAMPLES.md](PATH_EXAMPLES.md) | 路径类型与使用示例 |
+| [summarization.md](summarization.md) | 上下文摘要功能 |
+| [plan_mode_usage.md](plan_mode_usage.md) | 带 TodoList 的 Plan mode |
+| [AUTO_TITLE_GENERATION.md](AUTO_TITLE_GENERATION.md) | 自动标题生成 |
 
-## Development
+## 开发
 
-| Document | Description |
+| 文档 | 说明 |
 |----------|-------------|
-| [TODO.md](TODO.md) | Planned features and known issues |
+| [TODO.md](TODO.md) | 规划中的功能与已知问题 |
 
-## Getting Started
+## 入门
 
-1. **New to DeerFlow?** Start with [SETUP.md](SETUP.md) for quick installation
-2. **Configuring the system?** See [CONFIGURATION.md](CONFIGURATION.md)
-3. **Understanding the architecture?** Read [ARCHITECTURE.md](ARCHITECTURE.md)
-4. **Building integrations?** Check [API.md](API.md) for API reference
+1. **第一次接触 DeerFlow？** 先阅读 [SETUP.md](SETUP.md) 进行快速安装
+2. **正在配置系统？** 参见 [CONFIGURATION.md](CONFIGURATION.md)
+3. **想了解架构？** 阅读 [ARCHITECTURE.md](ARCHITECTURE.md)
+4. **要构建集成？** 查看 [API.md](API.md) 获取 API 参考
 
-## Document Organization
+## 文档组织
 
 ```
 docs/

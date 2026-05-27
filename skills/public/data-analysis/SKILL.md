@@ -1,37 +1,37 @@
 ---
 name: data-analysis
-description: Use this skill when the user uploads Excel (.xlsx/.xls) or CSV files and wants to perform data analysis, generate statistics, create summaries, pivot tables, SQL queries, or any form of structured data exploration. Supports multi-sheet Excel workbooks, aggregation, filtering, joins, and exporting results to CSV/JSON/Markdown.
+description: 当用户上传 Excel（.xlsx/.xls）或 CSV 文件并希望进行数据分析、生成统计结果、创建摘要、透视表、SQL 查询，或任何形式的结构化数据探索时使用此 skill。支持多工作表 Excel 工作簿、聚合、筛选、连接以及将结果导出为 CSV/JSON/Markdown。
 ---
 
-# Data Analysis Skill
+# 数据分析 Skill
 
-## Overview
+## 概述
 
-This skill analyzes user-uploaded Excel/CSV files using DuckDB — an in-process analytical SQL engine. It supports schema inspection, SQL-based querying, statistical summaries, and result export, all through a single Python script.
+此 skill 使用 DuckDB（一个进程内分析型 SQL 引擎）分析用户上传的 Excel/CSV 文件。它通过一个 Python 脚本统一支持 schema 检查、基于 SQL 的查询、统计摘要与结果导出。
 
-## Core Capabilities
+## 核心能力
 
-- Inspect Excel/CSV file structure (sheets, columns, types, row counts)
-- Execute arbitrary SQL queries against uploaded data
-- Generate statistical summaries (mean, median, stddev, percentiles, nulls)
-- Support multi-sheet Excel workbooks (each sheet becomes a table)
-- Export query results to CSV, JSON, or Markdown
-- Handle large files efficiently with DuckDB's columnar engine
+- 检查 Excel/CSV 文件结构（工作表、列、类型、行数）
+- 对上传数据执行任意 SQL 查询
+- 生成统计摘要（均值、中位数、stddev、百分位数、空值）
+- 支持多工作表 Excel 工作簿（每个工作表都会成为一张表）
+- 将查询结果导出为 CSV、JSON 或 Markdown
+- 借助 DuckDB 的列式引擎高效处理大文件
 
-## Workflow
+## 工作流
 
-### Step 1: Understand Requirements
+### 步骤 1：理解需求
 
-When a user uploads data files and requests analysis, identify:
+当用户上传数据文件并请求分析时，识别：
 
-- **File location**: Path(s) to uploaded Excel/CSV files under `/mnt/user-data/uploads/`
-- **Analysis goal**: What insights the user wants (summary, filtering, aggregation, comparison, etc.)
-- **Output format**: How results should be presented (table, CSV export, JSON, etc.)
-- You don't need to check the folder under `/mnt/user-data`
+- **文件位置**：上传到 `/mnt/user-data/uploads/` 下的 Excel/CSV 文件路径
+- **分析目标**：用户想获得什么洞察（摘要、筛选、聚合、比较等）
+- **输出格式**：结果应如何展示（表格、CSV 导出、JSON 等）
+- 你不需要检查 `/mnt/user-data` 下的文件夹
 
-### Step 2: Inspect File Structure
+### 步骤 2：检查文件结构
 
-First, inspect the uploaded file to understand its schema:
+先检查上传文件以理解其 schema：
 
 ```bash
 python /mnt/skills/public/data-analysis/scripts/analyze.py \
@@ -39,17 +39,17 @@ python /mnt/skills/public/data-analysis/scripts/analyze.py \
   --action inspect
 ```
 
-This returns:
-- Sheet names (for Excel) or filename (for CSV)
-- Column names, data types, and non-null counts
-- Row count per sheet/file
-- Sample data (first 5 rows)
+这将返回：
+- 工作表名称（Excel）或文件名（CSV）
+- 列名、数据类型与非空计数
+- 每个工作表/文件的行数
+- 示例数据（前 5 行）
 
-### Step 3: Perform Analysis
+### 步骤 3：执行分析
 
-Based on the schema, construct SQL queries to answer the user's questions.
+根据 schema，构造 SQL 查询来回答用户的问题。
 
-#### Run SQL Query
+#### 运行 SQL 查询
 
 ```bash
 python /mnt/skills/public/data-analysis/scripts/analyze.py \
@@ -58,7 +58,7 @@ python /mnt/skills/public/data-analysis/scripts/analyze.py \
   --sql "SELECT category, COUNT(*) as count, AVG(amount) as avg_amount FROM Sheet1 GROUP BY category ORDER BY count DESC"
 ```
 
-#### Generate Statistical Summary
+#### 生成统计摘要
 
 ```bash
 python /mnt/skills/public/data-analysis/scripts/analyze.py \
@@ -67,10 +67,10 @@ python /mnt/skills/public/data-analysis/scripts/analyze.py \
   --table Sheet1
 ```
 
-This returns for each numeric column: count, mean, std, min, 25%, 50%, 75%, max, null_count.
-For string columns: count, unique, top value, frequency, null_count.
+对于每个数值列，这会返回：count、mean、std、min、25%、50%、75%、max、null_count。
+对于字符串列，这会返回：count、unique、top value、frequency、null_count。
 
-#### Export Results
+#### 导出结果
 
 ```bash
 python /mnt/skills/public/data-analysis/scripts/analyze.py \
@@ -80,34 +80,34 @@ python /mnt/skills/public/data-analysis/scripts/analyze.py \
   --output-file /mnt/user-data/outputs/filtered-results.csv
 ```
 
-Supported output formats (auto-detected from extension):
-- `.csv` — Comma-separated values
-- `.json` — JSON array of records
-- `.md` — Markdown table
+支持的输出格式（根据扩展名自动识别）：
+- `.csv` —— 逗号分隔值
+- `.json` —— JSON 记录数组
+- `.md` —— Markdown 表格
 
-### Parameters
+### 参数
 
-| Parameter | Required | Description |
+| 参数 | 必填 | 说明 |
 |-----------|----------|-------------|
-| `--files` | Yes | Space-separated paths to Excel/CSV files |
-| `--action` | Yes | One of: `inspect`, `query`, `summary` |
-| `--sql` | For `query` | SQL query to execute |
-| `--table` | For `summary` | Table/sheet name to summarize |
-| `--output-file` | No | Path to export results (CSV/JSON/MD) |
+| `--files` | 是 | 以空格分隔的 Excel/CSV 文件路径 |
+| `--action` | 是 | 以下之一：`inspect`、`query`、`summary` |
+| `--sql` | 对 `query` 必填 | 要执行的 SQL 查询 |
+| `--table` | 对 `summary` 必填 | 要汇总的表/工作表名称 |
+| `--output-file` | 否 | 导出结果的路径（CSV/JSON/MD） |
 
 > [!NOTE]
-> Do NOT read the Python file, just call it with the parameters.
+> 不要读取这个 Python 文件，只需按参数调用它。
 
-## Table Naming Rules
+## 表命名规则
 
-- **Excel files**: Each sheet becomes a table named after the sheet (e.g., `Sheet1`, `Sales`, `Revenue`)
-- **CSV files**: Table name is the filename without extension (e.g., `data.csv` → `data`)
-- **Multiple files**: All tables from all files are available in the same query context, enabling cross-file joins
-- **Special characters**: Sheet/file names with spaces or special characters are auto-sanitized (spaces → underscores). Use double quotes for names that start with numbers or contain special characters, e.g., `"2024_Sales"`
+- **Excel 文件**：每个工作表都会成为以工作表名命名的表（例如 `Sheet1`、`Sales`、`Revenue`）
+- **CSV 文件**：表名为去掉扩展名后的文件名（例如 `data.csv` → `data`）
+- **多个文件**：所有文件中的所有表都可在同一查询上下文中使用，因此可以跨文件 join
+- **特殊字符**：带空格或特殊字符的工作表/文件名会被自动清洗（空格 → 下划线）。对于以数字开头或包含特殊字符的名称，请使用双引号，例如 `"2024_Sales"`
 
-## Analysis Patterns
+## 分析模式
 
-### Basic Exploration
+### 基础探索
 ```sql
 -- Row count
 SELECT COUNT(*) FROM Sheet1
@@ -122,7 +122,7 @@ SELECT category, COUNT(*) as cnt FROM Sheet1 GROUP BY category ORDER BY cnt DESC
 SELECT MIN(date_col), MAX(date_col) FROM Sheet1
 ```
 
-### Aggregation & Grouping
+### 聚合与分组
 ```sql
 -- Revenue by category and month
 SELECT category, DATE_TRUNC('month', order_date) as month,
@@ -137,7 +137,7 @@ FROM Orders GROUP BY customer_name
 ORDER BY total_spend DESC LIMIT 10
 ```
 
-### Cross-file Joins
+### 跨文件 Join
 ```sql
 -- Join sales with customer info from different files
 SELECT s.order_id, s.amount, c.customer_name, c.region
@@ -146,7 +146,7 @@ JOIN customers c ON s.customer_id = c.id
 WHERE s.amount > 500
 ```
 
-### Window Functions
+### 窗口函数
 ```sql
 -- Running total and rank
 SELECT order_date, amount,
@@ -155,7 +155,7 @@ SELECT order_date, amount,
 FROM Sales
 ```
 
-### Pivot-style Analysis
+### 类透视分析
 ```sql
 -- Pivot: monthly revenue by category
 SELECT category,
@@ -166,11 +166,11 @@ FROM Sales
 GROUP BY category
 ```
 
-## Complete Example
+## 完整示例
 
-User uploads `sales_2024.xlsx` (with sheets: `Orders`, `Products`, `Customers`) and asks: "Analyze my sales data — show top products by revenue and monthly trends."
+用户上传 `sales_2024.xlsx`（包含工作表：`Orders`、`Products`、`Customers`），并请求：“分析我的销售数据——展示收入最高的产品和月度趋势。”
 
-### Step 1: Inspect the file
+### 步骤 1：检查文件
 
 ```bash
 python /mnt/skills/public/data-analysis/scripts/analyze.py \
@@ -178,7 +178,7 @@ python /mnt/skills/public/data-analysis/scripts/analyze.py \
   --action inspect
 ```
 
-### Step 2: Top products by revenue
+### 步骤 2：按收入排序的热门产品
 
 ```bash
 python /mnt/skills/public/data-analysis/scripts/analyze.py \
@@ -187,7 +187,7 @@ python /mnt/skills/public/data-analysis/scripts/analyze.py \
   --sql "SELECT p.product_name, SUM(o.quantity * o.unit_price) as total_revenue, SUM(o.quantity) as total_units FROM Orders o JOIN Products p ON o.product_id = p.id GROUP BY p.product_name ORDER BY total_revenue DESC LIMIT 10"
 ```
 
-### Step 3: Monthly revenue trends
+### 步骤 3：月度收入趋势
 
 ```bash
 python /mnt/skills/public/data-analysis/scripts/analyze.py \
@@ -197,7 +197,7 @@ python /mnt/skills/public/data-analysis/scripts/analyze.py \
   --output-file /mnt/user-data/outputs/monthly-trends.csv
 ```
 
-### Step 4: Statistical summary
+### 步骤 4：统计摘要
 
 ```bash
 python /mnt/skills/public/data-analysis/scripts/analyze.py \
@@ -206,11 +206,11 @@ python /mnt/skills/public/data-analysis/scripts/analyze.py \
   --table Orders
 ```
 
-Present results to the user with clear explanations of findings, trends, and actionable insights.
+向用户展示结果时，要清晰解释发现、趋势和可执行洞察。
 
-## Multi-file Example
+## 多文件示例
 
-User uploads `orders.csv` and `customers.xlsx` and asks: "Which region has the highest average order value?"
+用户上传 `orders.csv` 和 `customers.xlsx`，并问：“哪个地区的平均订单价值最高？”
 
 ```bash
 python /mnt/skills/public/data-analysis/scripts/analyze.py \
@@ -219,30 +219,30 @@ python /mnt/skills/public/data-analysis/scripts/analyze.py \
   --sql "SELECT c.region, AVG(o.amount) as avg_order_value, COUNT(*) as order_count FROM orders o JOIN Customers c ON o.customer_id = c.id GROUP BY c.region ORDER BY avg_order_value DESC"
 ```
 
-## Output Handling
+## 输出处理
 
-After analysis:
+分析完成后：
 
-- Present query results directly in conversation as formatted tables
-- For large results, export to file and share via `present_files` tool
-- Always explain findings in plain language with key takeaways
-- Suggest follow-up analyses when patterns are interesting
-- Offer to export results if the user wants to keep them
+- 直接在对话中以格式化表格展示查询结果
+- 对于大结果，导出到文件并通过 `present_files` tool 分享
+- 始终用易懂语言解释发现并提炼关键结论
+- 当模式有趣时，建议后续分析方向
+- 如果用户希望保留结果，主动提出导出
 
-## Caching
+## 缓存
 
-The script automatically caches loaded data to avoid re-parsing files on every call:
+该脚本会自动缓存已加载数据，避免每次调用时都重新解析文件：
 
-- On first load, files are parsed and stored in a persistent DuckDB database under `/mnt/user-data/workspace/.data-analysis-cache/`
-- The cache key is a SHA256 hash of all input file contents — if files change, a new cache is created
-- Subsequent calls with the same files will use the cached database directly (near-instant startup)
-- Cache is transparent — no extra parameters needed
+- 首次加载时，文件会被解析并存储到 `/mnt/user-data/workspace/.data-analysis-cache/` 下的持久 DuckDB 数据库中
+- 缓存键为所有输入文件内容的 SHA256 哈希——如果文件变化，就会创建新的缓存
+- 后续使用同一批文件的调用将直接复用缓存数据库（几乎瞬时启动）
+- 缓存是透明的——无需额外参数
 
-This is especially useful when running multiple queries against the same data files (inspect → query → summary).
+当针对同一批数据文件执行多次查询（inspect → query → summary）时，这尤其有用。
 
-## Notes
+## 说明
 
-- DuckDB supports full SQL including window functions, CTEs, subqueries, and advanced aggregations
-- Excel date columns are automatically parsed; use DuckDB date functions (`DATE_TRUNC`, `EXTRACT`, etc.)
-- For very large files (100MB+), DuckDB handles them efficiently without loading everything into memory
-- Column names with spaces are accessible using double quotes: `"Column Name"`
+- DuckDB 支持完整 SQL，包括窗口函数、CTE、子查询和高级聚合
+- Excel 日期列会被自动解析；请使用 DuckDB 日期函数（`DATE_TRUNC`、`EXTRACT` 等）
+- 对于超大文件（100MB+），DuckDB 可高效处理而无需全部载入内存
+- 带空格的列名可通过双引号访问：`"Column Name"`

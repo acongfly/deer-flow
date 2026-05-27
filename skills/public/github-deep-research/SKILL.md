@@ -1,24 +1,24 @@
 ---
 name: github-deep-research
-description: Conduct multi-round deep research on any GitHub Repo. Use when users request comprehensive analysis, timeline reconstruction, competitive analysis, or in-depth investigation of GitHub. Produces structured markdown reports with executive summaries, chronological timelines, metrics analysis, and Mermaid diagrams. Triggers on Github repository URL or open source projects.
+description: 对任意 GitHub Repo 进行多轮深度研究。当用户请求全面分析、时间线重建、竞品分析或对 GitHub 的深入调查时使用。产出带有执行摘要、时间顺序时间线、指标分析和 Mermaid 图表的结构化 markdown 报告。在 GitHub 仓库 URL 或开源项目相关请求中触发。
 ---
 
-# GitHub Deep Research Skill
+# GitHub 深度研究 Skill
 
-Multi-round research combining GitHub API, web_search, web_fetch to produce comprehensive markdown reports.
+结合 GitHub API、web_search、web_fetch 进行多轮研究，以生成全面的 markdown 报告。
 
-## Research Workflow
+## 研究工作流
 
-- Round 1: GitHub API
-- Round 2: Discovery
-- Round 3: Deep Investigation
-- Round 4: Deep Dive
+- 第 1 轮：GitHub API
+- 第 2 轮：发现
+- 第 3 轮：深度调查
+- 第 4 轮：深入剖析
 
-## Core Methodology
+## 核心方法论
 
-### Query Strategy
+### 查询策略
 
-**Broad to Narrow**: Start with GitHub API, then general queries, refine based on findings.
+**由宽到窄**：先从 GitHub API 开始，再进行通用查询，并根据发现逐步细化。
 
 ```
 Round 1: GitHub API
@@ -27,24 +27,24 @@ Round 3: "{topic} architecture", "{topic} vs alternatives"
 Round 4: "{topic} issues", "{topic} roadmap", "site:github.com {topic}"
 ```
 
-**Source Prioritization**:
-1. Official docs/repos (highest weight)
-2. Technical blogs (Medium, Dev.to)
-3. News articles (verified outlets)
-4. Community discussions (Reddit, HN)
-5. Social media (lowest weight, for sentiment)
+**来源优先级**：
+1. 官方文档/仓库（最高权重）
+2. 技术博客（Medium、Dev.to）
+3. 新闻文章（已验证媒体）
+4. 社区讨论（Reddit、HN）
+5. 社交媒体（最低权重，用于情绪/口碑）
 
-### Research Rounds
+### 研究轮次
 
-**Round 1 - GitHub API**
-Directly execute `scripts/github_api.py` without `read_file()`:
+**第 1 轮 - GitHub API**
+直接执行 `scripts/github_api.py`，不要使用 `read_file()`：
 ```bash
 python /path/to/skill/scripts/github_api.py <owner> <repo> summary
 python /path/to/skill/scripts/github_api.py <owner> <repo> readme
 python /path/to/skill/scripts/github_api.py <owner> <repo> tree
 ```
 
-**Available commands (the last argument of `github_api.py`):**
+**可用命令（`github_api.py` 的最后一个参数）**：
 - summary
 - info
 - readme
@@ -56,41 +56,41 @@ python /path/to/skill/scripts/github_api.py <owner> <repo> tree
 - prs
 - releases
 
-**Round 2 - Discovery (3-5 web_search)**
-- Get overview and identify key terms
-- Find official website/repo
-- Identify main players/competitors
+**第 2 轮 - 发现（3-5 次 web_search）**
+- 获取概览并识别关键术语
+- 找到官方网站/仓库
+- 识别主要参与者/竞争者
 
-**Round 3 - Deep Investigation (5-10 web_search + web_fetch)**
-- Technical architecture details
-- Timeline of key events
-- Community sentiment
-- Use web_fetch on valuable URLs for full content
+**第 3 轮 - 深度调查（5-10 次 web_search + web_fetch）**
+- 技术架构细节
+- 关键事件时间线
+- 社区情绪
+- 对有价值的 URL 使用 web_fetch 获取完整内容
 
-**Round 4 - Deep Dive**
-- Analyze commit history for timeline
-- Review issues/PRs for feature evolution
-- Check contributor activity
+**第 4 轮 - 深入剖析**
+- 分析 commit 历史以构建时间线
+- 审查 issues/PRs 以了解功能演进
+- 检查贡献者活跃度
 
-## Report Structure
+## 报告结构
 
-Follow template in `assets/report_template.md`:
+遵循 `assets/report_template.md` 中的模板：
 
-1. **Metadata Block** - Date, confidence level, subject
-2. **Executive Summary** - 2-3 sentence overview with key metrics
-3. **Chronological Timeline** - Phased breakdown with dates
-4. **Key Analysis Sections** - Topic-specific deep dives
-5. **Metrics & Comparisons** - Tables, growth charts
-6. **Strengths & Weaknesses** - Balanced assessment
-7. **Sources** - Categorized references
-8. **Confidence Assessment** - Claims by confidence level
-9. **Methodology** - Research approach used
+1. **元数据块** - 日期、置信度级别、主题
+2. **执行摘要** - 2-3 句概述并包含关键指标
+3. **时间顺序时间线** - 按阶段拆解并附日期
+4. **关键分析章节** - 针对主题的深度剖析
+5. **指标与比较** - 表格、增长图表
+6. **优势与劣势** - 平衡评估
+7. **来源** - 分类参考资料
+8. **置信度评估** - 按置信度级别列出结论
+9. **方法论** - 使用的研究方法
 
-### Mermaid Diagrams
+### Mermaid 图表
 
-Include diagrams where helpful:
+在有帮助时加入图表：
 
-**Timeline (Gantt)**:
+**时间线（Gantt）**：
 ```mermaid
 gantt
     title Project Timeline
@@ -101,7 +101,7 @@ gantt
     Launch         :2025-03-01, 2025-04-01
 ```
 
-**Architecture (Flowchart)**:
+**架构（Flowchart）**：
 ```mermaid
 flowchart TD
     A[User] --> B[Coordinator]
@@ -110,7 +110,7 @@ flowchart TD
     D --> E[Reporter]
 ```
 
-**Comparison (Pie/Bar)**:
+**比较（Pie/Bar）**：
 ```mermaid
 pie title Market Share
     "Project A" : 45
@@ -118,48 +118,48 @@ pie title Market Share
     "Others" : 25
 ```
 
-## Confidence Scoring
+## 置信度评分
 
-Assign confidence based on source quality:
+根据来源质量分配置信度：
 
-| Confidence | Criteria |
+| 置信度 | 标准 |
 |------------|----------|
-| High (90%+) | Official docs, GitHub data, multiple corroborating sources |
-| Medium (70-89%) | Single reliable source, recent articles |
-| Low (50-69%) | Social media, unverified claims, outdated info |
+| High (90%+) | 官方文档、GitHub 数据、多个相互印证的来源 |
+| Medium (70-89%) | 单个可靠来源、近期文章 |
+| Low (50-69%) | 社交媒体、未经验证的说法、过时信息 |
 
-## Output
+## 输出
 
-Save report as: `research_{topic}_{YYYYMMDD}.md`
+将报告保存为：`research_{topic}_{YYYYMMDD}.md`
 
-### Formatting Rules
+### 格式规则
 
-- Chinese content: Use full-width punctuation（，。：；！？）
-- Technical terms: Provide Wiki/doc URL on first mention
-- Tables: Use for metrics, comparisons
-- Code blocks: For technical examples
-- Mermaid: For architecture, timelines, flows
+- 中文内容：使用全角标点（，。：；！？）
+- 技术术语：首次出现时提供 Wiki/文档 URL
+- 表格：用于指标、比较
+- 代码块：用于技术示例
+- Mermaid：用于架构、时间线、流程
 
-## Best Practices
+## 最佳实践
 
-1. **Start with official sources** - Repo, docs, company blog
-2. **Verify dates from commits/PRs** - More reliable than articles
-3. **Triangulate claims** - 2+ independent sources
-4. **Note conflicting info** - Don't hide contradictions
-5. **Distinguish fact vs opinion** - Label speculation clearly
-6. **CRITICAL: Always include inline citations** - Use `[citation:Title](URL)` format immediately after each claim from external sources
-7. **Extract URLs from search results** - web_search returns {title, url, snippet} - always use the URL field
-8. **Update as you go** - Don't wait until end to synthesize
+1. **先从官方来源开始** - 仓库、文档、公司博客
+2. **从 commits/PRs 验证日期** - 比文章更可靠
+3. **交叉验证说法** - 2 个以上独立来源
+4. **注明冲突信息** - 不要隐藏矛盾
+5. **区分事实与观点** - 明确标注推测
+6. **关键：始终包含行内引用** - 对外部来源的每条陈述，都要在后面立即使用 `[citation:Title](URL)` 格式
+7. **从搜索结果中提取 URL** - web_search 返回 {title, url, snippet}，始终使用 URL 字段
+8. **边研究边更新** - 不要等到最后才综合整理
 
-### Citation Examples
+### 引用示例
 
-**Good - With inline citations:**
+**好 - 带有行内引用：**
 ```markdown
 The project gained 10,000 stars within 3 months of launch [citation:GitHub Stats](https://github.com/owner/repo).
 The architecture uses LangGraph for workflow orchestration [citation:LangGraph Docs](https://langchain.com/langgraph).
 ```
 
-**Bad - Without citations:**
+**坏 - 没有引用：**
 ```markdown
 The project gained 10,000 stars within 3 months of launch.
 The architecture uses LangGraph for workflow orchestration.

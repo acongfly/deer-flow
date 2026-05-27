@@ -1,202 +1,202 @@
-# Dr. Fei-Fei Li: Recent Podcast Appearances Timeline (Last 6 Months)
+# 李飞飞博士：近期 Podcast 亮相时间线（最近 6 个月）
 
-## Overview
+## 概览
 
-Dr. Fei-Fei Li, often called the "Godmother of AI," has been actively appearing on major podcasts discussing the future of artificial intelligence, spatial intelligence, human-centered AI, and her work at World Labs. This timeline compiles key highlights from her recent podcast appearances from August 2025 to January 2026.
-
----
-
-## Timeline of Recent Podcast Appearances
-
-### January 15, 2025 - **Possible Podcast** (with Reid Hoffman and Aria Finger)
-
-**Episode:** "Fei-Fei Li on spatial intelligence and human-centered AI"
-
-**Key Highlights:**
-
-- **Spatial Intelligence as Next Frontier:** Emphasized that spatial intelligence represents the next major evolution beyond large language models (LLMs)
-- **Human-Centered AI Philosophy:** Discussed the importance of building AI that amplifies human potential rather than replacing humans
-- **Regulatory Guardrails:** Addressed the need for thoughtful regulation and governance frameworks for AI development
-- **World Labs Mission:** Explained her current role as co-founder and CEO of World Labs, focusing on spatial intelligence technology
-- **ImageNet Legacy:** Reflected on how ImageNet revolutionized computer vision and sparked the deep learning revolution
-
-**Notable Quote:** "Humans are capable of creating God-like technology so that we can improve our medieval institutions and raise above our paleolithic emotions."
+李飞飞博士常被称为“AI 教母”，她近期频繁出现在各大 podcast 中，讨论 artificial intelligence 的未来、spatial intelligence、human-centered AI，以及她在 World Labs 的工作。本时间线汇总了她从 2025 年 8 月到 2026 年 1 月期间近期 podcast 亮相的关键亮点。
 
 ---
 
-### August 15, 2025 - **Firing Line (PBS)**
+## 近期 Podcast 亮相时间线
 
-**Episode:** "Fei-Fei Li on ethical AI development"
+### 2025 年 1 月 15 日 - **Possible Podcast**（与 Reid Hoffman 和 Aria Finger）
 
-**Key Highlights:**
+**节目：** “Fei-Fei Li on spatial intelligence and human-centered AI”
 
-- **Ethical AI Development:** Discussed the challenges and responsibilities in developing AI ethically
-- **Societal Impact:** Addressed how AI will transform various sectors including healthcare, education, and employment
-- **Policy Recommendations:** Provided insights on what policy frameworks are needed for responsible AI deployment
-- **Global Collaboration:** Emphasized the need for international cooperation on AI standards and safety
+**关键亮点：**
 
----
+- **Spatial Intelligence 是下一个前沿：** 强调 spatial intelligence 代表着超越 large language models（LLMs）的下一次重大演进
+- **Human-Centered AI 理念：** 讨论构建能够放大人类潜能、而不是取代人类的 AI 的重要性
+- **监管护栏：** 谈到 AI 发展需要审慎的监管和治理框架
+- **World Labs 的使命：** 介绍她目前作为 World Labs 联合创始人兼 CEO 的角色，专注于 spatial intelligence 技术
+- **ImageNet 遗产：** 回顾了 ImageNet 如何彻底改变 computer vision，并引发 deep learning 革命
 
-### November 16, 2025 - **Lenny's Podcast**
-
-**Episode:** "The Godmother of AI on jobs, robots & why world models are next"
-
-**Key Highlights:**
-
-- **World Models Introduction:** Explained why world models and spatial intelligence represent the next frontier beyond LLMs
-- **AI Won't Replace Humans:** Argued that AI won't replace humans but will require us to take responsibility for ourselves
-- **Marble Applications:** Revealed surprising applications of World Labs' Marble product, from movie production to psychological research
-- **Robotics Challenges:** Discussed why robotics faces unique challenges compared with language models
-- **Historical Context:** Shared rarely told history of AI development, including that just nine years ago, calling yourself an AI company was "basically a death sentence"
-- **Participation for All:** Explained how anyone can participate in AI regardless of their role or background
-
-**Key Discussion Points:**
-
-1. How ImageNet helped spark the current AI explosion
-2. The "bitter lesson" in AI and robotics
-3. Applications of Marble in creative industries and therapy
-4. Human-centered AI initiatives at Stanford
+**值得注意的引语：** “人类有能力创造出如神一般的技术，从而改善我们中世纪式的制度，并超越我们旧石器时代般的情绪。”
 
 ---
 
-### November 25, 2025 - **Masters of Scale Summit**
+### 2025 年 8 月 15 日 - **Firing Line (PBS)**
 
-**Episode:** "The 'Godmother of AI' on the next phase of AI" (with Reid Hoffman)
+**节目：** “Fei-Fei Li on ethical AI development”
 
-**Key Highlights:**
+**关键亮点：**
 
-- **Fearless Approach:** Discussed why scientists and entrepreneurs need to be fearless in the face of an uncertain AI future
-- **Spatial Intelligence & World Modeling:** Detailed the next phase of AI focusing on spatial understanding
-- **Trust Building:** Explained how leaders should build societal trust in AI products and companies
-- **Human Agency:** Emphasized that trust cannot be outsourced to machines and must remain fundamentally human
-- **Entrepreneurial Responsibility:** Argued that entrepreneurs should care about trust from day one of AI development
-
-**Chapter Topics Covered:**
-
-- The next phase of AI: spatial intelligence & world modeling
-- What spatial intelligence has done for humans
-- Whether AI is over-hyped
-- How to build society trust in AI
-- Why we need to be "fearless" with AI
+- **Ethical AI Development：** 讨论以合乎伦理的方式开发 AI 所面临的挑战与责任
+- **社会影响：** 谈及 AI 将如何改变医疗、教育、就业等多个领域
+- **政策建议：** 提供了关于负责任部署 AI 所需政策框架的见解
+- **全球协作：** 强调在 AI 标准与安全方面需要国际合作
 
 ---
 
-### December 9, 2025 - **The Tim Ferriss Show** (#839)
+### 2025 年 11 月 16 日 - **Lenny's Podcast**
 
-**Episode:** "Dr. Fei-Fei Li, The Godmother of AI — Asking Audacious Questions, Civilizational Technology, and Finding Your North Star"
+**节目：** “The Godmother of AI on jobs, robots & why world models are next”
 
-**Key Highlights:**
+**关键亮点：**
 
-- **Civilizational Technology:** Defined AI as a "civilizational technology" that will have profound economic, social, cultural, and political impacts
-- **Personal Journey:** Shared her immigrant story from Chengdu to New Jersey, and her family's seven years running a dry cleaning shop while she attended Princeton
-- **ImageNet Creation:** Detailed the creation of ImageNet and how it birthed modern AI, including innovative use of Amazon Mechanical Turk for data labeling
-- **Spatial Intelligence Vision:** Explained why she founded World Labs to focus on spatial intelligence as the next frontier
-- **Educational Philosophy:** Proposed rethinking evaluation by showing students AI's "B-minus" work and challenging them to beat it
-- **Human-Centered Focus:** Emphasized that "people are at the heart of everything" in AI development
+- **World Models 介绍：** 解释为什么 world models 和 spatial intelligence 代表着超越 LLMs 的下一个前沿
+- **AI 不会取代人类：** 她认为 AI 不会取代人类，但会要求我们对自己承担责任
+- **Marble 的应用：** 揭示了 World Labs 的 Marble 产品一些出人意料的应用场景，从电影制作到心理学研究
+- **Robotics 挑战：** 讨论为什么 robotics 相比 language models 面临独特挑战
+- **历史背景：** 分享了鲜为人知的 AI 发展史，包括仅仅九年前，自称是一家 AI 公司还“几乎等同于死刑”
+- **人人都能参与：** 解释无论角色或背景如何，每个人都可以参与 AI
 
-**Notable Quotes:**
+**关键讨论点：**
 
-- "Really, at the end of the day, people are at the heart of everything. People made AI, people will be using AI, people will be impacted by AI, and people should have a say in AI."
-- "AI is absolutely a civilizational technology... it'll have—or [is] already having—a profound impact in the economic, social, cultural, political, downstream effects of our society."
-- "What is your North Star?"
-
-**Key Topics Discussed:**
-
-- From fighter jets to physics to asking "What is intelligence?"
-- The epiphany everyone missed: Big data as the hidden hypothesis
-- Against the single-genius myth: Science as non-linear lineage
-- Quality control puzzles in AI training data
-- Medieval French towns on a budget: How World Labs serves high school theater
-- Flight simulators for robots and strawberry field therapy for OCD
+1. ImageNet 如何帮助点燃当前的 AI 爆发
+2. AI 和 robotics 中的 “bitter lesson”
+3. Marble 在创意产业和治疗中的应用
+4. Stanford 的 human-centered AI initiatives
 
 ---
 
-### June 16, 2025 - **Y Combinator Startup Podcast**
+### 2025 年 11 月 25 日 - **Masters of Scale Summit**
 
-**Episode:** "Fei-Fei Li - Spatial Intelligence is the Next Frontier in AI"
+**节目：** “The 'Godmother of AI' on the next phase of AI”（与 Reid Hoffman）
 
-**Key Highlights:**
+**关键亮点：**
 
-- **Startup Perspective:** Provided insights for AI startups on navigating the current landscape
-- **Technical Deep Dive:** Offered detailed explanations of spatial intelligence technologies
-- **Entrepreneurial Advice:** Shared lessons from transitioning from academia to entrepreneurship
-- **Market Opportunities:** Identified emerging opportunities in spatial AI applications
+- **无畏的方法：** 讨论为什么科学家和企业家在面对不确定的 AI 未来时需要保持无畏
+- **Spatial Intelligence 与 World Modeling：** 详细说明 AI 的下一阶段将聚焦于空间理解
+- **建立信任：** 解释领导者应如何为 AI 产品和公司建立社会信任
+- **Human Agency：** 强调信任不能外包给机器，必须从根本上保持为人的能力
+- **企业家责任：** 认为企业家从 AI 开发第一天起就应关注信任问题
 
----
+**涵盖的章节主题：**
 
-## Common Themes Across Recent Appearances
-
-### 1. **Spatial Intelligence as the Next Frontier**
-
-- Repeated emphasis that spatial intelligence represents the next major evolution beyond language models
-- World Labs' focus on creating AI that understands and interacts with the physical world
-- Applications ranging from robotics and autonomous systems to creative industries and therapy
-
-### 2. **Human-Centered AI Philosophy**
-
-- Consistent message that AI should augment rather than replace human capabilities
-- Emphasis on maintaining human agency and responsibility in AI systems
-- Focus on building trust and ethical frameworks
-
-### 3. **Educational Transformation**
-
-- Advocacy for integrating AI into education to enhance learning
-- Proposal to use AI as a benchmark for student improvement
-- Emphasis on making AI accessible to people from all backgrounds
-
-### 4. **Historical Perspective**
-
-- Frequent references to ImageNet's role in sparking the deep learning revolution
-- Context about how rapidly the AI landscape has changed
-- Emphasis on collaborative, non-linear progress in scientific advancement
-
-### 5. **Entrepreneurial Vision**
-
-- Insights on building AI companies in the current environment
-- Balance between technological innovation and responsible development
-- Focus on practical applications that solve real-world problems
+- AI 的下一阶段：spatial intelligence 与 world modeling
+- spatial intelligence 为人类带来了什么
+- AI 是否被过度炒作
+- 如何建立社会对 AI 的信任
+- 为什么我们需要以“无畏”的方式面对 AI
 
 ---
 
-## Key Insights and Predictions
+### 2025 年 12 月 9 日 - **The Tim Ferriss Show**（#839）
 
-### **Near-Term Developments (1-3 years):**
+**节目：** “Dr. Fei-Fei Li, The Godmother of AI — Asking Audacious Questions, Civilizational Technology, and Finding Your North Star”
 
-- Rapid advancement in spatial intelligence and world modeling technologies
-- Increased integration of AI in education and creative industries
-- Growing focus on AI ethics and governance frameworks
-- Expansion of practical applications in healthcare, therapy, and accessibility
+**关键亮点：**
 
-### **Medium-Term Vision (3-5 years):**
+- **Civilizational Technology：** 将 AI 定义为一种“civilizational technology”，会带来深远的经济、社会、文化和政治影响
+- **个人历程：** 分享她从成都到新泽西的移民故事，以及在她就读 Princeton 期间家人经营干洗店七年的经历
+- **ImageNet 的诞生：** 详细介绍 ImageNet 的创建，以及它如何催生现代 AI，包括创新性地使用 Amazon Mechanical Turk 进行数据标注
+- **Spatial Intelligence 愿景：** 解释她为何创办 World Labs，把 spatial intelligence 作为下一个前沿
+- **教育理念：** 提出重新思考评估方式：向学生展示 AI 的 “B-minus” 水平作品，并鼓励他们超越它
+- **Human-Centered 聚焦：** 强调在 AI 开发中“人是一切的核心”
 
-- More sophisticated human-AI collaboration systems
-- Breakthroughs in robotics enabled by spatial intelligence
-- Transformation of how we teach and learn with AI assistance
-- Development of new industries centered around spatial AI
+**值得注意的引语：**
 
-### **Long-Term Philosophy:**
+- “归根结底，人是一切的核心。AI 是人创造的，AI 将被人使用，AI 会影响人，而人也应该对 AI 拥有发言权。”
+- “AI 绝对是一种 civilizational technology……它将会——或者说已经在——对我们社会的经济、社会、文化、政治以及下游效应产生深远影响。”
+- “你的 North Star 是什么？”
 
-- AI as a "civilizational technology" that requires thoughtful stewardship
-- Emphasis on maintaining human values and agency in technological progress
-- Vision of technology that helps humanity "raise above our paleolithic emotions"
+**讨论的关键主题：**
 
----
-
-## Conclusion
-
-Dr. Fei-Fei Li's recent podcast appearances reveal a consistent vision: AI should be developed as a human-centered technology that enhances our capabilities rather than replacing them. Her focus has shifted from the foundational work of ImageNet to the next frontier of spatial intelligence through World Labs. Across all conversations, she emphasizes the importance of ethics, education, and maintaining human agency in the age of artificial intelligence.
-
-The timeline shows her evolving role from academic researcher to entrepreneur while maintaining her core philosophy that technology should serve humanity's best interests. Her message remains one of cautious optimism, emphasizing both the tremendous potential and significant responsibilities of developing transformative AI technologies.
+- 从战斗机到 physics，再到追问“什么是 intelligence？”
+- 每个人都错过的顿悟：Big data 作为隐藏假设
+- 反对单一天才神话：science 是非线性的谱系传承
+- AI 训练数据中的质量控制难题
+- 低预算下的中世纪法国小镇：World Labs 如何服务高中戏剧
+- 机器人的飞行模拟器与针对 OCD 的草莓田疗法
 
 ---
 
-## Sources
+### 2025 年 6 月 16 日 - **Y Combinator Startup Podcast**
 
-1. The Tim Ferriss Show (December 9, 2025)
-2. Lenny's Podcast (November 16, 2025)
-3. Masters of Scale Summit (November 25, 2025)
-4. Possible Podcast (January 15, 2025)
-5. Firing Line, PBS (August 15, 2025)
-6. Y Combinator Startup Podcast (June 16, 2025)
+**节目：** “Fei-Fei Li - Spatial Intelligence is the Next Frontier in AI”
 
-_Compiled on January 25, 2026_
+**关键亮点：**
+
+- **Startup 视角：** 为 AI startups 提供关于如何驾驭当前环境的见解
+- **技术深潜：** 对 spatial intelligence 技术进行了详细解释
+- **创业建议：** 分享了她从 academia 转向 entrepreneurship 的经验教训
+- **市场机会：** 指出了 spatial AI 应用中新兴的机会
+
+---
+
+## 近期亮相中的共同主题
+
+### 1. **Spatial Intelligence 是下一个前沿**
+
+- 一再强调 spatial intelligence 代表着超越 language models 的下一次重大演进
+- World Labs 专注于打造能够理解并与物理世界交互的 AI
+- 应用范围从 robotics、autonomous systems，到创意产业和治疗
+
+### 2. **Human-Centered AI 理念**
+
+- 一贯传达 AI 应增强而非取代人类能力的信息
+- 强调在 AI 系统中保持 human agency 与责任
+- 聚焦于建立信任和伦理框架
+
+### 3. **教育变革**
+
+- 倡导将 AI 融入教育，以增强学习效果
+- 提议将 AI 作为学生提升的对照基准
+- 强调让各种背景的人都能接触和使用 AI
+
+### 4. **历史视角**
+
+- 经常提到 ImageNet 在引发 deep learning 革命中的作用
+- 为 AI 格局变化之快提供背景语境
+- 强调科学进步是协作的、非线性的过程
+
+### 5. **创业愿景**
+
+- 分享在当前环境中打造 AI 公司的见解
+- 在技术创新与负责任开发之间寻求平衡
+- 聚焦于解决真实世界问题的实际应用
+
+---
+
+## 关键洞察与预测
+
+### **近期发展（1-3 年）：**
+
+- spatial intelligence 与 world modeling 技术将快速进步
+- AI 在教育和创意产业中的整合会进一步增强
+- AI ethics 和治理框架将受到越来越多关注
+- 在医疗、治疗与可访问性方面的实际应用将扩展
+
+### **中期愿景（3-5 年）：**
+
+- 更复杂的人机协作系统
+- 由 spatial intelligence 驱动的 robotics 突破
+- 在 AI 辅助下，教学与学习方式将发生转变
+- 围绕 spatial AI 发展出新的产业
+
+### **长期理念：**
+
+- AI 是一种需要审慎引导的“civilizational technology”
+- 强调在技术进步中保持人类价值与 human agency
+- 追求帮助人类“超越旧石器时代情绪”的技术愿景
+
+---
+
+## 结论
+
+李飞飞博士近期的 podcast 亮相展现出一个一致的愿景：AI 应被发展为一种以人为中心的技术，用于增强我们的能力，而不是取代我们。她的重点已经从 ImageNet 的基础性工作，转向通过 World Labs 探索 spatial intelligence 这一下一前沿。在所有对话中，她都强调 ethics、education，以及在 artificial intelligence 时代保持 human agency 的重要性。
+
+这条时间线也展示了她从学术研究者向企业家转变的角色演进，同时仍然坚持其核心理念：技术应服务于人类的最大利益。她传递的信息始终是谨慎的乐观主义，既强调 transformative AI technologies 的巨大潜力，也强调开发这些技术所伴随的重要责任。
+
+---
+
+## 来源
+
+1. The Tim Ferriss Show（2025 年 12 月 9 日）
+2. Lenny's Podcast（2025 年 11 月 16 日）
+3. Masters of Scale Summit（2025 年 11 月 25 日）
+4. Possible Podcast（2025 年 1 月 15 日）
+5. Firing Line, PBS（2025 年 8 月 15 日）
+6. Y Combinator Startup Podcast（2025 年 6 月 16 日）
+
+_编译于 2026 年 1 月 25 日_

@@ -1,8 +1,8 @@
-# DeerFlow Sandbox Provisioner
+# DeerFlow Sandbox Provisioner（沙箱资源管理服务）
 
-The **Sandbox Provisioner** is a FastAPI service that dynamically manages sandbox Pods in Kubernetes. It provides a REST API for the DeerFlow backend to create, monitor, and destroy isolated sandbox environments for code execution.
+**Sandbox Provisioner** 是一个 FastAPI 服务，用于在 Kubernetes 中动态管理 sandbox Pod。它为 DeerFlow backend 提供 REST API，用于创建、监控和销毁隔离的 sandbox 环境，以执行代码。
 
-## Architecture
+## 架构
 
 ```
 ┌────────────┐  HTTP  ┌─────────────┐  K8s API  ┌──────────────┐
@@ -18,45 +18,45 @@ The **Sandbox Provisioner** is a FastAPI service that dynamically manages sandbo
                           └─────────────┘
 ```
 
-### How It Works
+### 工作方式
 
-1. **Backend Request**: When the backend needs to execute code, it sends a `POST /api/sandboxes` request with a `sandbox_id`, `thread_id`, and optional `user_id`.
+1. **Backend 请求**：当 backend 需要执行代码时，它会发送一个 `POST /api/sandboxes` 请求，并携带 `sandbox_id`、`thread_id` 和可选的 `user_id`。
 
-2. **Pod Creation**: The provisioner creates a dedicated Pod in the `deer-flow` namespace with:
-   - The sandbox container image (all-in-one-sandbox)
-   - HostPath volumes mounted for:
-     - `/mnt/skills` → Read-only access to public skills
-     - `/mnt/user-data` → Read-write access to thread-specific data
-   - Resource limits (CPU, memory, ephemeral storage)
-   - Readiness/liveness probes
+2. **创建 Pod**：provisioner 会在 `deer-flow` namespace 中创建一个专用 Pod，包含：
+   - sandbox container image（all-in-one-sandbox）
+   - 挂载 HostPath volume，用于：
+     - `/mnt/skills` → 对公共 skills 的只读访问
+     - `/mnt/user-data` → 对特定 thread 数据的读写访问
+   - 资源限制（CPU、memory、ephemeral storage）
+   - readiness/liveness probes
 
-3. **Service Creation**: A NodePort Service is created to expose the Pod, with Kubernetes auto-allocating a port from the NodePort range (typically 30000-32767).
+3. **创建 Service**：会创建一个 NodePort Service 来暴露该 Pod，Kubernetes 会自动从 NodePort 范围（通常是 30000-32767）分配端口。
 
-4. **Access URL**: The provisioner returns `http://host.docker.internal:{NodePort}` to the backend, which the backend containers can reach directly.
+4. **访问 URL**：provisioner 会向 backend 返回 `http://host.docker.internal:{NodePort}`，backend container 可以直接访问该地址。
 
-5. **Cleanup**: When the session ends, `DELETE /api/sandboxes/{sandbox_id}` removes both the Pod and Service.
+5. **清理**：当会话结束时，`DELETE /api/sandboxes/{sandbox_id}` 会同时删除 Pod 和 Service。
 
-## Requirements
+## 要求
 
-Host machine with a running Kubernetes cluster (Docker Desktop K8s, OrbStack, minikube, kind, etc.)
+主机机器上需要有一个正在运行的 Kubernetes 集群（Docker Desktop K8s、OrbStack、minikube、kind 等）。
 
-### Enable Kubernetes in Docker Desktop
-1. Open Docker Desktop settings
-2. Go to "Kubernetes" tab
-3. Check "Enable Kubernetes"
-4. Click "Apply & Restart"
+### 在 Docker Desktop 中启用 Kubernetes
+1. 打开 Docker Desktop 设置
+2. 进入 “Kubernetes” 标签页
+3. 勾选 “Enable Kubernetes”
+4. 点击 “Apply & Restart”
 
-### Enable Kubernetes in OrbStack
-1. Open OrbStack settings
-2. Go to "Kubernetes" tab
-3. Check "Enable Kubernetes"
+### 在 OrbStack 中启用 Kubernetes
+1. 打开 OrbStack 设置
+2. 进入 “Kubernetes” 标签页
+3. 勾选 “Enable Kubernetes”
 
-## API Endpoints
+## API 接口
 
 ### `GET /health`
-Health check endpoint.
+健康检查 endpoint。
 
-**Response**:
+**响应**：
 ```json
 {
   "status": "ok"
@@ -64,9 +64,9 @@ Health check endpoint.
 ```
 
 ### `POST /api/sandboxes`
-Create a new sandbox Pod + Service.
+创建一个新的 sandbox Pod + Service。
 
-**Request**:
+**请求**：
 ```json
 {
   "sandbox_id": "abc-123",
@@ -75,9 +75,9 @@ Create a new sandbox Pod + Service.
 }
 ```
 
-`user_id` is optional for backwards compatibility and defaults to `default`. When `USERDATA_PVC_NAME` is set, the provisioner uses it to isolate PVC-backed user-data directories.
+`user_id` 是为了向后兼容而提供的可选字段，默认值为 `default`。当设置了 `USERDATA_PVC_NAME` 时，provisioner 会使用它来隔离基于 PVC 的 user-data 目录。
 
-**Response**:
+**响应**：
 ```json
 {
   "sandbox_id": "abc-123",
@@ -86,12 +86,12 @@ Create a new sandbox Pod + Service.
 }
 ```
 
-**Idempotent**: Calling with the same `sandbox_id` returns the existing sandbox info.
+**幂等**：使用相同的 `sandbox_id` 调用时，会返回已有的 sandbox 信息。
 
 ### `GET /api/sandboxes/{sandbox_id}`
-Get status and URL of a specific sandbox.
+获取指定 sandbox 的状态和 URL。
 
-**Response**:
+**响应**：
 ```json
 {
   "sandbox_id": "abc-123",
@@ -100,12 +100,12 @@ Get status and URL of a specific sandbox.
 }
 ```
 
-**Status Values**: `Pending`, `Running`, `Succeeded`, `Failed`, `Unknown`, `NotFound`
+**状态值**：`Pending`、`Running`、`Succeeded`、`Failed`、`Unknown`、`NotFound`
 
 ### `DELETE /api/sandboxes/{sandbox_id}`
-Destroy a sandbox Pod + Service.
+销毁一个 sandbox Pod + Service。
 
-**Response**:
+**响应**：
 ```json
 {
   "ok": true,
@@ -114,9 +114,9 @@ Destroy a sandbox Pod + Service.
 ```
 
 ### `GET /api/sandboxes`
-List all sandboxes currently managed.
+列出当前所有受管理的 sandbox。
 
-**Response**:
+**响应**：
 ```json
 {
   "sandboxes": [
@@ -130,27 +130,27 @@ List all sandboxes currently managed.
 }
 ```
 
-## Configuration
+## 配置
 
-The provisioner is configured via environment variables (set in [docker-compose-dev.yaml](../docker-compose-dev.yaml)):
+provisioner 通过环境变量进行配置（在 [docker-compose-dev.yaml](../docker-compose-dev.yaml) 中设置）：
 
-| Variable | Default | Description |
+| 变量 | 默认值 | 说明 |
 |----------|---------|-------------|
-| `K8S_NAMESPACE` | `deer-flow` | Kubernetes namespace for sandbox resources |
-| `SANDBOX_IMAGE` | `enterprise-public-cn-beijing.cr.volces.com/vefaas-public/all-in-one-sandbox:latest` | Container image for sandbox Pods |
-| `SKILLS_HOST_PATH` | - | **Host machine** path to skills directory (must be absolute) |
-| `THREADS_HOST_PATH` | - | **Host machine** path to threads data directory (must be absolute) |
-| `SKILLS_PVC_NAME` | empty (use hostPath) | PVC name for skills volume; when set, sandbox Pods use PVC instead of hostPath |
-| `USERDATA_PVC_NAME` | empty (use hostPath) | PVC name for user-data volume; when set, uses PVC with `subPath: deer-flow/users/{user_id}/threads/{thread_id}/user-data` |
-| `KUBECONFIG_PATH` | `/root/.kube/config` | Path to kubeconfig **inside** the provisioner container |
-| `NODE_HOST` | `host.docker.internal` | Hostname that backend containers use to reach host NodePorts |
-| `K8S_API_SERVER` | (from kubeconfig) | Override K8s API server URL (e.g., `https://host.docker.internal:26443`) |
+| `K8S_NAMESPACE` | `deer-flow` | sandbox 资源所在的 Kubernetes namespace |
+| `SANDBOX_IMAGE` | `enterprise-public-cn-beijing.cr.volces.com/vefaas-public/all-in-one-sandbox:latest` | sandbox Pod 使用的 container image |
+| `SKILLS_HOST_PATH` | - | **主机机器** 上 skills 目录的路径（必须为绝对路径） |
+| `THREADS_HOST_PATH` | - | **主机机器** 上 threads 数据目录的路径（必须为绝对路径） |
+| `SKILLS_PVC_NAME` | 空（使用 hostPath） | skills volume 的 PVC 名称；设置后，sandbox Pod 将使用 PVC 而不是 hostPath |
+| `USERDATA_PVC_NAME` | 空（使用 hostPath） | user-data volume 的 PVC 名称；设置后，使用带有 `subPath: deer-flow/users/{user_id}/threads/{thread_id}/user-data` 的 PVC |
+| `KUBECONFIG_PATH` | `/root/.kube/config` | provisioner container **内部** 的 kubeconfig 路径 |
+| `NODE_HOST` | `host.docker.internal` | backend container 用于访问主机 NodePort 的主机名 |
+| `K8S_API_SERVER` | （来自 kubeconfig） | 覆盖 K8s API server URL（例如 `https://host.docker.internal:26443`） |
 
-### PVC User-Data Upgrade Note
+### PVC User-Data 升级说明
 
-Older provisioner versions mounted PVC user-data from `threads/{thread_id}/user-data`. The user-scoped layout mounts from `deer-flow/users/{user_id}/threads/{thread_id}/user-data`.
+旧版 provisioner 会从 `threads/{thread_id}/user-data` 挂载 PVC user-data。按用户作用域划分的新布局会从 `deer-flow/users/{user_id}/threads/{thread_id}/user-data` 挂载。
 
-If an existing deployment already has PVC-backed user-data under the legacy layout, migrate the DeerFlow data directory before relying on the new PVC subPath. Mount the same PVC path that the gateway uses as its DeerFlow base directory, then run the existing user-isolation migration script:
+如果现有部署已经在旧布局下使用了基于 PVC 的 user-data，请在依赖新的 PVC subPath 之前迁移 DeerFlow 数据目录。挂载 gateway 用作 DeerFlow 基础目录的同一路径 PVC，然后运行现有的 user-isolation 迁移脚本：
 
 ```bash
 cd backend
@@ -158,13 +158,13 @@ PYTHONPATH=. python scripts/migrate_user_isolation.py --dry-run
 PYTHONPATH=. python scripts/migrate_user_isolation.py --user-id <target-user-id>
 ```
 
-This moves legacy `threads/{thread_id}/user-data` data under `users/<target-user-id>/threads/{thread_id}/user-data`, which matches the new provisioner PVC subPath when the gateway base directory is mounted at `deer-flow/` on the PVC. Use `default` as the target user only when the legacy data should remain in the default no-auth user namespace. Run the migration while no gateway or sandbox Pods are writing to those paths.
+这会把旧的 `threads/{thread_id}/user-data` 数据迁移到 `users/<target-user-id>/threads/{thread_id}/user-data` 下；当 gateway 基础目录以 `deer-flow/` 挂载到 PVC 上时，这与新的 provisioner PVC subPath 保持一致。只有当旧数据应继续保留在默认无认证用户 namespace 中时，才把 `default` 用作目标用户。请在没有 gateway 或 sandbox Pod 正在写入这些路径时执行迁移。
 
-### Important: K8S_API_SERVER Override
+### 重要说明：K8S_API_SERVER 覆盖
 
-If your kubeconfig uses `localhost`, `127.0.0.1`, or `0.0.0.0` as the API server address (common with OrbStack, minikube, kind), the provisioner **cannot** reach it from inside the Docker container. 
+如果你的 kubeconfig 将 API server 地址设置为 `localhost`、`127.0.0.1` 或 `0.0.0.0`（OrbStack、minikube、kind 中很常见），provisioner **无法** 从 Docker container 内部访问它。
 
-**Solution**: Set `K8S_API_SERVER` to use `host.docker.internal`:
+**解决方案**：将 `K8S_API_SERVER` 设置为使用 `host.docker.internal`：
 
 ```yaml
 # docker-compose-dev.yaml
@@ -173,38 +173,38 @@ provisioner:
     - K8S_API_SERVER=https://host.docker.internal:26443  # Replace 26443 with your API port
 ```
 
-Check your kubeconfig API server:
+检查你的 kubeconfig API server：
 ```bash
 kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
 ```
 
-## Prerequisites
+## 前置条件
 
-### Host Machine Requirements
+### 主机机器要求
 
-1. **Kubernetes Cluster**: 
-   - Docker Desktop with Kubernetes enabled, or
-   - OrbStack (built-in K8s), or
-   - minikube, kind, k3s, etc.
+1. **Kubernetes 集群**：
+   - 已启用 Kubernetes 的 Docker Desktop，或
+   - OrbStack（内置 K8s），或
+   - minikube、kind、k3s 等。
 
-2. **kubectl Configured**:
-   - `~/.kube/config` must exist and be valid
-   - Current context should point to your local cluster
+2. **已配置 kubectl**：
+   - `~/.kube/config` 必须存在且有效
+   - 当前 context 应指向你的本地集群
 
-3. **Kubernetes Access**:
-   - The provisioner needs permissions to:
-     - Create/read/delete Pods in the `deer-flow` namespace
-     - Create/read/delete Services in the `deer-flow` namespace
-     - Read Namespaces (to create `deer-flow` if missing)
+3. **Kubernetes 访问权限**：
+   - provisioner 需要具备以下权限：
+     - 在 `deer-flow` namespace 中创建/读取/删除 Pod
+     - 在 `deer-flow` namespace 中创建/读取/删除 Service
+     - 读取 Namespace（以便在缺失时创建 `deer-flow`）
 
-4. **Host Paths**:
-   - The `SKILLS_HOST_PATH` and `THREADS_HOST_PATH` must be **absolute paths on the host machine**
-   - These paths are mounted into sandbox Pods via K8s HostPath volumes
-   - The paths must exist and be readable by the K8s node
+4. **Host 路径**：
+   - `SKILLS_HOST_PATH` 和 `THREADS_HOST_PATH` 必须是**主机机器上的绝对路径**
+   - 这些路径会通过 K8s HostPath volume 挂载到 sandbox Pod 中
+   - 这些路径必须存在，并且 K8s node 可读
 
-### Docker Compose Setup
+### Docker Compose 设置
 
-The provisioner runs as part of the docker-compose-dev stack:
+provisioner 作为 docker-compose-dev stack 的一部分运行：
 
 ```bash
 # Start Docker services (provisioner starts only when config.yaml enables provisioner mode)
@@ -214,14 +214,14 @@ make docker-start
 docker compose -p deer-flow-dev -f docker/docker-compose-dev.yaml up -d provisioner
 ```
 
-The compose file:
-- Mounts your host's `~/.kube/config` into the container
-- Adds `extra_hosts` entry for `host.docker.internal` (required on Linux)
-- Configures environment variables for K8s access
+compose 文件会：
+- 将主机的 `~/.kube/config` 挂载到 container 中
+- 添加 `host.docker.internal` 的 `extra_hosts` 条目（Linux 上必需）
+- 为 K8s 访问配置环境变量
 
-## Testing
+## 测试
 
-### Manual API Testing
+### 手动 API 测试
 
 ```bash
 # Health check
@@ -245,9 +245,9 @@ kubectl get pod,svc -n deer-flow -l sandbox-id=test-001
 docker exec deer-flow-provisioner curl -X DELETE http://localhost:8002/api/sandboxes/test-001
 ```
 
-### Verify from Backend Containers
+### 从 Backend Containers 验证
 
-Once a sandbox is created, the backend containers (gateway, langgraph) can access it:
+创建 sandbox 后，backend containers（gateway、langgraph）即可访问它：
 
 ```bash
 # Get sandbox URL from provisioner
@@ -257,93 +257,93 @@ SANDBOX_URL=$(docker exec deer-flow-provisioner curl -s http://localhost:8002/ap
 docker exec deer-flow-gateway curl -s $SANDBOX_URL/v1/sandbox
 ```
 
-## Troubleshooting
+## 故障排查
 
-### Issue: "Kubeconfig not found"
+### 问题：“Kubeconfig not found”
 
-**Cause**: The kubeconfig file doesn't exist at the mounted path.
+**原因**：挂载路径上的 kubeconfig 文件不存在。
 
-**Solution**: 
-- Ensure `~/.kube/config` exists on your host machine
-- Run `kubectl config view` to verify
-- Check the volume mount in docker-compose-dev.yaml
+**解决方案**：
+- 确认主机机器上的 `~/.kube/config` 存在
+- 运行 `kubectl config view` 进行验证
+- 检查 docker-compose-dev.yaml 中的 volume 挂载
 
-### Issue: "Kubeconfig path is a directory"
+### 问题：“Kubeconfig path is a directory”
 
-**Cause**: The mounted `KUBECONFIG_PATH` points to a directory instead of a file.
+**原因**：挂载的 `KUBECONFIG_PATH` 指向的是目录而不是文件。
 
-**Solution**:
-- Ensure the compose mount source is a file (e.g., `~/.kube/config`) not a directory
-- Verify inside container:
+**解决方案**：
+- 确保 compose 挂载源是文件（例如 `~/.kube/config`），而不是目录
+- 在 container 内验证：
   ```bash
   docker exec deer-flow-provisioner ls -ld /root/.kube/config
   ```
-- Expected output should indicate a regular file (`-`), not a directory (`d`)
+- 期望输出应显示为普通文件（`-`），而不是目录（`d`）
 
-### Issue: "Connection refused" to K8s API
+### 问题：连接 K8s API 时出现 “Connection refused”
 
-**Cause**: The provisioner can't reach the K8s API server.
+**原因**：provisioner 无法访问 K8s API server。
 
-**Solution**:
-1. Check your kubeconfig server address:
+**解决方案**：
+1. 检查你的 kubeconfig server 地址：
    ```bash
    kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
    ```
-2. If it's `localhost` or `127.0.0.1`, set `K8S_API_SERVER`:
+2. 如果它是 `localhost` 或 `127.0.0.1`，请设置 `K8S_API_SERVER`：
    ```yaml
    environment:
      - K8S_API_SERVER=https://host.docker.internal:PORT
    ```
 
-### Issue: "Unprocessable Entity" when creating Pod
+### 问题：创建 Pod 时出现 “Unprocessable Entity”
 
-**Cause**: HostPath volumes contain invalid paths (e.g., relative paths with `..`).
+**原因**：HostPath volume 包含无效路径（例如带 `..` 的相对路径）。
 
-**Solution**: 
-- Use absolute paths for `SKILLS_HOST_PATH` and `THREADS_HOST_PATH`
-- Verify the paths exist on your host machine:
+**解决方案**：
+- 为 `SKILLS_HOST_PATH` 和 `THREADS_HOST_PATH` 使用绝对路径
+- 在主机机器上验证这些路径存在：
   ```bash
   ls -la /path/to/skills
   ls -la /path/to/backend/.deer-flow/threads
   ```
 
-### Issue: Pod stuck in "ContainerCreating"
+### 问题：Pod 卡在 “ContainerCreating”
 
-**Cause**: Usually pulling the sandbox image from the registry.
+**原因**：通常是在从 registry 拉取 sandbox image。
 
-**Solution**:
-- Pre-pull the image: `make docker-init`
-- Check Pod events: `kubectl describe pod sandbox-XXX -n deer-flow`
-- Check node: `kubectl get nodes`
+**解决方案**：
+- 预先拉取 image：`make docker-init`
+- 检查 Pod 事件：`kubectl describe pod sandbox-XXX -n deer-flow`
+- 检查 node：`kubectl get nodes`
 
-### Issue: Cannot access sandbox URL from backend
+### 问题：Backend 无法访问 sandbox URL
 
-**Cause**: NodePort not reachable or `NODE_HOST` misconfigured.
+**原因**：NodePort 不可达，或 `NODE_HOST` 配置错误。
 
-**Solution**:
-- Verify the Service exists: `kubectl get svc -n deer-flow`
-- Test from host: `curl http://localhost:NODE_PORT/v1/sandbox`
-- Ensure `extra_hosts` is set in docker-compose (Linux)
-- Check `NODE_HOST` env var matches how backend reaches host
+**解决方案**：
+- 确认 Service 存在：`kubectl get svc -n deer-flow`
+- 从主机测试：`curl http://localhost:NODE_PORT/v1/sandbox`
+- 确保 docker-compose 中设置了 `extra_hosts`（Linux）
+- 检查 `NODE_HOST` 环境变量是否与 backend 访问主机的方式一致
 
-## Security Considerations
+## 安全注意事项
 
-1. **HostPath Volumes**: The provisioner mounts host directories into sandbox Pods by default. Ensure these paths contain only trusted data. For production, prefer PVC-based volumes (set `SKILLS_PVC_NAME` and `USERDATA_PVC_NAME`) to avoid node-specific data loss risks.
+1. **HostPath Volumes**：默认情况下，provisioner 会将主机目录挂载到 sandbox Pod 中。请确保这些路径只包含受信任的数据。对于生产环境，优先使用基于 PVC 的 volume（设置 `SKILLS_PVC_NAME` 和 `USERDATA_PVC_NAME`），以避免 node 特定的数据丢失风险。
 
-2. **Resource Limits**: Each sandbox Pod has CPU, memory, and storage limits to prevent resource exhaustion.
+2. **资源限制**：每个 sandbox Pod 都设置了 CPU、memory 和 storage 限制，以防止资源耗尽。
 
-3. **Network Isolation**: Sandbox Pods run in the `deer-flow` namespace but share the host's network namespace via NodePort. Consider NetworkPolicies for stricter isolation.
+3. **网络隔离**：sandbox Pod 运行在 `deer-flow` namespace 中，但通过 NodePort 共享主机的网络 namespace。如需更严格的隔离，请考虑使用 NetworkPolicies。
 
-4. **kubeconfig Access**: The provisioner has full access to your Kubernetes cluster via the mounted kubeconfig. Run it only in trusted environments.
+4. **kubeconfig 访问权限**：provisioner 通过挂载的 kubeconfig 对你的 Kubernetes 集群拥有完整访问权限。请仅在受信任的环境中运行它。
 
-5. **Image Trust**: The sandbox image should come from a trusted registry. Review and audit the image contents.
+5. **image 信任**：sandbox image 应来自受信任的 registry。请审查并审核 image 内容。
 
-## Future Enhancements
+## 后续增强
 
-- [ ] Support for custom resource requests/limits per sandbox
-- [x] PersistentVolume support for larger data requirements
-- [ ] Automatic cleanup of stale sandboxes (timeout-based)
-- [ ] Metrics and monitoring (Prometheus integration)
-- [ ] Multi-cluster support (route to different K8s clusters)
-- [ ] Pod affinity/anti-affinity rules for better placement
-- [ ] NetworkPolicy templates for sandbox isolation
+- [ ] 支持为每个 sandbox 自定义 resource request/limit
+- [x] 支持更大数据需求的 PersistentVolume
+- [ ] 自动清理陈旧 sandbox（基于超时）
+- [ ] Metrics 和监控（Prometheus 集成）
+- [ ] 多集群支持（路由到不同的 K8s 集群）
+- [ ] Pod affinity/anti-affinity 规则以改进调度
+- [ ] 用于 sandbox 隔离的 NetworkPolicy 模板

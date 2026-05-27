@@ -1,32 +1,32 @@
-# Troubleshooting Guide
+# 故障排除指南
 
-This document lists common issues encountered during DeerFlow smoke testing and how to resolve them.
+本文档列出了 DeerFlow 冒烟测试期间遇到的常见问题及其解决方法。
 
-## Code Update Issues
+## 代码更新问题
 
-### Issue: `git pull` Fails with a Merge Conflict Warning
+### 问题：`git pull` 因合并冲突警告失败
 
-**Symptoms**:
+**症状**：
 ```
 error: Your local changes to the following files would be overwritten by merge
 ```
 
-**Solutions**:
-1. Option A: Commit local changes first
+**解决方案**：
+1. 方案 A：先提交本地更改
    ```bash
    git add .
    git commit -m "Save local changes"
    git pull origin main
    ```
 
-2. Option B: Stash local changes
+2. 方案 B：暂存本地更改
    ```bash
    git stash
    git pull origin main
-   git stash pop  # Restore changes later if needed
+   git stash pop
    ```
 
-3. Option C: Discard local changes (use with caution)
+3. 方案 C：丢弃本地更改（谨慎使用）
    ```bash
    git reset --hard HEAD
    git pull origin main
@@ -34,254 +34,99 @@ error: Your local changes to the following files would be overwritten by merge
 
 ---
 
-## Local Mode Environment Issues
+## 本地模式环境问题
 
-### Issue: Node.js Version Is Too Old
+### 问题：Node.js 版本过旧
 
-**Symptoms**:
-```
-Node.js version is too old. Requires 22+, got x.x.x
-```
+**症状**：`Node.js version is too old. Requires 22+, got x.x.x`
 
-**Solutions**:
-1. Install or upgrade Node.js with nvm:
-   ```bash
-   nvm install 22
-   nvm use 22
-   ```
-
-2. Or download and install it from the official website: https://nodejs.org/
-
-3. Verify the version:
-   ```bash
-   node --version
-   ```
+**解决方案**：使用 nvm 安装 Node.js 22+，或从 https://nodejs.org/ 下载。
 
 ---
 
-### Issue: pnpm Is Not Installed
+### 问题：pnpm 未安装
 
-**Symptoms**:
-```
-command not found: pnpm
-```
-
-**Solutions**:
-1. Install pnpm with npm:
-   ```bash
-   npm install -g pnpm
-   ```
-
-2. Or use the official installation script:
-   ```bash
-   curl -fsSL https://get.pnpm.io/install.sh | sh -
-   ```
-
-3. Verify the installation:
-   ```bash
-   pnpm --version
-   ```
+**解决方案**：`npm install -g pnpm` 或参考 https://pnpm.io/installation
 
 ---
 
-### Issue: uv Is Not Installed
+### 问题：uv 未安装
 
-**Symptoms**:
-```
-command not found: uv
-```
-
-**Solutions**:
-1. Use the official installation script:
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
-
-2. macOS users can also install it with Homebrew:
-   ```bash
-   brew install uv
-   ```
-
-3. Verify the installation:
-   ```bash
-   uv --version
-   ```
+**解决方案**：`curl -LsSf https://astral.sh/uv/install.sh | sh`
 
 ---
 
-### Issue: nginx Is Not Installed
+### 问题：nginx 未安装
 
-**Symptoms**:
-```
-command not found: nginx
-```
-
-**Solutions**:
-1. macOS (Homebrew):
-   ```bash
-   brew install nginx
-   ```
-
-2. Ubuntu/Debian:
-   ```bash
-   sudo apt update
-   sudo apt install nginx
-   ```
-
-3. CentOS/RHEL:
-   ```bash
-   sudo yum install nginx
-   ```
-
-4. Verify the installation:
-   ```bash
-   nginx -v
-   ```
+**解决方案**：
+- macOS：`brew install nginx`
+- Ubuntu/Debian：`sudo apt install nginx`
 
 ---
 
-### Issue: Port Is Already in Use
+### 问题：端口已被占用
 
-**Symptoms**:
-```
-Error: listen EADDRINUSE: address already in use :::2026
-```
+**症状**：`Error: listen EADDRINUSE: address already in use :::2026`
 
-**Solutions**:
-1. Find the process using the port:
-   ```bash
-   lsof -i :2026  # macOS/Linux
-   netstat -ano | findstr :2026  # Windows
-   ```
-
-2. Stop that process:
-   ```bash
-   kill -9 <PID>  # macOS/Linux
-   taskkill /PID <PID> /F  # Windows
-   ```
-
-3. Or stop DeerFlow services first:
-   ```bash
-   make stop
-   ```
-
----
-
-## Local Mode Dependency Installation Issues
-
-### Issue: `make install` Fails Due to Network Timeout
-
-**Symptoms**:
-Network timeouts or connection failures occur during dependency installation.
-
-**Solutions**:
-1. Configure pnpm to use a mirror registry:
-   ```bash
-   pnpm config set registry https://registry.npmmirror.com
-   ```
-
-2. Configure uv to use a mirror registry:
-   ```bash
-   uv pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-   ```
-
-3. Retry the installation:
-   ```bash
-   make install
-   ```
-
----
-
-### Issue: Python Dependency Installation Fails
-
-**Symptoms**:
-Errors occur during `uv sync`.
-
-**Solutions**:
-1. Clean the uv cache:
-   ```bash
-   cd backend
-   uv cache clean
-   ```
-
-2. Resync dependencies:
-   ```bash
-   cd backend
-   uv sync
-   ```
-
-3. View detailed error logs:
-   ```bash
-   cd backend
-   uv sync --verbose
-   ```
-
----
-
-### Issue: Frontend Dependency Installation Fails
-
-**Symptoms**:
-Errors occur during `pnpm install`.
-
-**Solutions**:
-1. Clean the pnpm cache:
-   ```bash
-   cd frontend
-   pnpm store prune
-   ```
-
-2. Remove node_modules and the lock file:
-   ```bash
-   cd frontend
-   rm -rf node_modules pnpm-lock.yaml
-   ```
-
-3. Reinstall:
-   ```bash
-   cd frontend
-   pnpm install
-   ```
-
----
-
-## Local Mode Service Startup Issues
-
-### Issue: Services Exit Immediately After Startup
-
-**Symptoms**:
-Processes exit quickly after running `make dev-daemon`.
-
-**Solutions**:
-1. Check log files:
-   ```bash
-   tail -f logs/langgraph.log
-   tail -f logs/gateway.log
-   tail -f logs/frontend.log
-   tail -f logs/nginx.log
-   ```
-
-2. Check whether config.yaml is configured correctly
-3. Check environment variables in the .env file
-4. Confirm that required ports are not occupied
-5. Stop all services and restart:
-   ```bash
-   make stop
-   make dev-daemon
-   ```
-
----
-
-### Issue: Nginx Fails to Start Because Temp Directories Do Not Exist
-
-**Symptoms**:
-```
-nginx: [emerg] mkdir() "/opt/homebrew/var/run/nginx/client_body_temp" failed (2: No such file or directory)
+**解决方案**：
+```bash
+lsof -i :2026
+# 停止占用端口的进程，或运行：
+make stop
 ```
 
-**Solutions**:
-Add local temp directory configuration to `docker/nginx/nginx.local.conf` so nginx uses the repository's temp directory.
+---
 
-Add the following at the beginning of the `http` block:
+## 本地模式依赖安装问题
+
+### 问题：`make install` 因网络超时失败
+
+**解决方案**：
+```bash
+pnpm config set registry https://registry.npmmirror.com
+uv pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+make install
+```
+
+---
+
+### 问题：Python 依赖安装失败
+
+**解决方案**：
+```bash
+cd backend && uv cache clean && uv sync
+```
+
+---
+
+### 问题：前端依赖安装失败
+
+**解决方案**：
+```bash
+cd frontend && rm -rf node_modules pnpm-lock.yaml && pnpm install
+```
+
+---
+
+## 本地模式服务启动问题
+
+### 问题：服务在启动后立即退出
+
+**解决方案**：
+```bash
+tail -f logs/langgraph.log
+tail -f logs/gateway.log
+tail -f logs/frontend.log
+make stop && make dev-daemon
+```
+
+---
+
+### 问题：nginx 因临时目录不存在而启动失败
+
+**症状**：`nginx: [emerg] mkdir() "/opt/homebrew/var/run/nginx/client_body_temp" failed`
+
+**解决方案**：在 `docker/nginx/nginx.local.conf` 的 `http` 块开头添加：
 ```nginx
 client_body_temp_path temp/client_body_temp;
 proxy_temp_path temp/proxy_temp;
@@ -290,323 +135,132 @@ uwsgi_temp_path temp/uwsgi_temp;
 scgi_temp_path temp/scgi_temp;
 ```
 
-Note: The `temp/` directory under the repository root is created automatically by `make dev` or `make dev-daemon`.
-
 ---
 
-### Issue: Nginx Fails to Start (General)
+### 问题：nginx 启动失败（通用）
 
-**Symptoms**:
-The nginx process fails to start or reports an error.
-
-**Solutions**:
-1. Check the nginx configuration:
-   ```bash
-   nginx -t -c docker/nginx/nginx.local.conf -p .
-   ```
-
-2. Check nginx logs:
-   ```bash
-   tail -f logs/nginx.log
-   ```
-
-3. Ensure no other nginx process is running:
-   ```bash
-   ps aux | grep nginx
-   ```
-
-4. If needed, stop existing nginx processes:
-   ```bash
-   pkill -9 nginx
-   ```
-
----
-
-### Issue: Frontend Compilation Fails
-
-**Symptoms**:
-Compilation errors appear in `frontend.log`.
-
-**Solutions**:
-1. Check frontend logs:
-   ```bash
-   tail -f logs/frontend.log
-   ```
-
-2. Check whether Node.js version is 22+
-3. Reinstall frontend dependencies:
-   ```bash
-   cd frontend
-   rm -rf node_modules .next
-   pnpm install
-   ```
-
-4. Restart services:
-   ```bash
-   make stop
-   make dev-daemon
-   ```
-
----
-
-### Issue: Gateway Fails to Start
-
-**Symptoms**:
-Errors appear in `gateway.log`.
-
-**Solutions**:
-1. Check gateway logs:
-   ```bash
-   tail -f logs/gateway.log
-   ```
-
-2. Check whether config.yaml exists and has valid formatting
-3. Check whether Python dependencies are complete:
-   ```bash
-   cd backend
-   uv sync
-   ```
-
-4. Confirm that the LangGraph service is running normally (if not in gateway mode)
-
----
-
-### Issue: LangGraph Fails to Start
-
-**Symptoms**:
-Errors appear in `langgraph.log`.
-
-**Solutions**:
-1. Check LangGraph logs:
-   ```bash
-   tail -f logs/langgraph.log
-   ```
-
-2. Check config.yaml
-3. Check whether Python dependencies are complete
-4. Confirm that port 2024 is not occupied
-
----
-
-## Docker-Related Issues
-
-### Issue: Docker Commands Cannot Run
-
-**Symptoms**:
-```
-Cannot connect to the Docker daemon
-```
-
-**Solutions**:
-1. Confirm that Docker Desktop is running
-2. macOS: check whether the Docker icon appears in the top menu bar
-3. Linux: run `sudo systemctl start docker`
-4. Run `docker info` again to verify
-
----
-
-### Issue: `make docker-init` Fails to Pull the Image
-
-**Symptoms**:
-```
-Error pulling image: connection refused
-```
-
-**Solutions**:
-1. Check network connectivity
-2. Configure a Docker image mirror if needed
-3. Check whether a proxy is required
-4. Switch to local installation mode if necessary (recommended)
-
----
-
-## Configuration File Issues
-
-### Issue: config.yaml Is Missing or Invalid
-
-**Symptoms**:
-```
-Error: could not read config.yaml
-```
-
-**Solutions**:
-1. Regenerate the configuration file:
-   ```bash
-   make config
-   ```
-
-2. Check YAML syntax:
-   - Make sure indentation is correct (use 2 spaces)
-   - Make sure there are no tab characters
-   - Check that there is a space after each colon
-
-3. Use a YAML validation tool to check the format
-
----
-
-### Issue: Model API Key Is Not Configured
-
-**Symptoms**:
-After services start, API requests fail with authentication errors.
-
-**Solutions**:
-1. Edit the .env file and add the API key:
-   ```bash
-   OPENAI_API_KEY=your-actual-api-key-here
-   ```
-
-2. Restart services (local mode):
-   ```bash
-   make stop
-   make dev-daemon
-   ```
-
-3. Restart services (Docker mode):
-   ```bash
-   make docker-stop
-   make docker-start
-   ```
-
-4. Confirm that the model configuration in config.yaml references the environment variable correctly
-
----
-
-## Service Health Check Issues
-
-### Issue: Frontend Page Is Not Accessible
-
-**Symptoms**:
-The browser shows a connection failure when visiting http://localhost:2026.
-
-**Solutions** (local mode):
-1. Confirm that the nginx process is running:
-   ```bash
-   ps aux | grep nginx
-   ```
-
-2. Check nginx logs:
-   ```bash
-   tail -f logs/nginx.log
-   ```
-
-3. Check firewall settings
-
-**Solutions** (Docker mode):
-1. Confirm that the nginx container is running:
-   ```bash
-   docker ps | grep nginx
-   ```
-
-2. Check nginx logs:
-   ```bash
-   cd docker && docker compose -p deer-flow-dev -f docker-compose-dev.yaml logs nginx
-   ```
-
-3. Check firewall settings
-
----
-
-### Issue: API Gateway Health Check Fails
-
-**Symptoms**:
-Accessing `/health` returns an error or times out.
-
-**Solutions** (local mode):
-1. Check gateway logs:
-   ```bash
-   tail -f logs/gateway.log
-   ```
-
-2. Confirm that config.yaml exists and has valid formatting
-3. Check whether Python dependencies are complete
-4. Confirm that the LangGraph service is running normally
-
-**Solutions** (Docker mode):
-1. Check gateway container logs:
-   ```bash
-   make docker-logs-gateway
-   ```
-
-2. Confirm that config.yaml is mounted correctly
-3. Check whether Python dependencies are complete
-4. Confirm that the LangGraph service is running normally
-
----
-
-## Common Diagnostic Commands
-
-### Local Mode Diagnostics
-
-#### View All Service Processes
+**解决方案**：
 ```bash
-ps aux | grep -E "(langgraph|uvicorn|next|nginx)" | grep -v grep
-```
-
-#### View Service Logs
-```bash
-# View all logs
-tail -f logs/*.log
-
-# View specific service logs
-tail -f logs/langgraph.log
-tail -f logs/gateway.log
-tail -f logs/frontend.log
+nginx -t -c docker/nginx/nginx.local.conf -p .
 tail -f logs/nginx.log
 ```
 
-#### Stop All Services
-```bash
-make stop
-```
+---
 
-#### Fully Reset the Local Environment
+### 问题：前端编译失败
+
+**解决方案**：
 ```bash
-make stop
-make clean
-make config
-make install
-make dev-daemon
+cd frontend && rm -rf node_modules .next && pnpm install
+make stop && make dev-daemon
 ```
 
 ---
 
-### Docker Mode Diagnostics
+### 问题：Gateway 启动失败
 
-#### View All Container Status
+**解决方案**：
 ```bash
+tail -f logs/gateway.log
+cd backend && uv sync
+```
+
+---
+
+### 问题：LangGraph 启动失败
+
+**解决方案**：
+```bash
+tail -f logs/langgraph.log
+# 检查 config.yaml 和端口 2024
+```
+
+---
+
+## Docker 相关问题
+
+### 问题：无法运行 Docker 命令
+
+**解决方案**：确认 Docker Desktop 正在运行，或运行 `sudo systemctl start docker`。
+
+---
+
+### 问题：`make docker-init` 拉取镜像失败
+
+**解决方案**：检查网络/代理，或切换到本地安装模式（推荐）。
+
+---
+
+## 配置文件问题
+
+### 问题：config.yaml 缺失或无效
+
+**解决方案**：
+```bash
+make config
+# 检查 YAML 缩进（2 个空格，无 tab）
+```
+
+---
+
+### 问题：模型 API 密钥未配置
+
+**解决方案**：在 .env 文件中添加 `OPENAI_API_KEY=your-key`，然后重启服务。
+
+---
+
+## 服务健康检查问题
+
+### 问题：前端页面无法访问
+
+**解决方案**（本地模式）：
+```bash
+ps aux | grep nginx
+tail -f logs/nginx.log
+```
+
+**解决方案**（Docker 模式）：
+```bash
+docker ps | grep nginx
+```
+
+---
+
+### 问题：API Gateway 健康检查失败
+
+**解决方案**：
+```bash
+tail -f logs/gateway.log
+cd backend && uv sync
+```
+
+---
+
+## 常用诊断命令
+
+```bash
+# 查看所有服务进程
+ps aux | grep -E "(langgraph|uvicorn|next|nginx)" | grep -v grep
+
+# 查看所有日志
+tail -f logs/*.log
+
+# 停止所有服务
+make stop
+
+# 完全重置本地环境
+make stop && make clean && make config && make install && make dev-daemon
+
+# Docker 诊断
 docker ps -a
-```
-
-#### View Container Resource Usage
-```bash
 docker stats
-```
-
-#### Enter a Container for Debugging
-```bash
 docker exec -it deer-flow-gateway sh
 ```
 
-#### Clean Up All DeerFlow-Related Containers and Images
-```bash
-make docker-stop
-cd docker && docker compose -p deer-flow-dev -f docker-compose-dev.yaml down -v
-```
-
-#### Fully Reset the Docker Environment
-```bash
-make docker-stop
-make clean
-make config
-make docker-init
-make docker-start
-```
-
 ---
 
-## Get More Help
+## 获取更多帮助
 
-If the solutions above do not resolve the issue:
-1. Check the GitHub issues for the project: https://github.com/bytedance/deer-flow/issues
-2. Review the project documentation: README.md and the `backend/docs/` directory
-3. Open a new issue and include detailed error logs
+1. 查看项目 GitHub issues：https://github.com/bytedance/deer-flow/issues
+2. 查阅项目文档：README.md 和 `backend/docs/` 目录
+3. 提交新 issue 并附上详细错误日志

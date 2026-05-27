@@ -1,40 +1,40 @@
 ---
 name: image-generation
-description: Use this skill when the user requests to generate, create, imagine, or visualize images including characters, scenes, products, or any visual content. Supports structured prompts and reference images for guided generation.
+description: 当用户请求生成、创建、想象或可视化图像（包括角色、场景、产品或任何视觉内容）时使用此 skill。支持结构化 prompts 和参考图像，以进行引导式生成。
 ---
 
-# Image Generation Skill
+# 图像生成 Skill
 
-## Overview
+## 概览
 
-This skill generates high-quality images using structured prompts and a Python script. The workflow includes creating JSON-formatted prompts and executing image generation with optional reference images.
+此 skill 使用结构化 prompts 和 Python 脚本生成高质量图像。工作流包括创建 JSON 格式的 prompt，以及在可选参考图像的辅助下执行图像生成。
 
-## Core Capabilities
+## 核心能力
 
-- Create structured JSON prompts for AIGC image generation
-- Support multiple reference images for style/composition guidance
-- Generate images through automated Python script execution
-- Handle various image generation scenarios (character design, scenes, products, etc.)
+- 为 AIGC 图像生成创建结构化 JSON prompts
+- 支持多张参考图像用于风格/构图引导
+- 通过自动化 Python 脚本执行图像生成
+- 处理多种图像生成场景（角色设计、场景、产品等）
 
-## Workflow
+## 工作流
 
-### Step 1: Understand Requirements
+### 步骤 1：理解需求
 
-When a user requests image generation, identify:
+当用户请求图像生成时，识别：
 
-- Subject/content: What should be in the image
-- Style preferences: Art style, mood, color palette
-- Technical specs: Aspect ratio, composition, lighting
-- Reference images: Any images to guide generation
-- You don't need to check the folder under `/mnt/user-data`
+- 主题/内容：图像中应该包含什么
+- 风格偏好：艺术风格、情绪、配色
+- 技术规格：宽高比、构图、光照
+- 参考图像：任何用于引导生成的图像
+- 你不需要检查 `/mnt/user-data` 下的文件夹
 
-### Step 2: Create Structured Prompt
+### 步骤 2：创建结构化 Prompt
 
-Generate a structured JSON file in `/mnt/user-data/workspace/` with naming pattern: `{descriptive-name}.json`
+在 `/mnt/user-data/workspace/` 中生成一个结构化 JSON 文件，命名模式为：`{descriptive-name}.json`
 
-### Step 3: Execute Generation
+### 步骤 3：执行生成
 
-Call the Python script:
+调用 Python 脚本：
 ```bash
 python /mnt/skills/public/image-generation/scripts/generate.py \
   --prompt-file /mnt/user-data/workspace/prompt-file.json \
@@ -43,21 +43,21 @@ python /mnt/skills/public/image-generation/scripts/generate.py \
   --aspect-ratio 16:9
 ```
 
-Parameters:
+参数：
 
-- `--prompt-file`: Absolute path to JSON prompt file (required)
-- `--reference-images`: Absolute paths to reference images (optional, space-separated)
-- `--output-file`: Absolute path to output image file (required)
-- `--aspect-ratio`: Aspect ratio of the generated image (optional, default: 16:9)
+- `--prompt-file`：JSON prompt 文件的绝对路径（必需）
+- `--reference-images`：参考图像的绝对路径（可选，空格分隔）
+- `--output-file`：输出图像文件的绝对路径（必需）
+- `--aspect-ratio`：生成图像的宽高比（可选，默认：16:9）
 
 [!NOTE]
-Do NOT read the python file, just call it with the parameters.
+不要读取 python 文件，直接带参数调用它即可。
 
-## Character Generation Example
+## 角色生成示例
 
-User request: "Create a Tokyo street style woman character in 1990s"
+用户请求："Create a Tokyo street style woman character in 1990s"
 
-Create prompt file: `/mnt/user-data/workspace/asian-woman.json`
+创建 prompt 文件：`/mnt/user-data/workspace/asian-woman.json`
 ```json
 {
   "characters": [{
@@ -78,7 +78,7 @@ Create prompt file: `/mnt/user-data/workspace/asian-woman.json`
 }
 ```
 
-Execute generation:
+执行生成：
 ```bash
 python /mnt/skills/public/image-generation/scripts/generate.py \
   --prompt-file /mnt/user-data/workspace/cyberpunk-hacker.json \
@@ -86,7 +86,7 @@ python /mnt/skills/public/image-generation/scripts/generate.py \
   --aspect-ratio 2:3
 ```
 
-With reference images:
+带参考图像时：
 ```json
 {
   "characters": [{
@@ -120,68 +120,68 @@ python /mnt/skills/public/image-generation/scripts/generate.py \
   --aspect-ratio 16:9
 ```
 
-## Common Scenarios
+## 常见场景
 
-Use different JSON schemas for different scenarios.
+针对不同场景使用不同的 JSON schema。
 
-**Character Design**:
-- Physical attributes (gender, age, ethnicity, body type)
-- Facial features and expressions
-- Clothing and accessories
-- Historical era or setting
-- Pose and context
+**角色设计**：
+- 身体特征（性别、年龄、族裔、体型）
+- 面部特征和表情
+- 服装和配饰
+- 历史时代或设定
+- 姿态与上下文
 
-**Scene Generation**:
-- Environment description
-- Time of day, weather
-- Mood and atmosphere
-- Focal points and composition
+**场景生成**：
+- 环境描述
+- 时间、天气
+- 情绪与氛围
+- 焦点与构图
 
-**Product Visualization**:
-- Product details and materials
-- Lighting setup
-- Background and context
-- Presentation angle
+**产品可视化**：
+- 产品细节和材质
+- 灯光设置
+- 背景与上下文
+- 展示角度
 
-## Specific Templates
+## 特定模板
 
-Read the following template file only when matching the user request.
+仅在与用户请求匹配时读取以下模板文件。
 
 - [Doraemon Comic](templates/doraemon.md)
 
-## Output Handling
+## 输出处理
 
-After generation:
+生成后：
 
-- Images are typically saved in `/mnt/user-data/outputs/`
-- Share generated images with user using present_files tool
-- Provide brief description of the generation result
-- Offer to iterate if adjustments needed
+- 图像通常保存在 `/mnt/user-data/outputs/`
+- 使用 present_files tool 与用户分享生成的图像
+- 简要说明生成结果
+- 如果需要调整，主动提出继续迭代
 
-## Tips: Enhancing Generation with Reference Images
+## 提示：用参考图像增强生成效果
 
-For scenarios where visual accuracy is critical, **use the `image_search` tool first** to find reference images before generation.
+在视觉准确性很关键的场景中，**先使用 `image_search` tool** 查找参考图像，再进行生成。
 
-**Recommended scenarios for using image_search tool:**
-- **Character/Portrait Generation**: Search for similar poses, expressions, or styles to guide facial features and body proportions
-- **Specific Objects or Products**: Find reference images of real objects to ensure accurate representation
-- **Architectural or Environmental Scenes**: Search for location references to capture authentic details
-- **Fashion and Clothing**: Find style references to ensure accurate garment details and styling
+**推荐使用 image_search tool 的场景：**
+- **角色/肖像生成**：搜索相似姿势、表情或风格，以引导面部特征和身体比例
+- **特定物体或产品**：查找真实物体的参考图像，以确保准确呈现
+- **建筑或环境场景**：搜索地点参考，以捕捉真实细节
+- **时尚与服装**：查找风格参考，确保服装细节和搭配准确
 
-**Example workflow:**
-1. Call the `image_search` tool to find suitable reference images:
+**示例工作流：**
+1. 调用 `image_search` tool 查找合适的参考图像：
    ```
    image_search(query="Japanese woman street photography 1990s", size="Large")
    ```
-2. Download the returned image URLs to local files
-3. Use the downloaded images as `--reference-images` parameter in the generation script
+2. 将返回的图像 URL 下载为本地文件
+3. 将下载的图像作为生成脚本中的 `--reference-images` 参数使用
 
-This approach significantly improves generation quality by providing the model with concrete visual guidance rather than relying solely on text descriptions.
+这种方法通过为模型提供具体的视觉引导，而不是仅依赖文字描述，可显著提升生成质量。
 
-## Notes
+## 说明
 
-- Always use English for prompts regardless of user's language
-- JSON format ensures structured, parsable prompts
-- Reference images enhance generation quality significantly
-- Iterative refinement is normal for optimal results
-- For character generation, include the detailed character object plus a consolidated prompt field
+- 无论用户使用什么语言，prompts 一律使用英文
+- JSON 格式可确保 prompt 结构化且可解析
+- 参考图像能显著提升生成质量
+- 为达到最佳结果，迭代式优化是正常过程
+- 对于角色生成，除详细角色对象外，还应包含一个汇总后的 prompt 字段

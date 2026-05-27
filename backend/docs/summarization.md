@@ -1,20 +1,20 @@
-# Conversation Summarization
+# 对话摘要
 
-DeerFlow includes automatic conversation summarization to handle long conversations that approach model token limits. When enabled, the system automatically condenses older messages while preserving recent context.
+DeerFlow 包含自动对话摘要功能，用于处理接近模型 token 上限的长对话。启用后，系统会在保留最近上下文的同时，自动压缩较早的消息。
 
-## Overview
+## 概述
 
-The summarization feature uses LangChain's `SummarizationMiddleware` to monitor conversation history and trigger summarization based on configurable thresholds. When activated, it:
+摘要功能使用 LangChain 的 `SummarizationMiddleware` 监控对话历史，并根据可配置阈值触发摘要。启用后，它会：
 
-1. Monitors message token counts in real-time
-2. Triggers summarization when thresholds are met
-3. Keeps recent messages intact while summarizing older exchanges
-4. Maintains AI/Tool message pairs together for context continuity
-5. Injects the summary back into the conversation
+1. 实时监控消息 token 数量
+2. 在达到阈值时触发摘要
+3. 在保留最近消息不变的同时摘要更早的交流内容
+4. 将 AI/Tool 消息对保持在一起，以保证上下文连续性
+5. 将摘要重新注入到对话中
 
-## Configuration
+## 配置
 
-Summarization is configured in `config.yaml` under the `summarization` key:
+摘要功能在 `config.yaml` 中通过 `summarization` 键进行配置：
 
 ```yaml
 summarization:
@@ -50,47 +50,47 @@ summarization:
     - cat
 ```
 
-### Configuration Options
+### 配置选项
 
 #### `enabled`
-- **Type**: Boolean
-- **Default**: `false`
-- **Description**: Enable or disable automatic summarization
+- **类型**：Boolean
+- **默认值**：`false`
+- **说明**：启用或禁用自动摘要
 
 #### `model_name`
-- **Type**: String or null
-- **Default**: `null` (uses default model)
-- **Description**: Model to use for generating summaries. Recommended to use a lightweight, cost-effective model like `gpt-4o-mini` or equivalent.
+- **类型**：String 或 null
+- **默认值**：`null`（使用默认模型）
+- **说明**：用于生成摘要的模型。建议使用 `gpt-4o-mini` 或同类轻量、性价比高的模型。
 
 #### `trigger`
-- **Type**: Single `ContextSize` or list of `ContextSize` objects
-- **Required**: At least one trigger must be specified when enabled
-- **Description**: Thresholds that trigger summarization. Uses OR logic - summarization runs when ANY threshold is met.
+- **类型**：单个 `ContextSize` 或 `ContextSize` 对象列表
+- **必填**：启用时至少必须指定一个触发条件
+- **说明**：触发摘要的阈值。采用 OR 逻辑——任意一个阈值满足时就会执行摘要。
 
-**ContextSize Types:**
+**ContextSize 类型：**
 
-1. **Token-based trigger**: Activates when token count reaches the specified value
+1. **基于 token 的触发器**：当 token 数达到指定值时激活
    ```yaml
    trigger:
      type: tokens
      value: 4000
    ```
 
-2. **Message-based trigger**: Activates when message count reaches the specified value
+2. **基于消息数的触发器**：当消息数量达到指定值时激活
    ```yaml
    trigger:
      type: messages
      value: 50
    ```
 
-3. **Fraction-based trigger**: Activates when token usage reaches a percentage of the model's maximum input tokens
+3. **基于比例的触发器**：当 token 使用量达到模型最大输入 token 的某个比例时激活
    ```yaml
    trigger:
      type: fraction
      value: 0.8  # 80% of max input tokens
    ```
 
-**Multiple Triggers:**
+**多个触发器：**
 ```yaml
 trigger:
   - type: tokens
@@ -100,11 +100,11 @@ trigger:
 ```
 
 #### `keep`
-- **Type**: `ContextSize` object
-- **Default**: `{type: messages, value: 20}`
-- **Description**: Specifies how much recent conversation history to preserve after summarization.
+- **类型**：`ContextSize` 对象
+- **默认值**：`{type: messages, value: 20}`
+- **说明**：指定在摘要完成后要保留多少最近的对话历史。
 
-**Examples:**
+**示例：**
 ```yaml
 # Keep most recent 20 messages
 keep:
@@ -123,123 +123,123 @@ keep:
 ```
 
 #### `trim_tokens_to_summarize`
-- **Type**: Integer or null
-- **Default**: `4000`
-- **Description**: Maximum tokens to include when preparing messages for the summarization call itself. Set to `null` to skip trimming (not recommended for very long conversations).
+- **类型**：Integer 或 null
+- **默认值**：`4000`
+- **说明**：为摘要调用准备消息时允许包含的最大 token 数。设为 `null` 可跳过裁剪（不建议用于非常长的对话）。
 
 #### `summary_prompt`
-- **Type**: String or null
-- **Default**: `null` (uses LangChain's default prompt)
-- **Description**: Custom prompt template for generating summaries. The prompt should guide the model to extract the most important context.
+- **类型**：String 或 null
+- **默认值**：`null`（使用 LangChain 默认提示词）
+- **说明**：用于生成摘要的自定义提示词模板。该提示词应引导模型提取最重要的上下文。
 
 #### `preserve_recent_skill_count`
-- **Type**: Integer (≥ 0)
-- **Default**: `5`
-- **Description**: Number of most-recently-loaded skill files (tool results whose tool name is in `skill_file_read_tool_names` and whose target path is under `skills.container_path`, e.g. `/mnt/skills/...`) that are rescued from summarization. Prevents the agent from losing skill instructions after compression. Set to `0` to disable skill rescue entirely.
+- **类型**：Integer（≥ 0）
+- **默认值**：`5`
+- **说明**：从摘要中“抢救”出来的、最近加载的 skill 文件数量。这里的 skill 文件读取是指：工具名在 `skill_file_read_tool_names` 中，且目标路径位于 `skills.container_path` 下（例如 `/mnt/skills/...`）的工具结果。这样可防止 agent 在压缩后丢失 skill 指令。设为 `0` 可完全禁用 skill rescue。
 
 #### `preserve_recent_skill_tokens`
-- **Type**: Integer (≥ 0)
-- **Default**: `25000`
-- **Description**: Total token budget reserved for rescued skill reads. Once this budget is exhausted, older skill bundles are allowed to be summarized.
+- **类型**：Integer（≥ 0）
+- **默认值**：`25000`
+- **说明**：为被抢救的 skill 读取结果预留的总 token 预算。一旦该预算耗尽，较旧的 skill bundle 将允许被摘要。
 
 #### `preserve_recent_skill_tokens_per_skill`
-- **Type**: Integer (≥ 0)
-- **Default**: `5000`
-- **Description**: Per-skill token cap. Any individual skill read whose tool result exceeds this size is not rescued (it falls through to the summarizer like ordinary content).
+- **类型**：Integer（≥ 0）
+- **默认值**：`5000`
+- **说明**：单个 skill 的 token 上限。若某个 skill 读取结果超过该大小，则不会被抢救（会像普通内容一样进入摘要流程）。
 
 #### `skill_file_read_tool_names`
-- **Type**: List of strings
-- **Default**: `["read_file", "read", "view", "cat"]`
-- **Description**: Tool names treated as skill file reads during summarization rescue. A tool call is only eligible for skill rescue when its name appears in this list and its target path is under `skills.container_path`.
+- **类型**：字符串列表
+- **默认值**：`["read_file", "read", "view", "cat"]`
+- **说明**：在摘要 rescue 过程中被视为 skill 文件读取的工具名称。只有当工具名称出现在该列表中，且其目标路径位于 `skills.container_path` 下时，该次工具调用才有资格进行 skill rescue。
 
-**Default Prompt Behavior:**
-The default LangChain prompt instructs the model to:
-- Extract highest quality/most relevant context
-- Focus on information critical to the overall goal
-- Avoid repeating completed actions
-- Return only the extracted context
+**默认提示词行为：**
+默认的 LangChain 提示词会指导模型：
+- 提取质量最高、最相关的上下文
+- 聚焦对整体目标至关重要的信息
+- 避免重复已完成的动作
+- 仅返回提取出的上下文
 
-## How It Works
+## 工作原理
 
-### Summarization Flow
+### 摘要流程
 
-1. **Monitoring**: Before each model call, the middleware counts tokens in the message history
-2. **Trigger Check**: If any configured threshold is met, summarization is triggered
-3. **Message Partitioning**: Messages are split into:
-   - Messages to summarize (older messages beyond the `keep` threshold)
-   - Messages to preserve (recent messages within the `keep` threshold)
-4. **Summary Generation**: The model generates a concise summary of the older messages
-5. **Context Replacement**: The message history is updated:
-   - All old messages are removed
-   - A single summary message is added
-   - Recent messages are preserved
-6. **AI/Tool Pair Protection**: The system ensures AI messages and their corresponding tool messages stay together
-7. **Skill Rescue**: Before the summary is generated, the most recently loaded skill files (tool results whose tool name is in `skill_file_read_tool_names` and whose target path is under `skills.container_path`) are lifted out of the summarization set and prepended to the preserved tail. Selection walks newest-first under three budgets: `preserve_recent_skill_count`, `preserve_recent_skill_tokens`, and `preserve_recent_skill_tokens_per_skill`. The triggering AIMessage and all of its paired ToolMessages move together so tool_call ↔ tool_result pairing stays intact.
+1. **监控**：在每次模型调用前，middleware 会统计消息历史中的 token
+2. **触发检查**：如果任意已配置阈值满足，就触发摘要
+3. **消息划分**：消息会被拆分为：
+   - 需要摘要的消息（超出 `keep` 阈值的较旧消息）
+   - 需要保留的消息（位于 `keep` 阈值内的最近消息）
+4. **摘要生成**：模型会为较旧消息生成精炼摘要
+5. **上下文替换**：消息历史会更新为：
+   - 移除所有旧消息
+   - 添加一条摘要消息
+   - 保留最近消息
+6. **AI/Tool 对保护**：系统会确保 AI 消息及其对应的 tool 消息保持在一起
+7. **Skill Rescue**：在生成摘要之前，最近加载的 skill 文件（工具名位于 `skill_file_read_tool_names` 中，且目标路径位于 `skills.container_path` 下的工具结果）会先从待摘要集合中提取出来，并追加到保留尾部之前。选择过程按“从新到旧”进行，并同时受 `preserve_recent_skill_count`、`preserve_recent_skill_tokens` 和 `preserve_recent_skill_tokens_per_skill` 三个预算约束。触发该工具调用的 AIMessage 及其配对的所有 ToolMessages 会一起移动，以保持 `tool_call` ↔ `tool_result` 的配对关系完整。
 
-### Token Counting
+### Token 计数
 
-- Uses approximate token counting based on character count
-- For Anthropic models: ~3.3 characters per token
-- For other models: Uses LangChain's default estimation
-- Can be customized with a custom `token_counter` function
+- 使用基于字符数的近似 token 计数
+- 对 Anthropic 模型：约 3.3 个字符对应 1 个 token
+- 对其他模型：使用 LangChain 默认估算方式
+- 可通过自定义 `token_counter` 函数进行定制
 
-### Message Preservation
+### 消息保留
 
-The middleware intelligently preserves message context:
+middleware 会智能保留消息上下文：
 
-- **Recent Messages**: Always kept intact based on `keep` configuration
-- **AI/Tool Pairs**: Never split - if a cutoff point falls within tool messages, the system adjusts to keep the entire AI + Tool message sequence together
-- **Summary Format**: Summary is injected as a HumanMessage with the format:
+- **最近消息**：始终根据 `keep` 配置原样保留
+- **AI/Tool 对**：绝不会被拆开——如果截断点落在 tool 消息之间，系统会调整，以保持整个 AI + Tool 消息序列完整
+- **摘要格式**：摘要会以 HumanMessage 的形式注入，格式如下：
   ```
   Here is a summary of the conversation to date:
 
   [Generated summary text]
   ```
 
-## Best Practices
+## 最佳实践
 
-### Choosing Trigger Thresholds
+### 选择触发阈值
 
-1. **Token-based triggers**: Recommended for most use cases
-   - Set to 60-80% of your model's context window
-   - Example: For 8K context, use 4000-6000 tokens
+1. **基于 token 的触发器**：适用于大多数场景，推荐使用
+   - 建议设置为模型上下文窗口的 60-80%
+   - 示例：对于 8K 上下文，可使用 4000-6000 tokens
 
-2. **Message-based triggers**: Useful for controlling conversation length
-   - Good for applications with many short messages
-   - Example: 50-100 messages depending on average message length
+2. **基于消息数的触发器**：适合控制对话长度
+   - 适用于包含大量短消息的应用
+   - 示例：根据平均消息长度设置为 50-100 条消息
 
-3. **Fraction-based triggers**: Ideal when using multiple models
-   - Automatically adapts to each model's capacity
-   - Example: 0.8 (80% of model's max input tokens)
+3. **基于比例的触发器**：适合使用多个模型的场景
+   - 会自动适配每个模型的容量
+   - 示例：0.8（模型最大输入 token 的 80%）
 
-### Choosing Retention Policy (`keep`)
+### 选择保留策略（`keep`）
 
-1. **Message-based retention**: Best for most scenarios
-   - Preserves natural conversation flow
-   - Recommended: 15-25 messages
+1. **基于消息数的保留**：适合大多数场景
+   - 可保留自然的对话流
+   - 推荐：15-25 条消息
 
-2. **Token-based retention**: Use when precise control is needed
-   - Good for managing exact token budgets
-   - Recommended: 2000-4000 tokens
+2. **基于 token 的保留**：适用于需要精确控制时
+   - 有助于精确管理 token 预算
+   - 推荐：2000-4000 tokens
 
-3. **Fraction-based retention**: For multi-model setups
-   - Automatically scales with model capacity
-   - Recommended: 0.2-0.4 (20-40% of max input)
+3. **基于比例的保留**：适合多模型设置
+   - 会随模型容量自动缩放
+   - 推荐：0.2-0.4（最大输入的 20-40%）
 
-### Model Selection
+### 模型选择
 
-- **Recommended**: Use a lightweight, cost-effective model for summaries
-  - Examples: `gpt-4o-mini`, `claude-haiku`, or equivalent
-  - Summaries don't require the most powerful models
-  - Significant cost savings on high-volume applications
+- **推荐**：使用轻量、成本更低的模型生成摘要
+  - 示例：`gpt-4o-mini`、`claude-haiku` 或同类模型
+  - 摘要任务不需要最强大的模型
+  - 对高调用量应用可显著节省成本
 
-- **Default**: If `model_name` is `null`, uses the default model
-  - May be more expensive but ensures consistency
-  - Good for simple setups
+- **默认**：如果 `model_name` 为 `null`，则使用默认模型
+  - 可能更昂贵，但可确保一致性
+  - 适合简单配置
 
-### Optimization Tips
+### 优化建议
 
-1. **Balance triggers**: Combine token and message triggers for robust handling
+1. **平衡触发器**：组合 token 和消息数触发器，以获得更稳健的处理效果
    ```yaml
    trigger:
      - type: tokens
@@ -248,78 +248,78 @@ The middleware intelligently preserves message context:
        value: 50
    ```
 
-2. **Conservative retention**: Keep more messages initially, adjust based on performance
+2. **保守保留**：一开始保留更多消息，再根据表现进行调整
    ```yaml
    keep:
      type: messages
      value: 25  # Start higher, reduce if needed
    ```
 
-3. **Trim strategically**: Limit tokens sent to summarization model
+3. **策略性裁剪**：限制发送给摘要模型的 token 数
    ```yaml
    trim_tokens_to_summarize: 4000  # Prevents expensive summarization calls
    ```
 
-4. **Monitor and iterate**: Track summary quality and adjust configuration
+4. **持续监控并迭代**：跟踪摘要质量，并调整配置
 
-## Troubleshooting
+## 故障排查
 
-### Summary Quality Issues
+### 摘要质量问题
 
-**Problem**: Summaries losing important context
+**问题**：摘要丢失了重要上下文
 
-**Solutions**:
-1. Increase `keep` value to preserve more messages
-2. Decrease trigger thresholds to summarize earlier
-3. Customize `summary_prompt` to emphasize key information
-4. Use a more capable model for summarization
+**解决方案**：
+1. 增大 `keep` 的值以保留更多消息
+2. 降低触发阈值以更早进行摘要
+3. 自定义 `summary_prompt`，强调关键信息
+4. 为摘要使用能力更强的模型
 
-### Performance Issues
+### 性能问题
 
-**Problem**: Summarization calls taking too long
+**问题**：摘要调用耗时过长
 
-**Solutions**:
-1. Use a faster model for summaries (e.g., `gpt-4o-mini`)
-2. Reduce `trim_tokens_to_summarize` to send less context
-3. Increase trigger thresholds to summarize less frequently
+**解决方案**：
+1. 为摘要使用更快的模型（例如 `gpt-4o-mini`）
+2. 减少 `trim_tokens_to_summarize`，发送更少上下文
+3. 提高触发阈值，降低摘要频率
 
-### Token Limit Errors
+### Token 上限错误
 
-**Problem**: Still hitting token limits despite summarization
+**问题**：即使启用了摘要，仍然触发 token 上限
 
-**Solutions**:
-1. Lower trigger thresholds to summarize earlier
-2. Reduce `keep` value to preserve fewer messages
-3. Check if individual messages are very large
-4. Consider using fraction-based triggers
+**解决方案**：
+1. 降低触发阈值，更早开始摘要
+2. 减少 `keep` 的值，保留更少消息
+3. 检查是否存在特别大的单条消息
+4. 考虑使用基于比例的触发器
 
-## Implementation Details
+## 实现细节
 
-### Code Structure
+### 代码结构
 
-- **Configuration**: `packages/harness/deerflow/config/summarization_config.py`
-- **Integration**: `packages/harness/deerflow/agents/lead_agent/agent.py`
-- **Middleware**: Uses `langchain.agents.middleware.SummarizationMiddleware`
+- **配置**：`packages/harness/deerflow/config/summarization_config.py`
+- **集成**：`packages/harness/deerflow/agents/lead_agent/agent.py`
+- **Middleware**：使用 `langchain.agents.middleware.SummarizationMiddleware`
 
-### Middleware Order
+### Middleware 顺序
 
-Summarization runs after ThreadData and Sandbox initialization but before Title and Clarification:
+摘要会在线程数据和 Sandbox 初始化之后、Title 和 Clarification 之前运行：
 
 1. ThreadDataMiddleware
 2. SandboxMiddleware
-3. **SummarizationMiddleware** ← Runs here
+3. **SummarizationMiddleware** ← 在此运行
 4. TitleMiddleware
 5. ClarificationMiddleware
 
-### State Management
+### 状态管理
 
-- Summarization is stateless - configuration is loaded once at startup
-- Summaries are added as regular messages in the conversation history
-- The checkpointer persists the summarized history automatically
+- 摘要是无状态的——配置会在启动时加载一次
+- 摘要会作为普通消息添加到对话历史中
+- checkpointer 会自动持久化摘要后的历史记录
 
-## Example Configurations
+## 配置示例
 
-### Minimal Configuration
+### 最简配置
 ```yaml
 summarization:
   enabled: true
@@ -331,7 +331,7 @@ summarization:
     value: 20
 ```
 
-### Production Configuration
+### 生产环境配置
 ```yaml
 summarization:
   enabled: true
@@ -347,7 +347,7 @@ summarization:
   trim_tokens_to_summarize: 5000
 ```
 
-### Multi-Model Configuration
+### 多模型配置
 ```yaml
 summarization:
   enabled: true
@@ -361,7 +361,7 @@ summarization:
   trim_tokens_to_summarize: 4000
 ```
 
-### Conservative Configuration (High Quality)
+### 保守配置（高质量）
 ```yaml
 summarization:
   enabled: true
@@ -375,7 +375,7 @@ summarization:
   trim_tokens_to_summarize: null  # No trimming
 ```
 
-## References
+## 参考资料
 
 - [LangChain Summarization Middleware Documentation](https://docs.langchain.com/oss/python/langchain/middleware/built-in#summarization)
 - [LangChain Source Code](https://github.com/langchain-ai/langchain)

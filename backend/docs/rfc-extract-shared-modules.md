@@ -1,38 +1,38 @@
-# RFC: Extract Shared Skill Installer and Upload Manager into Harness
+# RFC：将共享的 Skill 安装器与 Upload 管理器提取到 Harness
 
-## 1. Problem
+## 1. 问题
 
-Gateway (`app/gateway/routers/skills.py`, `uploads.py`) and Client (`deerflow/client.py`) each independently implement the same business logic:
+Gateway（`app/gateway/routers/skills.py`、`uploads.py`）与 Client（`deerflow/client.py`）分别独立实现了相同的业务逻辑：
 
-### Skill Installation
+### Skill 安装
 
-| Logic | Gateway (`skills.py`) | Client (`client.py`) |
+| 逻辑 | Gateway（`skills.py`） | Client（`client.py`） |
 |-------|----------------------|---------------------|
-| Zip safety check | `_is_unsafe_zip_member()` | Inline `Path(info.filename).is_absolute()` |
-| Symlink filtering | `_is_symlink_member()` | `p.is_symlink()` post-extraction delete |
-| Zip bomb defence | `total_size += info.file_size` (declared) | `total_size > 100MB` (declared) |
-| macOS metadata filter | `_should_ignore_archive_entry()` | None |
-| Frontmatter validation | `_validate_skill_frontmatter()` | `_validate_skill_frontmatter()` |
-| Duplicate detection | `HTTPException(409)` | `ValueError` |
+| Zip 安全检查 | `_is_unsafe_zip_member()` | 内联 `Path(info.filename).is_absolute()` |
+| 符号链接过滤 | `_is_symlink_member()` | 解压后通过 `p.is_symlink()` 删除 |
+| Zip bomb 防护 | `total_size += info.file_size`（声明值） | `total_size > 100MB`（声明值） |
+| macOS 元数据过滤 | `_should_ignore_archive_entry()` | 无 |
+| Frontmatter 校验 | `_validate_skill_frontmatter()` | `_validate_skill_frontmatter()` |
+| 重复检测 | `HTTPException(409)` | `ValueError` |
 
-**Two implementations, inconsistent behaviour**: Gateway streams writes and tracks real decompressed size; Client sums declared `file_size`. Gateway skips symlinks during extraction; Client extracts everything then walks and deletes symlinks.
+**存在两套实现，行为并不一致**：Gateway 以流式写入方式处理，并跟踪真实解压后的大小；Client 只累计声明的 `file_size`。Gateway 在解压时跳过符号链接；Client 先全部解压，再遍历并删除符号链接。
 
-### Upload Management
+### Upload 管理
 
-| Logic | Gateway (`uploads.py`) | Client (`client.py`) |
+| 逻辑 | Gateway（`uploads.py`） | Client（`client.py`） |
 |-------|----------------------|---------------------|
-| Directory access | `get_uploads_dir()` + `mkdir` | `_get_uploads_dir()` + `mkdir` |
-| Filename safety | Inline `Path(f).name` + manual checks | No checks, uses `src_path.name` directly |
-| Duplicate handling | None (overwrites) | None (overwrites) |
-| Listing | Inline `iterdir()` | Inline `os.scandir()` |
-| Deletion | Inline `unlink()` + traversal check | Inline `unlink()` + traversal check |
-| Path traversal | `resolve().relative_to()` | `resolve().relative_to()` |
+| 目录访问 | `get_uploads_dir()` + `mkdir` | `_get_uploads_dir()` + `mkdir` |
+| 文件名安全 | 内联 `Path(f).name` + 手动检查 | 不做检查，直接使用 `src_path.name` |
+| 重复处理 | 无（覆盖） | 无（覆盖） |
+| 列表 | 内联 `iterdir()` | 内联 `os.scandir()` |
+| 删除 | 内联 `unlink()` + 路径穿越检查 | 内联 `unlink()` + 路径穿越检查 |
+| 路径穿越 | `resolve().relative_to()` | `resolve().relative_to()` |
 
-**The same traversal check is written twice** — any security fix must be applied to both locations.
+**同一段路径穿越检查逻辑被写了两次**——任何安全修复都必须同时改动这两个位置。
 
-## 2. Design Principles
+## 2. 设计原则
 
-### Dependency Direction
+### 依赖方向
 
 ```
 app.gateway.routers.skills  ──┐
@@ -40,23 +40,23 @@ app.gateway.routers.uploads ──┤── calls ──→  deerflow.skills.ins
 deerflow.client             ──┘              deerflow.uploads.manager
 ```
 
-- Shared modules live in the harness layer (`deerflow.*`), pure business logic, no FastAPI dependency
-- Gateway handles HTTP adaptation (`UploadFile` → bytes, exceptions → `HTTPException`)
-- Client handles local adaptation (`Path` → copy, exceptions → Python exceptions)
-- Satisfies `test_harness_boundary.py` constraint: harness never imports app
+- 共享模块放在 harness 层（`deerflow.*`），只包含纯业务逻辑，不依赖 FastAPI
+- Gateway 负责 HTTP 适配（`UploadFile` → bytes，异常 → `HTTPException`）
+- Client 负责本地适配（`Path` → copy，异常 → Python 异常）
+- 满足 `test_harness_boundary.py` 的约束：harness 永远不导入 app
 
-### Exception Strategy
+### 异常策略
 
-| Shared Layer Exception | Gateway Maps To | Client |
+| 共享层异常 | Gateway 映射为 | Client |
 |----------------------|-----------------|--------|
-| `FileNotFoundError` | `HTTPException(404)` | Propagates |
-| `ValueError` | `HTTPException(400)` | Propagates |
-| `SkillAlreadyExistsError` | `HTTPException(409)` | Propagates |
-| `PermissionError` | `HTTPException(403)` | Propagates |
+| `FileNotFoundError` | `HTTPException(404)` | 直接透传 |
+| `ValueError` | `HTTPException(400)` | 直接透传 |
+| `SkillAlreadyExistsError` | `HTTPException(409)` | 直接透传 |
+| `PermissionError` | `HTTPException(403)` | 直接透传 |
 
-Replaces stringly-typed routing (`"already exists" in str(e)`) with typed exception matching (`SkillAlreadyExistsError`).
+这将用类型化异常匹配（`SkillAlreadyExistsError`）替代字符串匹配路由（`"already exists" in str(e)`）。
 
-## 3. New Modules
+## 3. 新模块
 
 ### 3.1 `deerflow.skills.installer`
 
@@ -115,76 +115,76 @@ upload_virtual_path(filename) -> str               # Sandbox-internal path
 enrich_file_listing(result, thread_id) -> dict     # Adds URLs, stringifies sizes
 ```
 
-## 4. Changes
+## 4. 变更内容
 
-### 4.1 Gateway Slimming
+### 4.1 Gateway 瘦身
 
-**`app/gateway/routers/skills.py`**:
-- Remove `_is_unsafe_zip_member`, `_is_symlink_member`, `_safe_extract_skill_archive`, `_should_ignore_archive_entry`, `_resolve_skill_dir_from_archive_root` (~80 lines)
-- `install_skill` route becomes a single call to `install_skill_from_archive(path)`
-- Exception mapping: `SkillAlreadyExistsError → 409`, `ValueError → 400`, `FileNotFoundError → 404`
+**`app/gateway/routers/skills.py`**：
+- 删除 `_is_unsafe_zip_member`、`_is_symlink_member`、`_safe_extract_skill_archive`、`_should_ignore_archive_entry`、`_resolve_skill_dir_from_archive_root`（约 80 行）
+- `install_skill` 路由改为单次调用 `install_skill_from_archive(path)`
+- 异常映射：`SkillAlreadyExistsError → 409`、`ValueError → 400`、`FileNotFoundError → 404`
 
-**`app/gateway/routers/uploads.py`**:
-- Remove inline `get_uploads_dir` (replaced by `ensure_uploads_dir`/`get_uploads_dir`)
-- `upload_files` uses `normalize_filename()` instead of inline safety checks
-- `list_uploaded_files` uses `list_files_in_dir()` + enrichment
-- `delete_uploaded_file` uses `delete_file_safe()` + companion markdown cleanup
+**`app/gateway/routers/uploads.py`**：
+- 删除内联的 `get_uploads_dir`（改用 `ensure_uploads_dir` / `get_uploads_dir`）
+- `upload_files` 使用 `normalize_filename()` 替代内联安全检查
+- `list_uploaded_files` 使用 `list_files_in_dir()` + enrich
+- `delete_uploaded_file` 使用 `delete_file_safe()` + 配套 markdown 清理
 
-### 4.2 Client Slimming
+### 4.2 Client 瘦身
 
-**`deerflow/client.py`**:
-- Remove `_get_uploads_dir` static method
-- Remove ~50 lines of inline zip handling in `install_skill`
-- `install_skill` delegates to `install_skill_from_archive()`
-- `upload_files` uses `deduplicate_filename()` + `ensure_uploads_dir()`
-- `list_uploads` uses `get_uploads_dir()` + `list_files_in_dir()`
-- `delete_upload` uses `get_uploads_dir()` + `delete_file_safe()`
-- `update_mcp_config` / `update_skill` now reset `_agent_config_key = None`
+**`deerflow/client.py`**：
+- 删除 `_get_uploads_dir` 静态方法
+- 删除 `install_skill` 中约 50 行的内联 zip 处理逻辑
+- `install_skill` 改为委托给 `install_skill_from_archive()`
+- `upload_files` 使用 `deduplicate_filename()` + `ensure_uploads_dir()`
+- `list_uploads` 使用 `get_uploads_dir()` + `list_files_in_dir()`
+- `delete_upload` 使用 `get_uploads_dir()` + `delete_file_safe()`
+- `update_mcp_config` / `update_skill` 现在会重置 `_agent_config_key = None`
 
-### 4.3 Read/Write Path Separation
+### 4.3 读写路径分离
 
-| Operation | Function | Creates dir? |
+| 操作 | 函数 | 会创建目录？ |
 |-----------|----------|:------------:|
-| upload (write) | `ensure_uploads_dir()` | Yes |
-| list (read) | `get_uploads_dir()` | No |
-| delete (read) | `get_uploads_dir()` | No |
+| upload（写） | `ensure_uploads_dir()` | 是 |
+| list（读） | `get_uploads_dir()` | 否 |
+| delete（读） | `get_uploads_dir()` | 否 |
 
-Read paths no longer have `mkdir` side effects — non-existent directories return empty lists.
+读取路径不再带有 `mkdir` 副作用——当目录不存在时返回空列表。
 
-## 5. Security Improvements
+## 5. 安全改进
 
-| Improvement | Before | After |
+| 改进项 | 之前 | 之后 |
 |-------------|--------|-------|
-| Zip bomb detection | Sum of declared `file_size` | Streaming write, accumulates real bytes |
-| Symlink handling | Gateway skips / Client deletes post-extract | Unified skip + log |
-| Traversal check | Member-level only | Member-level + `resolve().is_relative_to()` |
-| Filename backslash | Gateway checks / Client doesn't | Unified rejection |
-| Filename length | No check | Reject > 255 bytes (OS limit) |
-| thread_id validation | None | Reject unsafe filesystem characters |
-| Listing symlink leak | `follow_symlinks=True` (default) | `follow_symlinks=False` |
-| 409 status routing | `"already exists" in str(e)` | `SkillAlreadyExistsError` type match |
-| Artifact URL encoding | Raw filename in URL | `urllib.parse.quote()` |
+| Zip bomb 检测 | 累加声明的 `file_size` | 流式写入，累计真实字节数 |
+| 符号链接处理 | Gateway 跳过 / Client 解压后删除 | 统一为跳过 + 记录日志 |
+| 路径穿越检查 | 仅成员级检查 | 成员级 + `resolve().is_relative_to()` |
+| 文件名反斜杠 | Gateway 检查 / Client 不检查 | 统一拒绝 |
+| 文件名长度 | 无检查 | 拒绝 > 255 字节（OS 限制） |
+| `thread_id` 校验 | 无 | 拒绝不安全的文件系统字符 |
+| 列表中的符号链接泄露 | `follow_symlinks=True`（默认） | `follow_symlinks=False` |
+| 409 状态路由 | `"already exists" in str(e)` | `SkillAlreadyExistsError` 类型匹配 |
+| Artifact URL 编码 | URL 中直接使用原始文件名 | `urllib.parse.quote()` |
 
-## 6. Alternatives Considered
+## 6. 考虑过的替代方案
 
-| Alternative | Why Not |
+| 替代方案 | 不采用原因 |
 |-------------|---------|
-| Keep logic in Gateway, Client calls Gateway via HTTP | Adds network dependency to embedded Client; defeats the purpose of `DeerFlowClient` as an in-process API |
-| Abstract base class with Gateway/Client subclasses | Over-engineered for what are pure functions; no polymorphism needed |
-| Move everything into `client.py` and have Gateway import it | Violates harness/app boundary — Client is in harness, but Gateway-specific models (Pydantic response types) should stay in app layer |
-| Merge Gateway and Client into one module | They serve different consumers (HTTP vs in-process) with different adaptation needs |
+| 保持逻辑在 Gateway 中，让 Client 通过 HTTP 调 Gateway | 给嵌入式 Client 增加网络依赖；违背 `DeerFlowClient` 作为进程内 API 的初衷 |
+| 使用带 Gateway/Client 子类的抽象基类 | 对纯函数场景来说过度设计；不需要多态 |
+| 把所有逻辑都移到 `client.py`，由 Gateway 导入 | 违反 harness/app 边界——Client 位于 harness，但 Gateway 专属模型（Pydantic 响应类型）应留在 app 层 |
+| 将 Gateway 和 Client 合并到一个模块 | 它们面向的消费者不同（HTTP vs 进程内），适配需求也不同 |
 
-## 7. Breaking Changes
+## 7. 破坏性变更
 
-**None.** All public APIs (Gateway HTTP endpoints, `DeerFlowClient` methods) retain their existing signatures and return formats. The `SkillAlreadyExistsError` is a subclass of `ValueError`, so existing `except ValueError` handlers still catch it.
+**没有。** 所有公开 API（Gateway HTTP 端点、`DeerFlowClient` 方法）都保留了现有签名与返回格式。`SkillAlreadyExistsError` 是 `ValueError` 的子类，因此现有的 `except ValueError` 处理仍可捕获它。
 
-## 8. Tests
+## 8. 测试
 
-| Module | Test File | Count |
+| 模块 | 测试文件 | 数量 |
 |--------|-----------|:-----:|
 | `skills.installer` | `tests/test_skills_installer.py` | 22 |
 | `uploads.manager` | `tests/test_uploads_manager.py` | 20 |
-| `client` hardening | `tests/test_client.py` (new cases) | ~40 |
-| `client` e2e | `tests/test_client_e2e.py` (new file) | ~20 |
+| `client` 加固 | `tests/test_client.py`（新增用例） | ~40 |
+| `client` 端到端 | `tests/test_client_e2e.py`（新文件） | ~20 |
 
-Coverage: unsafe zip / symlink / zip bomb / frontmatter / duplicate / extension / macOS filter / normalize / deduplicate / traversal / list / delete / agent invalidation / upload lifecycle / thread isolation / URL encoding / config pollution.
+覆盖范围：unsafe zip / symlink / zip bomb / frontmatter / duplicate / extension / macOS filter / normalize / deduplicate / traversal / list / delete / agent invalidation / upload lifecycle / thread isolation / URL encoding / config pollution。

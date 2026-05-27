@@ -1,8 +1,8 @@
-# Architecture Overview
+# 架构概览
 
-This document provides a comprehensive overview of the DeerFlow backend architecture.
+本文档全面概述了 DeerFlow backend 的架构。
 
-## System Architecture
+## 系统架构
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -48,23 +48,23 @@ This document provides a comprehensive overview of the DeerFlow backend architec
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Component Details
+## 组件细节
 
-### Gateway Embedded Agent Runtime
+### Gateway 内嵌 Agent Runtime
 
-The agent runtime is embedded in the FastAPI Gateway and built on LangGraph for robust multi-agent workflow orchestration. Nginx rewrites `/api/langgraph/*` to Gateway's native `/api/*` routes, so the public API remains compatible with LangGraph SDK clients without running a separate LangGraph server.
+Agent runtime 内嵌在 FastAPI Gateway 中，并构建于 LangGraph 之上，以实现稳健的多 agent 工作流编排。Nginx 会将 `/api/langgraph/*` 重写到 Gateway 原生的 `/api/*` 路由，因此无需单独运行 LangGraph server，也能保持对外 API 与 LangGraph SDK 客户端兼容。
 
-**Entry Point**: `packages/harness/deerflow/agents/lead_agent/agent.py:make_lead_agent`
+**入口点**：`packages/harness/deerflow/agents/lead_agent/agent.py:make_lead_agent`
 
-**Key Responsibilities**:
-- Agent creation and configuration
-- Thread state management
-- Middleware chain execution
-- Tool execution orchestration
-- SSE streaming for real-time responses
+**核心职责：**
+- 创建和配置 agent
+- 管理 thread 状态
+- 执行 middleware 链
+- 编排工具执行
+- 通过 SSE 提供实时响应流
 
-**Graph registry**: `langgraph.json` remains available for tooling, Studio, or direct LangGraph Server compatibility.
-It is not the default service entrypoint; scripts and Docker deployments run the Gateway embedded runtime.
+**Graph registry**：`langgraph.json` 仍可供工具链、Studio 或直接兼容 LangGraph Server 的场景使用。
+它不是默认的服务入口；脚本和 Docker 部署运行的是 Gateway 内嵌 runtime。
 
 ```json
 {
@@ -75,25 +75,25 @@ It is not the default service entrypoint; scripts and Docker deployments run the
 }
 ```
 
-### Gateway API
+### Gateway API 服务
 
-FastAPI application providing REST endpoints plus the public LangGraph-compatible `/api/langgraph/*` runtime routes.
+FastAPI 应用，提供 REST 端点以及公开的兼容 LangGraph 的 `/api/langgraph/*` runtime 路由。
 
-**Entry Point**: `app/gateway/app.py`
+**入口点**：`app/gateway/app.py`
 
-**Routers**:
-- `models.py` - `/api/models` - Model listing and details
-- `thread_runs.py` / `runs.py` - `/api/threads/{id}/runs`, `/api/runs/*` - LangGraph-compatible runs and streaming
-- `mcp.py` - `/api/mcp` - MCP server configuration
-- `skills.py` - `/api/skills` - Skills management
-- `uploads.py` - `/api/threads/{id}/uploads` - File upload
-- `threads.py` - `/api/threads/{id}` - Local DeerFlow thread data cleanup after LangGraph deletion
-- `artifacts.py` - `/api/threads/{id}/artifacts` - Artifact serving
-- `suggestions.py` - `/api/threads/{id}/suggestions` - Follow-up suggestion generation
+**路由器：**
+- `models.py` - `/api/models` - 模型列表与详情
+- `thread_runs.py` / `runs.py` - `/api/threads/{id}/runs`、`/api/runs/*` - 兼容 LangGraph 的 runs 与流式传输
+- `mcp.py` - `/api/mcp` - MCP server 配置
+- `skills.py` - `/api/skills` - Skills 管理
+- `uploads.py` - `/api/threads/{id}/uploads` - 文件上传
+- `threads.py` - `/api/threads/{id}` - 在 LangGraph 删除后清理由 DeerFlow 管理的本地 thread 数据
+- `artifacts.py` - `/api/threads/{id}/artifacts` - artifact 提供
+- `suggestions.py` - `/api/threads/{id}/suggestions` - 后续建议生成
 
-The web conversation delete flow first deletes Gateway-managed thread state through the LangGraph-compatible route, then the Gateway `threads.py` router removes DeerFlow-managed filesystem data via `Paths.delete_thread_dir()`.
+Web 对话删除流程会先通过兼容 LangGraph 的路由删除 Gateway 管理的 thread 状态，然后再由 Gateway 的 `threads.py` 路由通过 `Paths.delete_thread_dir()` 删除由 DeerFlow 管理的文件系统数据。
 
-### Agent Architecture
+### Agent 架构
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -126,9 +126,9 @@ The web conversation delete flow first deletes Gateway-managed thread state thro
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Thread State
+### Thread 状态
 
-The `ThreadState` extends LangGraph's `AgentState` with additional fields:
+`ThreadState` 在 LangGraph 的 `AgentState` 基础上扩展了额外字段：
 
 ```python
 class ThreadState(AgentState):
@@ -144,7 +144,7 @@ class ThreadState(AgentState):
     viewed_images: dict       # Vision model image data
 ```
 
-### Sandbox System
+### Sandbox 系统
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -179,16 +179,16 @@ class ThreadState(AgentState):
                       └─────────────────────────┘
 ```
 
-**Virtual Path Mapping**:
+**虚拟路径映射：**
 
-| Virtual Path | Physical Path |
+| 虚拟路径 | 物理路径 |
 |-------------|---------------|
 | `/mnt/user-data/workspace` | `backend/.deer-flow/threads/{thread_id}/user-data/workspace` |
 | `/mnt/user-data/uploads` | `backend/.deer-flow/threads/{thread_id}/user-data/uploads` |
 | `/mnt/user-data/outputs` | `backend/.deer-flow/threads/{thread_id}/user-data/outputs` |
 | `/mnt/skills` | `deer-flow/skills/` |
 
-### Tool System
+### 工具系统
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -217,7 +217,7 @@ class ThreadState(AgentState):
                       └─────────────────────────┘
 ```
 
-### Model Factory
+### 模型工厂
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -258,13 +258,13 @@ config.yaml:
                       └─────────────────────────┘
 ```
 
-**Supported Providers**:
+**支持的 Provider：**
 - OpenAI (`langchain_openai:ChatOpenAI`)
 - Anthropic (`langchain_anthropic:ChatAnthropic`)
 - DeepSeek (`langchain_deepseek:ChatDeepSeek`)
-- Custom via LangChain integrations
+- 通过 LangChain integrations 接入的自定义 provider
 
-### MCP Integration
+### MCP 集成
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -302,7 +302,7 @@ extensions_config.json:
        └───────────┘        └───────────┘        └───────────┘
 ```
 
-### Skills System
+### Skills 系统
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -310,7 +310,7 @@ extensions_config.json:
 │                       (packages/harness/deerflow/skills/loader.py)                             │
 └─────────────────────────────────────────────────────────────────────────┘
 
-Directory Structure:
+目录结构：
 ┌─────────────────────────────────────────────────────────────────────────┐
 │ skills/                                                                  │
 │ ├── public/                        # Public skills (committed)           │
@@ -324,7 +324,7 @@ Directory Structure:
 │         └── SKILL.md                                                    │
 └─────────────────────────────────────────────────────────────────────────┘
 
-SKILL.md Format:
+`SKILL.md` 格式：
 ┌─────────────────────────────────────────────────────────────────────────┐
 │ ---                                                                      │
 │ name: PDF Processing                                                     │
@@ -341,7 +341,7 @@ SKILL.md Format:
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Request Flow
+### 请求流
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -379,9 +379,9 @@ SKILL.md Format:
 4. Client receives streaming response
 ```
 
-## Data Flow
+## 数据流
 
-### File Upload Flow
+### 文件上传流程
 
 ```
 1. Client uploads file
@@ -409,7 +409,7 @@ SKILL.md Format:
    - Agent can access via virtual_path
 ```
 
-### Thread Cleanup Flow
+### Thread 清理流程
 
 ```
 1. Client deletes conversation via the LangGraph-compatible Gateway route
@@ -424,7 +424,7 @@ SKILL.md Format:
    - Invalid thread IDs are rejected before filesystem access
 ```
 
-### Configuration Reload
+### 配置重载
 
 ```
 1. Client updates MCP config
@@ -442,43 +442,43 @@ SKILL.md Format:
 4. Next agent run uses new tools
 ```
 
-## Security Considerations
+## 安全性考量
 
-### Sandbox Isolation
+### Sandbox 隔离
 
-- Agent code executes within sandbox boundaries
-- Local sandbox: Direct execution (development only)
-- Docker sandbox: Container isolation (production recommended)
-- Path traversal prevention in file operations
+- Agent 代码在 sandbox 边界内执行
+- Local sandbox：直接执行（仅用于开发）
+- Docker sandbox：容器隔离（推荐用于生产环境）
+- 文件操作中会防止路径遍历
 
-### API Security
+### API 安全
 
-- Thread isolation: Each thread has separate data directories
-- File validation: Uploads checked for path safety
-- Environment variable resolution: Secrets not stored in config
+- Thread 隔离：每个 thread 都有单独的数据目录
+- 文件校验：上传内容会检查路径安全性
+- 环境变量解析：敏感信息不会存储在配置中
 
-### MCP Security
+### MCP 安全
 
-- Each MCP server runs in its own process
-- Environment variables resolved at runtime
-- Servers can be enabled/disabled independently
+- 每个 MCP server 都在独立进程中运行
+- 环境变量在运行时解析
+- 各 server 可独立启用/禁用
 
-## Performance Considerations
+## 性能考量
 
-### Caching
+### 缓存
 
-- MCP tools cached with file mtime invalidation
-- Configuration loaded once, reloaded on file change
-- Skills parsed once at startup, cached in memory
+- MCP 工具会缓存，并通过文件 mtime 失效
+- 配置只加载一次，在文件变化时重新加载
+- Skills 在启动时解析一次，并缓存在内存中
 
-### Streaming
+### 流式传输
 
-- SSE used for real-time response streaming
-- Reduces time to first token
-- Enables progress visibility for long operations
+- 使用 SSE 进行实时响应流式传输
+- 减少首个 token 的等待时间
+- 让长时间操作具备进度可见性
 
-### Context Management
+### 上下文管理
 
-- Summarization middleware reduces context when limits approached
-- Configurable triggers: tokens, messages, or fraction
-- Preserves recent messages while summarizing older ones
+- Summarization middleware 会在接近上限时压缩上下文
+- 支持可配置触发器：tokens、messages 或 fraction
+- 在摘要旧消息的同时保留最近消息

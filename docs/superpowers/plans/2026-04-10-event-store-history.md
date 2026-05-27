@@ -1,65 +1,65 @@
-# Event Store History — Backend Compatibility Layer
+# Event Store 历史记录——Backend 兼容层
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **针对 agentic workers：** 必需的子技能：使用 superpowers:subagent-driven-development（推荐）或 superpowers:executing-plans，按任务逐项实现该计划。步骤使用 checkbox（`- [ ]`）语法进行跟踪。
 
-**Goal:** Replace checkpoint state with the append-only event store as the message source in the thread state/history endpoints, so summarization never causes message loss.
+**目标：** 在 thread state/history endpoints 中，用 append-only 的 event store 替代 checkpoint state 作为消息来源，这样 summarization 就不会导致消息丢失。
 
-**Architecture:** The Gateway's `get_thread_state` and `get_thread_history` endpoints currently read messages from `checkpoint.channel_values["messages"]`. After summarization, those messages are replaced with a synthetic summary-as-human message and all pre-summarize messages are gone. We modify these endpoints to read messages from the RunEventStore instead (append-only, unaffected by summarization). The response shape for each message stays identical so the chat render path needs no changes, but the frontend's feedback hook must be aligned to use the same full-history view (see Task 4).
+**架构：** Gateway 的 `get_thread_state` 和 `get_thread_history` endpoints 当前从 `checkpoint.channel_values["messages"]` 读取消息。summarization 之后，这些消息会被替换成一个 synthetic 的 summary-as-human message，所有 summarization 之前的消息都会消失。我们要修改这些 endpoints，使其改为从 RunEventStore 读取消息（append-only，不受 summarization 影响）。每条消息的响应结构保持完全一致，因此 chat 渲染路径无需改动，但 frontend 的 feedback hook 必须对齐为使用同一份完整历史视图（见任务 4）。
 
-**Tech Stack:** Python (FastAPI, SQLAlchemy), pytest, TypeScript (React Query)
+**技术栈：** Python（FastAPI、SQLAlchemy）、pytest、TypeScript（React Query）
 
-**Scope:** Gateway mode only (`make dev-pro`). Standard mode uses the LangGraph Server directly and does not go through these endpoints; the summarize bug is still present there and must be tracked as a separate follow-up (see §"Follow-ups" at end of plan).
+**范围：** 仅限 Gateway mode（`make dev-pro`）。Standard mode 直接使用 LangGraph Server，不会经过这些 endpoints；因此 summarize bug 在那里依然存在，必须作为单独的后续项跟踪（见本文末尾“Follow-ups”）。
 
-**Prerequisite already landed:** `backend/packages/harness/deerflow/runtime/journal.py` now unwraps `Command(update={'messages':[ToolMessage(...)]})` in `on_tool_end`, so new runs that use state-updating tools (e.g. `present_files`) write the inner `ToolMessage` content to the event store instead of `str(Command(...))`. Legacy data captured before this fix is cleaned up defensively by the new helper (see Task 1 Step 3 `_sanitize_legacy_command_repr`).
+**已落地的前置项：** `backend/packages/harness/deerflow/runtime/journal.py` 现在会在 `on_tool_end` 中解包 `Command(update={'messages':[ToolMessage(...)]})`，因此新运行中使用 state-updating tools（例如 `present_files`）时，会将内部 `ToolMessage` 内容写入 event store，而不是写入 `str(Command(...))`。在该修复之前产生的 legacy 数据，会由新的 helper 做防御性清理（见任务 1 步骤 3 中的 `_sanitize_legacy_command_repr`）。
 
 ---
 
-## Real Data Alignment Analysis
+## 真实数据对齐分析
 
-Compared real `POST /history` response (checkpoint-based) with `run_events` table for thread `6d30913e-dcd4-41c8-8941-f66c716cf359` (docs/resp.json + backend/.deer-flow/data/deerflow.db). See `docs/superpowers/specs/2026-04-11-runjournal-history-evaluation.md` for full evidence chain.
+已将真实的 `POST /history` 响应（基于 checkpoint）与 thread `6d30913e-dcd4-41c8-8941-f66c716cf359` 的 `run_events` 表（`docs/resp.json` + `backend/.deer-flow/data/deerflow.db`）进行了对比。完整证据链见 `docs/superpowers/specs/2026-04-11-runjournal-history-evaluation.md`。
 
-| Message type | Fields compared | Difference |
+| 消息类型 | 对比字段 | 差异 |
 |-------------|----------------|------------|
-| human_message | all fields | `id` is `None` in event store, has UUID in checkpoint |
-| ai_message (tool_call) | all fields, 6 overlapping | **IDENTICAL** (0 diffs) |
-| ai_message (final) | all fields | **IDENTICAL** |
-| tool_result (normal) | all fields | Only `id` differs (`None` vs UUID) |
-| tool_result (from `Command`-returning tool) | content | **Legacy data stored `str(Command(...))` repr instead of inner ToolMessage** — fixed in journal.py for new runs; legacy rows sanitized by helper |
+| human_message | 全部字段 | event store 中 `id` 为 `None`，checkpoint 中为 UUID |
+| ai_message (tool_call) | 全部字段，6 个重叠字段 | **完全一致**（0 个差异） |
+| ai_message (final) | 全部字段 | **完全一致** |
+| tool_result (normal) | 全部字段 | 只有 `id` 不同（`None` vs UUID） |
+| tool_result（来自 `Command`-returning tool） | content | **legacy 数据存储的是 `str(Command(...))` repr，而不是内部 ToolMessage** —— 新运行已在 `journal.py` 中修复；legacy 行由 helper 清理 |
 
-**Root cause for id difference:** LangGraph's checkpoint assigns `id` to HumanMessage and ToolMessage during graph execution. Event store writes happen earlier, when those ids are still None. AI messages receive `id` from the LLM response (`lc_run--*`) and are unaffected.
+**`id` 差异的根本原因：** LangGraph 的 checkpoint 会在 graph 执行期间为 HumanMessage 和 ToolMessage 分配 `id`。而 event store 写入发生得更早，此时这些 `id` 仍然是 None。AI message 的 `id` 来自 LLM 响应（`lc_run--*`），因此不受影响。
 
-**Fix for id:** Generate deterministic UUIDs for `id=None` messages using `uuid5(NAMESPACE_URL, f"{thread_id}:{seq}")` at read time. Patch a **copy** of the content dict, never the live store object.
+**`id` 的修复方案：** 对 `id=None` 的消息，在读取时使用 `uuid5(NAMESPACE_URL, f"{thread_id}:{seq}")` 生成确定性的 UUID。要修改的是内容 dict 的**副本**，绝不能改动 live store object。
 
-**Summarize impact quantified on the reproducer thread**: event_store has 16 messages (7 AI + 9 others); checkpoint has 12 after summarize (5 AI + 7 others). AI id overlap: 5 of 7 — the 2 missing AI messages are pre-summarize.
+**在复现 thread 上量化 summarize 的影响：** event_store 中有 16 条消息（7 条 AI + 9 条其他消息）；summarize 后 checkpoint 中只有 12 条（5 条 AI + 7 条其他消息）。AI id 重叠数：7 条中的 5 条——缺失的 2 条 AI 消息都发生在 summarize 之前。
 
 ---
 
-## File Structure
+## 文件结构
 
-| File | Action | Responsibility |
+| 文件 | 操作 | 职责 |
 |------|--------|----------------|
-| `backend/app/gateway/routers/threads.py` | Modify | Replace checkpoint messages with event store messages in `get_thread_state` and `get_thread_history` |
-| `backend/tests/test_thread_state_event_store.py` | Create | Tests for the modified endpoints |
+| `backend/app/gateway/routers/threads.py` | 修改 | 在 `get_thread_state` 和 `get_thread_history` 中，用 event store 消息替换 checkpoint 消息 |
+| `backend/tests/test_thread_state_event_store.py` | 新建 | 为修改后的 endpoints 编写测试 |
 
 ---
 
-### Task 1: Add `_get_event_store_messages` helper to `threads.py`
+### 任务 1：在 `threads.py` 中添加 `_get_event_store_messages` helper
 
-A shared helper that loads the **full** message stream from the event store, patches `id=None` messages with deterministic UUIDs, and defensively sanitizes legacy `Command(update=...)` reprs captured before the journal.py fix. Patches a copy of each content dict so the live store is never mutated.
+一个共享 helper，用于从 event store 加载**完整**消息流，为 `id=None` 的消息补上确定性 UUID，并对 `journal.py` 修复前遗留的 `Command(update=...)` repr 做防御性清理。它会对每条 content dict 的副本进行修补，以确保不会修改 live store。
 
-**Design constraints (derived from evaluation §3, §4, §5):**
-- **Full pagination**, not `limit=1000`. `RunEventStore.list_messages` returns "latest N records" — a fixed limit silently truncates older messages. Use `count_messages()` to size the request or loop with `after_seq` cursors.
-- **Copy before mutate**. `MemoryRunEventStore` returns live dict references; the JSONL/DB stores may return detached rows but we must not rely on that. Always `content = dict(evt["content"])` before patching `id`.
-- **Legacy Command sanitization.** Legacy data contains `content["content"] == "Command(update={'artifacts': [...], 'messages': [ToolMessage(content='X', ...)]})"`. Regex-extract the inner ToolMessage content string and replace; if extraction fails, leave content as-is (still strictly better than nothing because checkpoint fallback is also wrong for summarized threads).
-- **User context.** `DbRunEventStore.list_messages` is user-scoped via `resolve_user_id(AUTO)` and relies on the auth contextvar set by `@require_permission`. Both endpoints are already decorated — document this dependency in the helper docstring.
+**设计约束（来自评估 §3、§4、§5）：**
+- **完整分页**，而不是 `limit=1000`。`RunEventStore.list_messages` 返回的是“最新 N 条记录”——固定 limit 会静默截断更旧的消息。使用 `count_messages()` 来确定请求规模，或通过 `after_seq` cursor 循环分页。
+- **修改前先复制。** `MemoryRunEventStore` 返回的是 live dict 引用；JSONL/DB store 可能返回脱离的数据行，但我们不能依赖这一点。补 `id` 之前始终执行 `content = dict(evt["content"])`。
+- **Legacy Command 清理。** legacy 数据中会出现 `content["content"] == "Command(update={'artifacts': [...], 'messages': [ToolMessage(content='X', ...)]})"`。用 regex 提取内部 ToolMessage 的内容字符串并替换；如果提取失败，则保持原样不动（即便如此也依然优于现有基于 checkpoint 的回退，因为 summarized thread 上那个回退同样是错误的）。
+- **用户上下文。** `DbRunEventStore.list_messages` 通过 `resolve_user_id(AUTO)` 按用户作用域工作，并依赖 `@require_permission` 设置的 auth contextvar。这两个 endpoint 已经都带有该 decorator——请在 helper 的 docstring 中注明这一依赖。
 
-**Files:**
-- Modify: `backend/app/gateway/routers/threads.py`
-- Test: `backend/tests/test_thread_state_event_store.py`
+**文件：**
+- 修改：`backend/app/gateway/routers/threads.py`
+- 测试：`backend/tests/test_thread_state_event_store.py`
 
-- [ ] **Step 1: Write the test**
+- [ ] **步骤 1：编写测试**
 
-Create `backend/tests/test_thread_state_event_store.py`:
+创建 `backend/tests/test_thread_state_event_store.py`：
 
 ```python
 """Tests for event-store-backed message loading in thread state/history endpoints."""
@@ -196,28 +196,27 @@ class TestGetEventStoreMessages:
         assert tool["status"] == "success"
 ```
 
-- [ ] **Step 2: Run tests to verify they pass**
+- [ ] **步骤 2：运行测试并确认通过**
 
-Run: `cd backend && PYTHONPATH=. uv run pytest tests/test_thread_state_event_store.py -v`
+运行：`cd backend && PYTHONPATH=. uv run pytest tests/test_thread_state_event_store.py -v`
 
-- [ ] **Step 3: Add the helper function and modify `get_thread_history`**
+- [ ] **步骤 3：添加 helper function 并修改 `get_thread_history`**
 
-In `backend/app/gateway/routers/threads.py`:
+在 `backend/app/gateway/routers/threads.py` 中：
 
-1. Add import at the top:
+1. 在文件顶部添加 import：
 ```python
 import uuid  # ADD (may already exist, check first)
 from app.gateway.deps import get_run_event_store  # ADD
 ```
 
-2. Add the helper function (before the endpoint functions, after the model definitions):
+2. 添加 helper function（放在 endpoint functions 之前、model 定义之后）：
 
 ```python
 _LEGACY_CMD_INNER_CONTENT_RE = re.compile(
     r"ToolMessage\(content=(?P<q>['\"])(?P<inner>.*?)(?P=q)",
     re.DOTALL,
 )
-
 
 def _sanitize_legacy_command_repr(content_field: Any) -> Any:
     """Recover the inner ToolMessage text from a legacy ``str(Command(...))`` repr.
@@ -308,11 +307,11 @@ async def _get_event_store_messages(request: Request, thread_id: str) -> list[di
     return messages if messages else None
 ```
 
-Also add `import re` at the top of the file if it isn't already imported.
+另外，如果文件顶部还没有 `import re`，也请添加。
 
-3. In `get_thread_history` (around line 585-590), replace the messages section:
+3. 在 `get_thread_history` 中（大约第 585-590 行），替换 messages 处理部分：
 
-**Before:**
+**修改前：**
 ```python
             # Attach messages from checkpointer only for the latest checkpoint
             if is_latest_checkpoint:
@@ -322,7 +321,7 @@ Also add `import re` at the top of the file if it isn't already imported.
             is_latest_checkpoint = False
 ```
 
-**After:**
+**修改后：**
 ```python
             # Attach messages: prefer event store (immune to summarization),
             # fall back to checkpoint messages when event store is unavailable.
@@ -337,17 +336,17 @@ Also add `import re` at the top of the file if it isn't already imported.
             is_latest_checkpoint = False
 ```
 
-- [ ] **Step 4: Modify `get_thread_state` similarly**
+- [ ] **步骤 4：以相同方式修改 `get_thread_state`**
 
-In `get_thread_state` (around line 443-444), replace:
+在 `get_thread_state` 中（大约第 443-444 行），替换：
 
-**Before:**
+**修改前：**
 ```python
     return ThreadStateResponse(
         values=serialize_channel_values(channel_values),
 ```
 
-**After:**
+**修改后：**
 ```python
     values = serialize_channel_values(channel_values)
 
@@ -360,11 +359,11 @@ In `get_thread_state` (around line 443-444), replace:
         values=values,
 ```
 
-- [ ] **Step 5: Run all backend tests**
+- [ ] **步骤 5：运行所有 backend 测试**
 
-Run: `cd backend && PYTHONPATH=. uv run pytest tests/ -v --timeout=30 -x`
+运行：`cd backend && PYTHONPATH=. uv run pytest tests/ -v --timeout=30 -x`
 
-- [ ] **Step 6: Commit**
+- [ ] **步骤 6：提交**
 
 ```bash
 git add backend/app/gateway/routers/threads.py backend/tests/test_thread_state_event_store.py
@@ -377,24 +376,24 @@ for stable frontend rendering."
 
 ---
 
-### Task 2 (OPTIONAL, deferred): Reduce flush_threshold for shorter mid-stream gap
+### 任务 2（可选，延期）：降低 flush_threshold，以缩短中途间隔
 
-**Status:** Not a correctness fix. Re-evaluation (see spec) found that `RunJournal` already flushes on `run_end`, `run_error`, cancel, and worker `finally` paths. The only window this tuning narrows is a hard process crash or mid-run reload. Defer and decide separately; do not couple with Task 1 merge.
+**状态：** 这不是正确性修复。重新评估（见 spec）发现，`RunJournal` 已经会在 `run_end`、`run_error`、取消以及 worker `finally` 路径上 flush。此次调优唯一缩小的窗口，是硬进程崩溃或运行中 reload 的情况。应延期并单独决策；不要与任务 1 的合并绑定。
 
-If pursued: change `flush_threshold` default from 20 → 5 in `journal.py:42`, rerun `tests/test_run_journal.py`, commit as a separate `perf(journal): …` commit.
+如果继续推进：将 `journal.py:42` 中 `flush_threshold` 的默认值从 20 改为 5，重新运行 `tests/test_run_journal.py`，并作为单独的 `perf(journal): …` commit 提交。
 
 ---
 
-### Task 3: Fix `useThreadFeedback` pagination in frontend
+### 任务 3：修复 frontend 中的 `useThreadFeedback` 分页
 
-Once `/history` returns the full event-store-backed message stream, the frontend's `runIdByAiIndex` map must also cover the full stream or its positional AI-index mapping drifts and feedback clicks go to the wrong `run_id`. The current hook hardcodes `limit=200`.
+一旦 `/history` 返回完整的、由 event-store 提供支持的消息流，frontend 中的 `runIdByAiIndex` 映射也必须覆盖完整流，否则它基于位置的 AI 索引映射会漂移，导致 feedback 点击指向错误的 `run_id`。当前 hook 把 `limit=200` 写死了。
 
-**Files:**
-- Modify: `frontend/src/core/threads/hooks.ts` (around line 679)
+**文件：**
+- 修改：`frontend/src/core/threads/hooks.ts`（大约第 679 行）
 
-- [ ] **Step 1: Replace the fixed `?limit=200` with full pagination**
+- [ ] **步骤 1：用完整分页替换固定的 `?limit=200`**
 
-Change:
+将：
 
 ```ts
 const res = await fetchWithAuth(
@@ -402,23 +401,23 @@ const res = await fetchWithAuth(
 );
 ```
 
-to a loop that pages via `after_seq` (or an equivalent query param exposed by the `/messages` endpoint — check `backend/app/gateway/routers/thread_runs.py:285-323` for the actual parameter names before writing the TS code). Accumulate `messages` until a page returns fewer than the page size.
+改为通过 `after_seq`（或 `/messages` endpoint 实际暴露的等价查询参数——在编写 TS 代码之前，请先检查 `backend/app/gateway/routers/thread_runs.py:285-323` 中的真实参数名）循环分页。持续累积 `messages`，直到某一页返回的数据量少于 page size。
 
-- [ ] **Step 2: Defensive index guard**
+- [ ] **步骤 2：防御性索引保护**
 
-`runIdByAiIndex[aiMessageIndex]` can still be `undefined` when the frontend renders optimistic state before the messages query refreshes. The current `?? undefined` in `message-list.tsx:71` already handles this; do not remove it.
+当 frontend 还在渲染 optimistic state、而 messages 查询尚未刷新时，`runIdByAiIndex[aiMessageIndex]` 仍然可能是 `undefined`。当前 `message-list.tsx:71` 中的 `?? undefined` 已经处理了这一点；不要删除它。
 
-- [ ] **Step 3: Invalidate `["thread-feedback", threadId]` after a new run**
+- [ ] **步骤 3：新 run 完成后使 `['thread-feedback', threadId]` 失效**
 
-In `useThreadStream` (or wherever stream-end is handled), call `queryClient.invalidateQueries({ queryKey: ["thread-feedback", threadId] })` when the stream closes so the runIdByAiIndex picks up the new run's AI message immediately.
+在 `useThreadStream`（或处理 stream-end 的位置）中，当 stream 关闭时调用 `queryClient.invalidateQueries({ queryKey: ["thread-feedback", threadId] })`，以便 `runIdByAiIndex` 能立即拿到新 run 的 AI message。
 
-- [ ] **Step 4: Run `pnpm check`**
+- [ ] **步骤 4：运行 `pnpm check`**
 
 ```bash
 cd frontend && pnpm check
 ```
 
-- [ ] **Step 5: Commit**
+- [ ] **步骤 5：提交**
 
 ```bash
 git add frontend/src/core/threads/hooks.ts
@@ -427,45 +426,44 @@ git commit -m "fix(feedback): paginate useThreadFeedback and invalidate after st
 
 ---
 
-### Task 4: End-to-end test — summarize + multi-run feedback
+### 任务 4：端到端测试——summarize + 多 run feedback
 
-Add a regression test that exercises the exact bug class we are fixing: a summarized thread with at least two runs, where feedback clicks must target the correct `run_id`.
+添加一个回归测试，覆盖我们正在修复的精确 bug 类型：一个已 summarized 的 thread，至少包含两次 run，点击 feedback 时必须命中正确的 `run_id`。
 
-**Files:**
-- Modify: `backend/tests/test_thread_state_event_store.py`
+**文件：**
+- 修改：`backend/tests/test_thread_state_event_store.py`
 
-- [ ] **Step 1: Write the test**
+- [ ] **步骤 1：编写测试**
 
-Seed a `MemoryRunEventStore` with two runs worth of messages (`r1`: human + ai + human + ai, `r2`: human + ai), then simulate a summarized checkpoint state that drops the `r1` messages. Call `_get_event_store_messages` and assert:
+为 `MemoryRunEventStore` 注入两次 run 的消息（`r1`：human + ai + human + ai，`r2`：human + ai），然后模拟一个 summarized 的 checkpoint state，使其丢弃 `r1` 的消息。调用 `_get_event_store_messages` 并断言：
+- 长度与 event store 一致，而不是 checkpoint
+- 第一条消息是原始 `r1` 的 human，而不是 summary
+- AI 消息按顺序保留它们的 `lc_run--*` ids
+- 所有 `id=None` 的消息都会获得稳定的 `uuid5(...)` id
+- tool_result 中 legacy 的 `str(Command(update=...))` content 字段会被清洗为内部文本
 
-- Length matches the event store, not the checkpoint
-- The first message is the original `r1` human, not a summary
-- AI messages preserve their `lc_run--*` ids in order
-- Any `id=None` messages get a stable `uuid5(...)` id
-- A legacy `str(Command(update=...))` content field in a tool_result is sanitized to the inner text
-
-- [ ] **Step 2: Run the new test**
+- [ ] **步骤 2：运行新测试**
 
 ```bash
 cd backend && PYTHONPATH=. uv run pytest tests/test_thread_state_event_store.py -v
 ```
 
-- [ ] **Step 3: Commit with Tasks 1, 3 changes**
+- [ ] **步骤 3：与任务 1、3 的改动一起提交**
 
-Bundle with the Task 1 commit so tests always land alongside the implementation.
+与任务 1 的 commit 打包在一起，这样测试总能与实现同步落地。
 
 ---
 
-### Task 5: Standard mode follow-up (documentation only)
+### 任务 5：Standard mode 后续项（仅文档）
 
-Standard mode (`make dev`) hits LangGraph Server directly for `/threads/{id}/history` and does not go through the Gateway router we just patched. The summarize bug is still present there.
+Standard mode（`make dev`）会直接命中 LangGraph Server 的 `/threads/{id}/history`，不会经过我们刚刚修补过的 Gateway router。因此 summarize bug 在那里依然存在。
 
-**Files:**
-- Modify: this plan (add follow-up section at the bottom, see below) OR create a separate tracking issue
+**文件：**
+- 修改：本计划（在底部添加 follow-up 小节，见下文）或创建一个单独的跟踪 issue
 
-- [ ] **Step 1: Record the gap**
+- [ ] **步骤 1：记录该缺口**
 
-Append to the bottom of this plan (or open a GitHub issue and link it):
+将以下内容追加到本计划底部（或者新开一个 GitHub issue 并链接到这里）：
 
 > **Follow-up — Standard mode summarize bug**
 > `get_thread_history` in `backend/app/gateway/routers/threads.py` is only hit in Gateway mode. Standard mode proxies `/api/langgraph/*` directly to the LangGraph Server (see `backend/CLAUDE.md` nginx routing and `frontend/CLAUDE.md` `NEXT_PUBLIC_LANGGRAPH_BASE_URL`). The summarize-message-loss symptom is still reproducible there. Options: (a) teach the LangGraph Server checkpointer to branch on an override, (b) move `/history` behind Gateway in Standard mode as well, (c) accept as known limitation for Standard mode. Decide before GA.

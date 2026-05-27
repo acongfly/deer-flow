@@ -1,55 +1,54 @@
-# 🦌 [About DeerFlow 2.0](https://github.com/bytedance/deer-flow)
+# 🦌 [关于 DeerFlow 2.0](https://github.com/bytedance/deer-flow)
 
-> **From Open Source, Back to Open Source**
+> **源于开源，回归开源**
 
-**DeerFlow** (**D**eep **E**xploration and **E**fficient **R**esearch **Flow**) is a community-driven SuperAgent harness that researches, codes, and creates.
-With the help of sandboxes, memories, tools and skills, it handles
-different levels of tasks that could take minutes to hours.
-
----
-
-## 🌟 GitHub Repository
-
-Explore DeerFlow on GitHub: [github.com/bytedance/deer-flow](https://github.com/bytedance/deer-flow)
-
-## 🌐 Official Website
-
-Visit the official website of DeerFlow: [deerflow.tech](https://deerflow.tech/)
-
-## 📧 Support
-
-If you have any questions or need help, please contact us at [support@deerflow.tech](mailto:support@deerflow.tech).
+**DeerFlow**（**D**eep **E**xploration and **E**fficient **R**esearch **Flow**）是一个由社区驱动的 SuperAgent harness，能够进行研究、编码与创作。
+借助 sandboxes、memories、tools 和 skills，它可以处理不同层级、耗时从几分钟到数小时不等的任务。
 
 ---
 
-## 📜 License
+## 🌟 GitHub 仓库
 
-DeerFlow is proudly open source and distributed under the **MIT License**.
+在 GitHub 上探索 DeerFlow：[github.com/bytedance/deer-flow](https://github.com/bytedance/deer-flow)
+
+## 🌐 官方网站
+
+访问 DeerFlow 官方网站：[deerflow.tech](https://deerflow.tech/)
+
+## 📧 支持
+
+如果你有任何问题或需要帮助，请通过 [support@deerflow.tech](mailto:support@deerflow.tech) 联系我们。
 
 ---
 
-## 🙌 Acknowledgments
+## 📜 许可证
 
-We extend our heartfelt gratitude to the open source projects and contributors who have made DeerFlow a reality. We truly stand on the shoulders of giants.
+DeerFlow 以开源为荣，并根据 **MIT License** 发布。
 
-### Core Frameworks
+---
 
-- **[LangChain](https://github.com/langchain-ai/langchain)**: A phenomenal framework that powers our LLM interactions and chains.
-- **[LangGraph](https://github.com/langchain-ai/langgraph)**: Enabling sophisticated multi-agent orchestration.
-- **[Next.js](https://nextjs.org/)**: A cutting-edge framework for building web applications.
+## 🙌 致谢
 
-### UI Libraries
+我们向那些让 DeerFlow 成为现实的开源项目和贡献者致以诚挚的感谢。我们确实是站在巨人的肩膀上前行。
 
-- **[Shadcn](https://ui.shadcn.com/)**: Minimalistic components that power our UI.
-- **[SToneX](https://github.com/stonexer)**: For his invaluable contribution to token-by-token visual effects.
+### 核心框架
 
-These outstanding projects form the backbone of DeerFlow and exemplify the transformative power of open source collaboration.
+- **[LangChain](https://github.com/langchain-ai/langchain)**：一个卓越的框架，为我们的 LLM 交互与 chains 提供动力。
+- **[LangGraph](https://github.com/langchain-ai/langgraph)**：让复杂的 multi-agent 编排成为可能。
+- **[Next.js](https://nextjs.org/)**：用于构建 Web 应用的前沿框架。
 
-### Special Thanks
+### UI 库
 
-Finally, we want to express our heartfelt gratitude to the core authors of DeerFlow 1.0 and 2.0:
+- **[Shadcn](https://ui.shadcn.com/)**：为我们的 UI 提供支持的极简组件。
+- **[SToneX](https://github.com/stonexer)**：感谢他在逐 token 视觉效果方面作出的宝贵贡献。
+
+这些杰出的项目构成了 DeerFlow 的骨干，也体现了开源协作的变革力量。
+
+### 特别感谢
+
+最后，我们想向 DeerFlow 1.0 和 2.0 的核心作者表达衷心感谢：
 
 - **[Daniel Walnut](https://github.com/hetaoBackend/)**
 - **[Henry Li](https://github.com/magiccube/)**
 
-Without their vision, passion and dedication, `DeerFlow` would not be what it is today.
+没有他们的愿景、热情和奉献，`DeerFlow` 就不会成为今天的样子。

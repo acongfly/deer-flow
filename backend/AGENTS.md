@@ -1,2 +1,2 @@
-For the backend architecture and design patterns:
+关于后端架构和设计模式：
 @./CLAUDE.md

@@ -1,18 +1,18 @@
-# BibTeX Citation Template
+# BibTeX 引用模板
 
-Use this template when the user mentions BibTeX, LaTeX, wants machine-readable references, or is writing a paper that will be typeset with a LaTeX citation style (natbib, biblatex, etc.).
+当用户提到 BibTeX、LaTeX，或希望获得机器可读的参考文献时使用此模板。
 
-## Critical: use `@misc`, not `@article`, for arXiv papers
+## 关键：arXiv 论文使用 `@misc`，而不是 `@article`
 
-**arXiv preprints must be cited as `@misc`, not `@article`.** This is the most common mistake when generating BibTeX for arXiv papers, and it matters:
+**arXiv 预印本必须引用为 `@misc`，而不是 `@article`。**
 
-- `@article` requires a `journal` field. arXiv is not a journal — it is a preprint server. Using `@article` with `journal = {arXiv}` is technically wrong and some bibliography styles will complain or render it inconsistently.
-- `@misc` is the correct entry type for preprints, technical reports, and other non-journal publications. It accepts `howpublished` and `eprint` fields, which is exactly what arXiv citations need.
-- Only switch to `@article` (or `@inproceedings`) when the paper has been **formally published** in a peer-reviewed venue and you have the venue metadata. In this workflow we only have arXiv metadata, so always emit `@misc`.
+- `@article` 需要 `journal` 字段。arXiv 不是期刊——它是一个预印本服务器。
+- `@misc` 是预印本、技术报告和其他非期刊出版物的正确条目类型。
+- 只有当论文**正式发表**在经同行评审的场所且你有场所元数据时，才切换到 `@article`。
 
-## Citation Format Rules
+## 引用格式规则
 
-### Entry structure for arXiv preprints
+### arXiv 预印本的条目结构
 
 ```bibtex
 @misc{citekey,
@@ -26,7 +26,7 @@ Use this template when the user mentions BibTeX, LaTeX, wants machine-readable r
 }
 ```
 
-**Real example**:
+**实际示例**：
 
 ```bibtex
 @misc{vaswani2017attention,
@@ -40,83 +40,40 @@ Use this template when the user mentions BibTeX, LaTeX, wants machine-readable r
 }
 ```
 
-### Field rules
+### 字段规则
 
-- **Cite key**: `<firstauthorlast><year><firstwordoftitle>`, all lowercase, no punctuation. Example: `vaswani2017attention`. Keys must be unique within the report.
-- **`author`**: `LastName, FirstName and LastName, FirstName and ...` — note the literal word `and` between authors, not a comma. LaTeX requires this exact separator. LastName comes first, then a comma, then the given names.
-- **Special characters**: escape or wrap LaTeX-sensitive characters. For example, `Łukasz` becomes `{\L}ukasz`, `é` becomes `{\'e}` (or wrap the whole name in braces to preserve casing: `{Łukasz}`). If unsure, wrap the problematic name in curly braces.
-- **`title`**: preserve the paper's capitalization by wrapping it in double braces if it contains acronyms or proper nouns you need to keep capitalized: `title = {{BERT}: Pre-training of Deep Bidirectional Transformers}`. Otherwise plain braces are fine.
-- **`year`**: the 4-digit year from the paper's `published` field.
-- **`eprint`**: the **bare arXiv id** (e.g. `1706.03762`), **without** the `arXiv:` prefix and **without** the version suffix.
-- **`archivePrefix`**: literal string `{arXiv}`.
-- **`primaryClass`**: the first category from the paper's `categories` list (e.g. `cs.CL`, `cs.CV`, `stat.ML`). This is the paper's primary subject area.
-- **`url`**: the full `abs_url` from paper metadata.
+- **引用键**：`<第一作者姓><年份><标题第一词>`，全小写，无标点。示例：`vaswani2017attention`。
+- **`author`**：`LastName, FirstName and LastName, FirstName and ...` — 作者之间使用字面词 `and`，而不是逗号。
+- **特殊字符**：转义或包裹 LaTeX 敏感字符。例如，`Łukasz` 变为 `{\L}ukasz`。
+- **`title`**：如果包含需要保持大写的缩略词或专有名词，用双花括号包裹：`title = {{BERT}: Pre-training ...}`。
+- **`year`**：论文 `published` 字段的 4 位数年份。
+- **`eprint`**：**裸 arXiv id**（例如 `1706.03762`），**不带** `arXiv:` 前缀和版本后缀。
+- **`archivePrefix`**：字面字符串 `{arXiv}`。
+- **`primaryClass`**：论文 `categories` 列表中的第一个类别（例如 `cs.CL`、`cs.CV`）。
+- **`url`**：论文元数据中的完整 `abs_url`。
 
-## Report Structure
+## 报告结构
 
-The BibTeX report is slightly different from APA / IEEE: the **bibliography is a separate `.bib` file**, and the main report uses LaTeX-style `\cite{key}` references that would resolve against that file. Since we are emitting markdown, we show `\cite{key}` verbatim in the prose and emit the BibTeX entries inside a fenced code block at the end.
+BibTeX 报告与 APA/IEEE 略有不同：**参考书目是一个单独的 `.bib` 文件**，主报告使用 LaTeX 风格的 `\cite{key}` 引用。
 
 ```markdown
-# Systematic Literature Review: <Topic>
+# 系统性文献综述：<主题>
 
-**Date**: <YYYY-MM-DD>
-**Papers surveyed**: <N>
-**Scope**: <arXiv search query, category, time window>
-**Citation format**: BibTeX
+**日期**：<YYYY-MM-DD>
+**调查论文数**：<N>
+**引用格式**：BibTeX
 
-## Executive Summary
+## 执行摘要
 
-<3-5 sentences. Use \cite{key} form for citations, e.g. "Transformer architectures \cite{vaswani2017attention} have become the dominant approach.">
+<3-5 句话。对引用使用 \cite{key} 形式。>
 
-## Methodology
+## BibTeX 参考书目
 
-This review surveyed <N> arXiv papers retrieved on <YYYY-MM-DD> using the query `<query>`<, filtered to category <cat>><, published between <start_date> and <end_date>>. Metadata extraction was performed by language-model agents, with cross-paper synthesis performed by the lead agent. All citations in this report use BibTeX cite keys; the corresponding `.bib` entries are at the end of this document.
-
-**Limitations of this review**: arXiv preprints are not peer-reviewed; coverage is limited to arXiv.
-
-## Themes
-
-### Theme 1: <Theme name>
-
-<Paragraphs describing the theme. Cite with \cite{key} form: "The original transformer architecture \cite{vaswani2017attention} introduced self-attention, which was later extended in \cite{dai2019transformerxl}.">
-
-### Theme 2: <Theme name>
-
-<...>
-
-## Convergences and Disagreements
-
-**Convergences**: <e.g. "Multiple papers \cite{key1,key2,key3} agree that X is necessary.">
-
-**Disagreements**: <...>
-
-## Gaps and Open Questions
-
-<...>
-
-## Per-Paper Annotations
-
-### \cite{vaswani2017attention} — "Attention Is All You Need" (2017)
-
-**Research question**: <1 sentence>
-**Methodology**: <1-2 sentences>
-**Key findings**:
-- <bullet>
-- <bullet>
-- <bullet>
-**Limitations**: <1-2 sentences>
-
-### \cite{devlin2018bert} — "BERT: Pre-training of Deep Bidirectional Transformers" (2018)
-
-<...>
-
-## BibTeX Bibliography
-
-Save the entries below to a `.bib` file and reference them from your LaTeX document with `\bibliography{filename}`.
+将以下条目保存到 `.bib` 文件，并在 LaTeX 文档中用 `\bibliography{filename}` 引用。
 
 \`\`\`bibtex
 @misc{vaswani2017attention,
-  author        = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, {\L}ukasz and Polosukhin, Illia},
+  author        = {Vaswani, Ashish and Shazeer, Noam and ...},
   title         = {Attention Is All You Need},
   year          = {2017},
   eprint        = {1706.03762},
@@ -124,33 +81,13 @@ Save the entries below to a `.bib` file and reference them from your LaTeX docum
   primaryClass  = {cs.CL},
   url           = {https://arxiv.org/abs/1706.03762}
 }
-
-@misc{devlin2018bert,
-  author        = {Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina},
-  title         = {{BERT}: Pre-training of Deep Bidirectional Transformers for Language Understanding},
-  year          = {2018},
-  eprint        = {1810.04805},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.CL},
-  url           = {https://arxiv.org/abs/1810.04805}
-}
-
-... more entries, one per paper ...
 \`\`\`
 ```
 
-(Note: in the actual saved report, use a real fenced code block `` ```bibtex `` — the backticks above are escaped only because this template file itself is inside a markdown code block when rendered.)
+## 定稿前的质量检查
 
-## Quality checks before finalizing
-
-Before saving the report, verify:
-
-- [ ] Every entry is `@misc`, not `@article` (this workflow only has arXiv metadata).
-- [ ] Cite keys are unique within the report.
-- [ ] Cite keys follow the `<firstauthorlast><year><firstword>` pattern, all lowercase.
-- [ ] `author` field uses ` and ` (the literal word) between authors, not commas.
-- [ ] LaTeX special characters in author names are escaped or brace-wrapped.
-- [ ] `eprint` is the bare arXiv id (no `arXiv:` prefix, no version suffix).
-- [ ] `primaryClass` is set from the paper's first category.
-- [ ] Every `\cite{key}` in the text has a matching `@misc` entry in the bibliography.
-- [ ] The bibliography is emitted inside a fenced ```` ```bibtex ```` code block so users can copy-paste directly into a `.bib` file.
+- [ ] 每个条目都是 `@misc`，不是 `@article`。
+- [ ] 引用键在报告中唯一。
+- [ ] `author` 字段在作者之间使用 ` and `（字面词），不是逗号。
+- [ ] `eprint` 是裸 arXiv id（无 `arXiv:` 前缀，无版本后缀）。
+- [ ] 参考书目在 `` ```bibtex `` 代码块中输出。

@@ -1,61 +1,61 @@
 ---
 name: code-documentation
-description: Use this skill when the user requests to generate, create, or improve documentation for code, APIs, libraries, repositories, or software projects. Supports README generation, API reference documentation, inline code comments, architecture documentation, changelog generation, and developer guides. Trigger on requests like "document this code", "create a README", "generate API docs", "write developer guide", or when analyzing codebases for documentation purposes.
+description: 当用户请求为代码、API、库、仓库或软件项目生成、创建或改进文档时使用此 skill。支持 README 生成、API 参考文档、行内代码注释、架构文档、changelog 生成以及开发者指南。当请求类似“document this code”“create a README”“generate API docs”“write developer guide”或出于文档目的分析代码库时触发。
 ---
 
-# Code Documentation Skill
+# 代码文档 Skill
 
-## Overview
+## 概述
 
-This skill generates professional, comprehensive documentation for software projects, codebases, libraries, and APIs. It follows industry best practices from projects like React, Django, Stripe, and Kubernetes to produce documentation that is accurate, well-structured, and useful for both new contributors and experienced developers.
+此 skill 用于为软件项目、代码库、库和 API 生成专业且完整的文档。它借鉴 React、Django、Stripe 和 Kubernetes 等项目的行业最佳实践，生成准确、结构清晰且对新贡献者和资深开发者都实用的文档。
 
-The output ranges from single-file READMEs to multi-document developer guides, always matched to the project's complexity and the user's needs.
+输出范围可以从单文件 README 到多文档开发者指南，并始终与项目复杂度和用户需求相匹配。
 
-## Core Capabilities
+## 核心能力
 
-- Generate comprehensive README.md files with badges, installation, usage, and API reference
-- Create API reference documentation from source code analysis
-- Produce architecture and design documentation with diagrams
-- Write developer onboarding and contribution guides
-- Generate changelogs from commit history or release notes
-- Create inline code documentation following language-specific conventions
-- Support JSDoc, docstrings, GoDoc, Javadoc, and Rustdoc formats
-- Adapt documentation style to the project's language and ecosystem
+- 生成完整的 README.md，包括徽章、安装、使用方式和 API 参考
+- 通过分析源码创建 API 参考文档
+- 生成包含图表的架构与设计文档
+- 编写开发者入门与贡献指南
+- 根据提交历史或发布说明生成 changelog
+- 按语言特定约定创建行内代码文档
+- 支持 JSDoc、docstrings、GoDoc、Javadoc 和 Rustdoc 格式
+- 根据项目所用语言与生态调整文档风格
 
-## When to Use This Skill
+## 何时使用此 Skill
 
-**Always load this skill when:**
+**在以下情况下始终加载此 skill：**
 
-- User asks to "document", "create docs", or "write documentation" for any code
-- User requests a README, API reference, or developer guide
-- User shares a codebase or repository and wants documentation generated
-- User asks to improve or update existing documentation
-- User needs architecture documentation, including diagrams
-- User requests a changelog or migration guide
+- 用户要求为任意代码“document”“create docs”或“write documentation”
+- 用户请求 README、API 参考或开发者指南
+- 用户分享代码库或仓库并希望自动生成文档
+- 用户要求改进或更新现有文档
+- 用户需要架构文档，包括图表
+- 用户请求 changelog 或迁移指南
 
-## Documentation Workflow
+## 文档工作流
 
-### Phase 1: Codebase Analysis
+### 阶段 1：代码库分析
 
-Before writing any documentation, thoroughly understand the codebase.
+在编写任何文档之前，先彻底理解代码库。
 
-#### Step 1.1: Project Discovery
+#### 步骤 1.1：项目发现
 
-Identify the project fundamentals:
+识别项目基础信息：
 
-| Field | How to Determine |
+| 字段 | 如何判断 |
 |-------|-----------------|
-| **Language(s)** | Check file extensions, `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, etc. |
-| **Framework** | Look at dependencies for known frameworks (React, Django, Express, Spring, etc.) |
-| **Build System** | Check for `Makefile`, `CMakeLists.txt`, `webpack.config.js`, `build.gradle`, etc. |
-| **Package Manager** | npm/yarn/pnpm, pip/uv/poetry, cargo, go modules, etc. |
-| **Project Structure** | Map out the directory tree to understand the architecture |
-| **Entry Points** | Find main files, CLI entry points, exported modules |
-| **Existing Docs** | Check for existing README, docs/, wiki, or inline documentation |
+| **Language(s)** | 检查文件扩展名、`package.json`、`pyproject.toml`、`go.mod`、`Cargo.toml` 等 |
+| **Framework** | 查看依赖中是否存在已知框架（React、Django、Express、Spring 等） |
+| **Build System** | 检查 `Makefile`、`CMakeLists.txt`、`webpack.config.js`、`build.gradle` 等 |
+| **Package Manager** | npm/yarn/pnpm、pip/uv/poetry、cargo、go modules 等 |
+| **Project Structure** | 梳理目录树以理解架构 |
+| **Entry Points** | 查找主文件、CLI 入口、导出模块 |
+| **Existing Docs** | 检查现有 README、docs/、wiki 或行内文档 |
 
-#### Step 1.2: Code Structure Analysis
+#### 步骤 1.2：代码结构分析
 
-Use sandbox tools to explore the codebase:
+使用 sandbox tools 探索代码库：
 
 ```bash
 # Get directory structure
@@ -71,22 +71,22 @@ grep -r "def " /mnt/user-data/uploads/project-dir/src/ --include="*.py"
 grep -r "func " /mnt/user-data/uploads/project-dir/ --include="*.go"
 ```
 
-#### Step 1.3: Identify Documentation Scope
+#### 步骤 1.3：确定文档范围
 
-Based on analysis, determine what documentation to produce:
+根据分析结果，确定应产出哪些文档：
 
-| Project Size | Recommended Documentation |
+| 项目规模 | 推荐文档 |
 |-------------|--------------------------|
-| **Single file / script** | Inline comments + usage header |
-| **Small library** | README with API reference |
-| **Medium project** | README + API docs + examples |
-| **Large project** | README + Architecture + API + Contributing + Changelog |
+| **单文件 / 脚本** | 行内注释 + 使用说明头部 |
+| **小型库** | README + API 参考 |
+| **中型项目** | README + API 文档 + 示例 |
+| **大型项目** | README + 架构 + API + Contributing + Changelog |
 
-### Phase 2: Documentation Generation
+### 阶段 2：文档生成
 
-#### Step 2.1: README Generation
+#### 步骤 2.1：README 生成
 
-Every project needs a README. Follow this structure:
+每个项目都需要 README。遵循以下结构：
 
 ```markdown
 # Project Name
@@ -157,11 +157,11 @@ Every project needs a README. Follow this structure:
 [License information]
 ```
 
-#### Step 2.2: API Reference Generation
+#### 步骤 2.2：API 参考生成
 
-For each public API surface, document:
+对于每一个公开 API 面，都应记录：
 
-**Function / Method Documentation**:
+**Function / Method 文档：**
 
 ```markdown
 ### `functionName(param1, param2, options?)`
@@ -191,7 +191,7 @@ console.log(result.data);
 \`\`\`
 ```
 
-**Class Documentation**:
+**Class 文档：**
 
 ```markdown
 ### `ClassName`
@@ -222,9 +222,9 @@ new ClassName(config)
 | `property2` | `number` | Read-only. Description |
 ```
 
-#### Step 2.3: Architecture Documentation
+#### 步骤 2.3：架构文档
 
-For medium-to-large projects, include architecture documentation:
+对于中大型项目，应包含架构文档：
 
 ```markdown
 # Architecture Overview
@@ -263,11 +263,11 @@ graph TD
 - **Trade-offs**: What was sacrificed
 ```
 
-#### Step 2.4: Inline Code Documentation
+#### 步骤 2.4：行内代码文档
 
-Generate language-appropriate inline documentation:
+生成符合语言习惯的行内文档：
 
-**Python (Docstrings — Google style)**:
+**Python（Docstrings — Google 风格）：**
 ```python
 def process_data(input_path: str, options: dict | None = None) -> ProcessResult:
     """Process data from the given file path.
@@ -296,7 +296,7 @@ def process_data(input_path: str, options: dict | None = None) -> ProcessResult:
     """
 ```
 
-**TypeScript (JSDoc / TSDoc)**:
+**TypeScript（JSDoc / TSDoc）：**
 ```typescript
 /**
  * Fetches user data from the API and transforms it for display.
@@ -317,7 +317,7 @@ def process_data(input_path: str, options: dict | None = None) -> ProcessResult:
  */
 ```
 
-**Go (GoDoc)**:
+**Go（GoDoc）：**
 ```go
 // ProcessData reads the input file at the given path, applies the specified
 // transformations, and returns the processed result.
@@ -329,87 +329,87 @@ def process_data(input_path: str, options: dict | None = None) -> ProcessResult:
 func ProcessData(inputPath string, options *ProcessOptions) (*Result, error) {
 ```
 
-### Phase 3: Quality Assurance
+### 阶段 3：质量保证
 
-#### Step 3.1: Documentation Completeness Check
+#### 步骤 3.1：文档完整性检查
 
-Verify the documentation covers:
+确认文档覆盖以下内容：
 
-- [ ] **What it is** — Clear project description that a newcomer can understand
-- [ ] **Why it exists** — Problem it solves and value proposition
-- [ ] **How to install** — Copy-paste-ready installation commands
-- [ ] **How to use** — At least one minimal working example
-- [ ] **API surface** — All public functions, classes, and types documented
-- [ ] **Configuration** — All environment variables, config files, and options
-- [ ] **Error handling** — Common errors and how to resolve them
-- [ ] **Contributing** — How to set up dev environment and submit changes
+- [ ] **它是什么** —— 清晰的项目描述，新手也能理解
+- [ ] **为什么存在** —— 它解决的问题与价值主张
+- [ ] **如何安装** —— 可直接复制粘贴的安装命令
+- [ ] **如何使用** —— 至少一个最小可运行示例
+- [ ] **API 面** —— 所有公开函数、类和类型均有文档
+- [ ] **配置** —— 所有环境变量、配置文件和选项
+- [ ] **错误处理** —— 常见错误及其解决方式
+- [ ] **Contributing** —— 如何搭建开发环境并提交变更
 
-#### Step 3.2: Quality Standards
+#### 步骤 3.2：质量标准
 
-| Standard | Check |
+| 标准 | 检查项 |
 |----------|-------|
-| **Accuracy** | Every code example must actually work with the described API |
-| **Completeness** | No public API surface left undocumented |
-| **Consistency** | Same formatting and structure throughout |
-| **Freshness** | Documentation matches the current code, not an older version |
-| **Accessibility** | No jargon without explanation, acronyms defined on first use |
-| **Examples** | Every complex concept has at least one practical example |
+| **Accuracy** | 每个代码示例都必须与描述的 API 真正匹配并可运行 |
+| **Completeness** | 不得遗漏任何公开 API 面 |
+| **Consistency** | 全文格式与结构保持一致 |
+| **Freshness** | 文档必须对应当前代码，而不是旧版本 |
+| **Accessibility** | 不解释的术语不要出现，缩写首次出现时要定义 |
+| **Examples** | 每个复杂概念至少给出一个实际示例 |
 
-#### Step 3.3: Cross-reference Validation
+#### 步骤 3.3：交叉引用校验
 
-Ensure:
-- All mentioned file paths exist in the project
-- All referenced functions and classes exist in the code
-- All code examples use the correct function signatures
-- Version numbers match the project's actual version
-- All links (internal and external) are valid
+确保：
+- 所有提到的文件路径都真实存在于项目中
+- 所有引用的函数和类都存在于代码中
+- 所有代码示例都使用正确的函数签名
+- 版本号与项目实际版本一致
+- 所有链接（内部与外部）都有效
 
-## Documentation Style Guide
+## 文档风格指南
 
-### Writing Principles
+### 写作原则
 
-1. **Lead with the "why"** — Before explaining how something works, explain why it exists
-2. **Progressive disclosure** — Start simple, add complexity gradually
-3. **Show, don't tell** — Prefer code examples over lengthy explanations
-4. **Active voice** — "The function returns X" not "X is returned by the function"
-5. **Present tense** — "The server starts on port 8080" not "The server will start on port 8080"
-6. **Second person** — "You can configure..." not "Users can configure..."
+1. **先讲“为什么”** —— 在解释某物如何工作之前，先解释它为什么存在
+2. **渐进式披露** —— 从简单开始，逐步增加复杂度
+3. **以示例代替空谈** —— 优先使用代码示例，而非冗长说明
+4. **主动语态** —— 写 “The function returns X”，而不是 “X is returned by the function”
+5. **现在时** —— 写 “The server starts on port 8080”，而不是 “The server will start on port 8080”
+6. **第二人称** —— 写 “You can configure...”，而不是 “Users can configure...”
 
-### Formatting Rules
+### 格式规则
 
-- Use ATX-style headers (`#`, `##`, `###`)
-- Use fenced code blocks with language specification (` ```python `, ` ```bash `)
-- Use tables for structured information (parameters, options, configuration)
-- Use admonitions for important notes, warnings, and tips
-- Keep line length readable (wrap prose at ~80-100 characters in source)
-- Use `code formatting` for function names, file paths, variable names, and CLI commands
+- 使用 ATX 风格标题（`#`、`##`、`###`）
+- 使用带语言标识的围栏代码块（` ```python `、` ```bash `）
+- 对结构化信息（参数、选项、配置）使用表格
+- 对重要说明、警告和提示使用 admonitions
+- 保持行宽易读（源码中的正文建议在 ~80-100 字符换行）
+- 对函数名、文件路径、变量名和 CLI 命令使用 `code formatting`
 
-### Language-Specific Conventions
+### 语言特定约定
 
-| Language | Doc Format | Style Guide |
+| 语言 | 文档格式 | 风格指南 |
 |----------|-----------|-------------|
-| Python | Google-style docstrings | PEP 257 |
+| Python | Google 风格 docstrings | PEP 257 |
 | TypeScript/JavaScript | TSDoc / JSDoc | TypeDoc conventions |
 | Go | GoDoc comments | Effective Go |
 | Rust | Rustdoc (`///`) | Rust API Guidelines |
 | Java | Javadoc | Oracle Javadoc Guide |
 | C/C++ | Doxygen | Doxygen manual |
 
-## Output Handling
+## 输出处理
 
-After generation:
+生成后：
 
-- Save documentation files to `/mnt/user-data/outputs/`
-- For multi-file documentation, maintain the project directory structure
-- Present generated files to the user using the `present_files` tool
-- Offer to iterate on specific sections or adjust the level of detail
-- Suggest additional documentation that might be valuable
+- 将文档文件保存到 `/mnt/user-data/outputs/`
+- 对于多文件文档，保持项目目录结构
+- 使用 `present_files` tool 向用户展示生成的文件
+- 提供继续迭代特定章节或调整细节层级的选项
+- 建议可能同样有价值的附加文档
 
-## Notes
+## 说明
 
-- Always analyze the actual code before writing documentation — never guess at API signatures or behavior
-- When existing documentation exists, preserve its structure unless the user explicitly asks for a rewrite
-- For large codebases, prioritize documenting the public API surface and key abstractions first
-- Documentation should be written in the same language as the project's existing docs; default to English if none exist
-- When generating changelogs, use the [Keep a Changelog](https://keepachangelog.com/) format
-- This skill works well in combination with the `deep-research` skill for documenting third-party integrations or dependencies
+- 在编写文档前，始终分析真实代码——绝不要猜测 API 签名或行为
+- 如果已存在文档，除非用户明确要求重写，否则保留其结构
+- 对于大型代码库，优先记录公开 API 面和关键抽象
+- 文档应使用与项目现有文档相同的语言；如果没有现有文档，默认使用英文
+- 生成 changelog 时，使用 [Keep a Changelog](https://keepachangelog.com/) 格式
+- 此 skill 可与 `deep-research` skill 搭配使用，用于记录第三方集成或依赖
