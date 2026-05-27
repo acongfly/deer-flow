@@ -20,6 +20,7 @@ mcp = FastMCP("business-api")
 REQUEST_TIMEOUT_SECONDS = 30.0
 HEALTH_CHECK_TIMEOUT_SECONDS = 15.0
 MAX_BODY_PREVIEW_CHARS = 500
+HEALTH_CHECK_PATH = os.getenv("BUSINESS_API_HEALTH_PATH", "health").strip("/") or "health"
 SENSITIVE_FIELD_MARKER = "<redacted>"
 SENSITIVE_KEY_PARTS = ("token", "secret", "password", "authorization", "api_key", "apikey")
 
@@ -139,15 +140,35 @@ def post_action(path: str, payload_json: str = "{}") -> str:
 @mcp.tool()
 def health_check() -> str:
     """Simple health check for connectivity and auth."""
+    url = urljoin(_base_url(), HEALTH_CHECK_PATH)
     with httpx.Client(timeout=HEALTH_CHECK_TIMEOUT_SECONDS) as client:
-        resp = client.get(urljoin(_base_url(), "health"), headers=_headers())
-        return json.dumps(
-            {
-                "status_code": resp.status_code,
-                "ok": resp.is_success,
-                "body": _truncate(resp.text),
-            }
-        )
+        try:
+            resp = client.get(url, headers=_headers())
+            resp.raise_for_status()
+            return json.dumps(
+                {
+                    "status_code": resp.status_code,
+                    "ok": True,
+                    "body": _truncate(resp.text),
+                }
+            )
+        except httpx.HTTPStatusError as exc:
+            return json.dumps(
+                {
+                    "status_code": exc.response.status_code,
+                    "ok": False,
+                    "error": f"Health endpoint returned non-success status for {url}",
+                    "body": _truncate(exc.response.text),
+                }
+            )
+        except httpx.RequestError as exc:
+            return json.dumps(
+                {
+                    "status_code": 0,
+                    "ok": False,
+                    "error": f"Health request failed for {url}: {exc!s}",
+                }
+            )
 
 
 if __name__ == "__main__":
