@@ -9,6 +9,7 @@
 #   with `DEER_FLOW_HOME` when you need a different writable data directory.
 # - Environment variables are available for all field values. Example: `api_key: $OPENAI_API_KEY`
 # - The `use` path is a string that looks like "package_name.sub_package_name.module_name:class_name/variable_name".
+# - MCP servers are configured in extensions_config.json (see extensions_config.example.json).
 
 # ============================================================================
 # Config Version (used to detect outdated config files)
@@ -140,6 +141,20 @@ models:
   #   when_thinking_disabled:
   #     thinking:
   #       type: disabled
+
+  # Example: Claude Code OAuth model (uses DeerFlow Claude provider)
+  # Requires one of:
+  #   - CLAUDE_CODE_OAUTH_TOKEN
+  #   - ANTHROPIC_AUTH_TOKEN
+  #   - CLAUDE_CODE_CREDENTIALS_PATH
+  # This mode auto-loads Claude Code credentials and applies OAuth billing headers.
+  # - name: claude-code-oauth
+  #   display_name: Claude (Code OAuth)
+  #   use: deerflow.models.claude_provider:ClaudeChatModel
+  #   model: claude-sonnet-4-6
+  #   max_tokens: 16384
+  #   enable_prompt_caching: true
+  #   auto_thinking_budget: true
 
   # Example: Google Gemini model (native SDK, no thinking support)
   # - name: gemini-2.5-pro

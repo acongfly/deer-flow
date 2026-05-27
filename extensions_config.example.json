@@ -27,6 +27,19 @@
       ],
       "env": {},
       "description": "PostgreSQL database access"
+    },
+    "business-api": {
+      "enabled": false,
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "/absolute/path/to/skills/public/project-builder/scripts/business_api_mcp_server.py"
+      ],
+      "env": {
+        "BUSINESS_API_BASE_URL": "$BUSINESS_API_BASE_URL",
+        "BUSINESS_API_TOKEN": "$BUSINESS_API_TOKEN"
+      },
+      "description": "Business API MCP server template used by project-builder skill"
     }
   },
   "skills": {}
