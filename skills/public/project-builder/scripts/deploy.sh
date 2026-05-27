@@ -38,9 +38,10 @@ if [[ -z "$RESULT_JSON" ]]; then
   exit 1
 fi
 
-if ! printf '%s' "$RESULT_JSON" | python3 -c 'import json,sys
+if ! python3 -c 'import json
+import sys
 try:
-    data = json.load(sys.stdin)
+    data = json.loads(sys.argv[1])
 except json.JSONDecodeError:
     print("invalid json response", file=sys.stderr)
     raise SystemExit(1)
@@ -48,7 +49,7 @@ preview = data.get("previewUrl")
 if not isinstance(preview, str) or not preview:
     print("missing previewUrl in response", file=sys.stderr)
     raise SystemExit(1)
-'; then
+' "$RESULT_JSON"; then
   echo "Error: deployment response is not valid JSON with previewUrl." >&2
   exit 1
 fi

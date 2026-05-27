@@ -20,7 +20,10 @@ mcp = FastMCP("business-api")
 REQUEST_TIMEOUT_SECONDS = 30.0
 HEALTH_CHECK_TIMEOUT_SECONDS = 15.0
 MAX_BODY_PREVIEW_CHARS = 500
-HEALTH_CHECK_PATH = os.getenv("BUSINESS_API_HEALTH_PATH", "health").strip("/") or "health"
+_RAW_HEALTH_CHECK_PATH = os.getenv("BUSINESS_API_HEALTH_PATH", "health")
+HEALTH_CHECK_PATH = _RAW_HEALTH_CHECK_PATH.strip("/")
+if not HEALTH_CHECK_PATH:
+    HEALTH_CHECK_PATH = "health"
 SENSITIVE_FIELD_MARKER = "<redacted>"
 SENSITIVE_KEY_PARTS = ("token", "secret", "password", "authorization", "api_key", "apikey")
 

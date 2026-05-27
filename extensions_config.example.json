@@ -33,7 +33,7 @@
       "type": "stdio",
       "command": "python",
       "args": [
-        "/absolute/path/to/skills/public/project-builder/scripts/business_api_mcp_server.py"
+        "/path/to/deer-flow/skills/public/project-builder/scripts/business_api_mcp_server.py"
       ],
       "env": {
         "BUSINESS_API_BASE_URL": "$BUSINESS_API_BASE_URL",
