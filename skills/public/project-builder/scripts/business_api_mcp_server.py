@@ -53,9 +53,15 @@ def get_resource(path: str, query_json: str = "{}") -> str:
         raise ValueError("query_json must be a JSON object.")
     url = urljoin(_base_url(), path.lstrip("/"))
     with httpx.Client(timeout=30.0) as client:
-        resp = client.get(url, headers=_headers(), params=query)
-        resp.raise_for_status()
-        return resp.text
+        try:
+            resp = client.get(url, headers=_headers(), params=query)
+            resp.raise_for_status()
+            return resp.text
+        except httpx.HTTPStatusError as exc:
+            raise RuntimeError(
+                f"GET failed for {url} with params={json.dumps(query, ensure_ascii=False)}: "
+                f"status={exc.response.status_code}, body={exc.response.text[:500]}"
+            ) from exc
 
 
 @mcp.tool()
@@ -71,9 +77,15 @@ def post_action(path: str, payload_json: str = "{}") -> str:
         raise ValueError("payload_json must be a JSON object.")
     url = urljoin(_base_url(), path.lstrip("/"))
     with httpx.Client(timeout=30.0) as client:
-        resp = client.post(url, headers=_headers(), json=payload)
-        resp.raise_for_status()
-        return resp.text
+        try:
+            resp = client.post(url, headers=_headers(), json=payload)
+            resp.raise_for_status()
+            return resp.text
+        except httpx.HTTPStatusError as exc:
+            raise RuntimeError(
+                f"POST failed for {url} with payload={json.dumps(payload, ensure_ascii=False)}: "
+                f"status={exc.response.status_code}, body={exc.response.text[:500]}"
+            ) from exc
 
 
 @mcp.tool()
@@ -91,4 +103,12 @@ def health_check() -> str:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    try:
+        _base_url()
+        mcp.run()
+    except ValueError as exc:
+        raise SystemExit(
+            f"{exc}\n"
+            "Please set BUSINESS_API_BASE_URL and optionally BUSINESS_API_TOKEN "
+            "before starting this MCP server."
+        ) from exc
